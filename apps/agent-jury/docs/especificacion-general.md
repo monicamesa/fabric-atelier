@@ -94,24 +94,26 @@ El admin exporta las preguntas aprobadas de un agente a un CSV con columnas `que
 
 ## 7. Modelo de datos (base de datos de la app)
 
-Patrón general: **registros de solo inserción con identidad verificada + estado calculado**. Las políticas garantizan que nadie inserta en nombre de otro (`claims.sub.eq(item.user_id)`); la validez de cada voto (rol, dominio, no autoaprobación) se calcula al derivar el estado. Así se respetan las limitaciones de `@role` sin perder garantías.
+Patrón general: **registros de solo inserción con identidad verificada + estado calculado**. Las políticas garantizan que nadie inserta en nombre de otro (`claims.sub.eq(item.authorUserId)` y equivalentes); la validez de cada voto (rol, dominio, no autoaprobación) se calcula al derivar el estado. Así se respetan las limitaciones de `@role` sin perder garantías.
 
 Convenciones de Rayfin a respetar:
 - Clave primaria siempre `id` UUID; sin claves compuestas.
 - Todo campo de texto con `max` explícito (sin `max` genera `NVARCHAR(MAX)` y puede romper la generación de metadatos GraphQL).
-- Relaciones con `@one()` / `@many()` y claves foráneas `{propiedad}_id`. Sin muchos a muchos.
-- La identidad del usuario se guarda en un campo `*_user_id` de texto rellenado desde `claims.sub` (no se puede relacionar con la entidad de sistema `USER`).
+- Nombres de campo en camelCase (`createdAt`, `judgeVerdict`, `authorUserId`), salvo las claves foráneas de relaciones.
+- Relaciones con `@one()` / `@many()` y claves foráneas con el formato `{propiedad}_id` que exige Rayfin (`case_id`, `testimony_id`). Sin muchos a muchos.
+- La identidad del usuario se guarda en un campo de texto `*UserId` (max 255) rellenado desde `claims.sub`. No es una clave foránea: no se puede relacionar con la entidad de sistema `USER`.
+- Las claves foráneas son texto con max 36. Los valores cerrados usan `@set()`.
 
 | Entidad | Campos principales | Permisos |
 |---|---|---|
 | `Domain` | `name` | Lectura: autenticados. Escritura: admin (ver nota) |
 | `Juror` | `email`, `domain_id`, `role` (`expert` · `approver` · `admin`), `active` | Lectura: autenticados. Escritura: admin (ver nota) |
-| `Agent` | `name`, `workspace_id`, `item_id`, `domain_id`, `active` | Lectura: autenticados. Escritura: admin (ver nota) |
-| `Case` | `agent_id`, `text` (max 1000), `category`, `tags`, `author_user_id`, `dismissed` | Crear: autenticados con `claims.sub.eq(item.author_user_id)`. Leer: autenticados. Sin actualizar ni borrar |
-| `Testimony` | `case_id`, `answer` (max 2000), `definition` (max 1000), `author_user_id`, `author_email` | Crear: igual que `Case`. Leer: autenticados. Sin actualizar ni borrar |
-| `Vote` | `testimony_id`, `value` (`for` · `against`), `comment` (max 1000), `voter_user_id`, `voter_email` | Crear: `claims.sub.eq(item.voter_user_id)`. Leer: autenticados. Sin actualizar ni borrar |
-| `Hearing` | `agent_id`, `stage`, `launched_by_user_id`, `job_instance_id`, `evaluation_id`, `status`, `case_count` | Crear y actualizar: solo desde la Function |
-| `Appeal` | `hearing_id`, `case_id`, `judge_verdict`, `human_verdict` (`correct` · `incorrect` · `ambiguous`), `reason`, `comment` (max 1000), `reviewer_user_id` | Crear: `claims.sub.eq(item.reviewer_user_id)`. Leer: autenticados. Sin actualizar ni borrar |
+| `Agent` | `name`, `workspaceId`, `itemId`, `domain_id`, `active` | Lectura: autenticados. Escritura: admin (ver nota) |
+| `Case` | `agent_id`, `text` (max 1000), `category`, `tags`, `authorUserId`, `dismissed`, `createdAt` | Crear: autenticados con `claims.sub.eq(item.authorUserId)`. Leer: autenticados. Sin actualizar ni borrar |
+| `Testimony` | `case_id`, `answer` (max 2000), `definition` (max 1000), `authorUserId`, `authorEmail`, `createdAt` | Crear: igual que `Case`. Leer: autenticados. Sin actualizar ni borrar |
+| `Vote` | `testimony_id`, `value` (`for` · `against`), `comment` (max 1000), `voterUserId`, `voterEmail`, `createdAt` | Crear: `claims.sub.eq(item.voterUserId)`. Leer: autenticados. Sin actualizar ni borrar |
+| `Hearing` | `agent_id`, `stage`, `launchedByUserId`, `jobInstanceId`, `evaluationId`, `status`, `caseCount`, `createdAt` | Crear y actualizar: solo desde la Function |
+| `Appeal` | `hearing_id`, `case_id`, `judgeVerdict`, `humanVerdict` (`correct` · `incorrect` · `ambiguous`), `reason`, `comment` (max 1000), `reviewerUserId`, `createdAt` | Crear: `claims.sub.eq(item.reviewerUserId)`. Leer: autenticados. Sin actualizar ni borrar |
 
 **Nota sobre la escritura de admin:** las políticas no permiten comprobar pertenencia a una lista. Para el MVP, `Domain`, `Juror` y `Agent` se escriben a través de Functions que comprueban que el llamante figura como `admin` en `Juror` antes de escribir (usando `ctx.getDataClient()`, que conserva la identidad del llamante). El primer admin se siembra directamente en la base de datos.
 
@@ -138,7 +140,7 @@ Convenciones de Rayfin a respetar:
 Decisiones:
 - **Plantilla:** Data App de Rayfin (framework de visuales y validación con Playwright). Activar datos en `rayfin.yml`.
 - **Lectura de resultados:** connector `fabric-sqlanalytics` sobre `jury_lh`. Con CLI 1.36.2 usa por defecto la identidad de la app; acceso protegido con `@role` en las entidades del connector.
-- **Lanzar evaluaciones:** Function con *audience* `Fabric` que llama a *Run On Demand Item Job* del notebook. Límite de 240 s por ejecución de Function: solo lanza el job y devuelve el `job_instance_id`; el seguimiento del estado se hace por consulta posterior.
+- **Lanzar evaluaciones:** Function con *audience* `Fabric` que llama a *Run On Demand Item Job* del notebook. Límite de 240 s por ejecución de Function: solo lanza el job y devuelve el `jobInstanceId`; el seguimiento del estado se hace por consulta posterior.
 - **Región:** app, Lakehouse, notebooks y capacidad en la misma región (las conexiones al endpoint SQL entre regiones no están soportadas). Región con Fabric Apps disponible.
 
 ## 9. Pantallas

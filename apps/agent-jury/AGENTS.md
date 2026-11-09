@@ -165,22 +165,23 @@ These rules come from [docs/especificacion-general.md](docs/especificacion-gener
 
 10. Every entity has a UUID primary key named `id`; no composite keys.
 11. Every text field has an explicit `max`. Without it Rayfin generates `NVARCHAR(MAX)`, which can break GraphQL metadata generation.
-12. Model relations with `@one()` / `@many()` and `{property}_id` foreign keys. No many-to-many relations.
-13. Store user identity in a text `*_user_id` field filled from `claims.sub`. Do not relate to the system `USER` entity.
+12. Model relations with `@one()` / `@many()` and `{property}_id` foreign keys (text, max 36), the format Rayfin requires. No many-to-many relations.
+13. Store user identity in a text `*UserId` field (max 255) filled from `claims.sub`. It is not a foreign key: do not relate to the system `USER` entity.
+14. Name every other field in camelCase (`createdAt`, `judgeVerdict`, `humanVerdict`, `authorUserId`). Only relation foreign keys use `{property}_id` (`case_id`, `testimony_id`, `hearing_id`). Use `@set()` for closed value lists.
 
 ### Business rules and security
 
-14. `Case`, `Testimony`, `Vote` and `Appeal` are insert-only: no update or delete. Their policies require `claims.sub.eq(item.<field>_user_id)` so nobody inserts on behalf of someone else.
-15. Votes are immutable; a juror's latest vote counts (R1). An author's vote on their own testimony does not count (R2).
-16. Consensus (R3): at least `N` valid votes in favour from the domain (default `N = 1`), at least one from an approver, and no current vote against from an approver. A case is disputed (R4) when two or more testimonies have votes in favour, or one testimony has approver votes both for and against.
-17. A case's state is computed, never written by the client (R6). The logic lives in a single shared module with tests. The frontend uses it for display; the notebook or Function uses it for anything authoritative.
-18. Only ruled cases enter a hearing or the export, with the ruled testimony as the expected answer (R5).
-19. `Domain`, `Juror` and `Agent` are written only through Functions that check the caller is an `admin` juror, using `ctx.getDataClient()`.
-20. No token leaves a Function. The client is not an authorization boundary: enforce every restriction with `@role`, policies and Functions.
-21. The Function that launches a hearing only starts the notebook job and returns `job_instance_id` (240-second Function limit). Status is checked with later queries.
-22. Nothing is ever deleted: every vote, testimony and appeal keeps its author and date.
+15. `Case`, `Testimony`, `Vote` and `Appeal` are insert-only: no update or delete. Their policies require `claims.sub.eq(item.<role>UserId)` (for example `authorUserId`, `voterUserId`) so nobody inserts on behalf of someone else.
+16. Votes are immutable; a juror's latest vote counts (R1). An author's vote on their own testimony does not count (R2).
+17. Consensus (R3): at least `N` valid votes in favour from the domain (default `N = 1`), at least one from an approver, and no current vote against from an approver. A case is disputed (R4) when two or more testimonies have votes in favour, or one testimony has approver votes both for and against.
+18. A case's state is computed, never written by the client (R6). The logic lives in a single shared module with tests. The frontend uses it for display; the notebook or Function uses it for anything authoritative.
+19. Only ruled cases enter a hearing or the export, with the ruled testimony as the expected answer (R5).
+20. `Domain`, `Juror` and `Agent` are written only through Functions that check the caller is an `admin` juror, using `ctx.getDataClient()`.
+21. No token leaves a Function. The client is not an authorization boundary: enforce every restriction with `@role`, policies and Functions.
+22. The Function that launches a hearing only starts the notebook job and returns `jobInstanceId` (240-second Function limit). Status is checked with later queries.
+23. Nothing is ever deleted: every vote, testimony and appeal keeps its author and date.
 
 ### UI
 
-23. Show useful empty and error states. Never replace a failed query with mock or simulated data.
-24. Before launching a hearing, show a cost estimate (about 50 seconds of agent time per case plus the judge's LLM usage) and allow evaluating a subset of cases.
+24. Show useful empty and error states. Never replace a failed query with mock or simulated data.
+25. Before launching a hearing, show a cost estimate (about 50 seconds of agent time per case plus the judge's LLM usage) and allow evaluating a subset of cases.
