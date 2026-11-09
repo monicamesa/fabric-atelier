@@ -94,6 +94,8 @@ const VOTE_FIELDS = ["id", "testimony_id", "value", "comment", "voterUserId", "v
 const DISMISSAL_FIELDS = ["id", "case_id", "reason", "dismissedByUserId", "dismissedByEmail", "createdAt"] as const;
 // Keeps `in` filters to a modest size per request.
 const ID_CHUNK = 50;
+// Whole-table reads: each request costs a fixed ~20 s on the test backend, so fewer, larger pages.
+const BULK_PAGE_SIZE = 1000;
 
 function chunks<T>(items: readonly T[]): T[][] {
     const out: T[][] = [];
@@ -106,34 +108,25 @@ export async function getCase(client: DataClient, caseId: string): Promise<CaseR
     return rows?.[0];
 }
 
-export async function listTestimoniesForCases(client: DataClient, caseIds: readonly string[]): Promise<TestimonyRow[]> {
-    const pages = await Promise.all(
-        chunks(caseIds).map((ids) =>
-            readAllPages((after) => {
-                const query = client.data.Testimony.select([...TESTIMONY_FIELDS])
-                    .where({ case_id: { in: ids } })
-                    .orderBy({ createdAt: "asc" })
-                    .first(PAGE_SIZE);
-                return (after ? query.after(after) : query).executePaginated();
-            }),
-        ),
-    );
-    return pages.flat() as TestimonyRow[];
+export async function listAllTestimonies(client: DataClient): Promise<TestimonyRow[]> {
+    return (await readAllPages((after) => {
+        const query = client.data.Testimony.select([...TESTIMONY_FIELDS]).orderBy({ createdAt: "asc" }).first(BULK_PAGE_SIZE);
+        return (after ? query.after(after) : query).executePaginated();
+    })) as TestimonyRow[];
 }
 
-export async function listVotesForTestimonies(client: DataClient, testimonyIds: readonly string[]): Promise<VoteRow[]> {
-    const pages = await Promise.all(
-        chunks(testimonyIds).map((ids) =>
-            readAllPages((after) => {
-                const query = client.data.Vote.select([...VOTE_FIELDS])
-                    .where({ testimony_id: { in: ids } })
-                    .orderBy({ createdAt: "asc" })
-                    .first(PAGE_SIZE);
-                return (after ? query.after(after) : query).executePaginated();
-            }),
-        ),
-    );
-    return pages.flat() as VoteRow[];
+export async function listAllVotes(client: DataClient): Promise<VoteRow[]> {
+    return (await readAllPages((after) => {
+        const query = client.data.Vote.select([...VOTE_FIELDS]).orderBy({ createdAt: "asc" }).first(BULK_PAGE_SIZE);
+        return (after ? query.after(after) : query).executePaginated();
+    })) as VoteRow[];
+}
+
+export async function listAllCaseDismissals(client: DataClient): Promise<CaseDismissalRow[]> {
+    return (await readAllPages((after) => {
+        const query = client.data.CaseDismissal.select([...DISMISSAL_FIELDS]).orderBy({ createdAt: "asc" }).first(BULK_PAGE_SIZE);
+        return (after ? query.after(after) : query).executePaginated();
+    })) as CaseDismissalRow[];
 }
 
 export function listCasesByAgent(client: DataClient, agentId: string): Promise<CaseRow[]> {

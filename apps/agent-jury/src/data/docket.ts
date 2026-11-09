@@ -11,10 +11,12 @@ import {
 } from "@/rules/case-validity";
 import {
     getCase,
+    listAllCaseDismissals,
+    listAllTestimonies,
+    listAllVotes,
     listCaseDismissals,
     listCasesByAgent,
-    listTestimoniesForCases,
-    listVotesForTestimonies,
+    listTestimonies,
     type CaseDismissalRow,
     type CaseRow,
     type TestimonyRow,
@@ -100,26 +102,41 @@ export function buildDocket(raw: DocketRecords, jurors: readonly JurorRecord[], 
     return { cases, categories: categories.sort((a, b) => a.localeCompare(b)), ticker };
 }
 
-/** Reads every case of an agent with its testimonies, votes and dismissals. */
-export async function loadDocketRecords(client: DataClient, agentId: string): Promise<DocketRecords> {
-    const cases = await listCasesByAgent(client, agentId);
-    const caseIds = cases.map((record) => record.id);
-    const [testimonies, dismissals] = await Promise.all([listTestimoniesForCases(client, caseIds), listCaseDismissals(client, caseIds)]);
-    const votes = await listVotesForTestimonies(
-        client,
-        testimonies.map((testimony) => testimony.id),
-    );
-    return { cases, testimonies, votes, dismissals };
+/** Keeps only the testimonies, votes and dismissals that belong to `cases`. */
+export function scopeToCases(cases: CaseRow[], all: Omit<DocketRecords, "cases">): DocketRecords {
+    const caseIds = new Set(cases.map((record) => record.id));
+    const testimonies = all.testimonies.filter((testimony) => caseIds.has(testimony.case_id));
+    const testimonyIds = new Set(testimonies.map((testimony) => testimony.id));
+    return {
+        cases,
+        testimonies,
+        votes: all.votes.filter((vote) => testimonyIds.has(vote.testimony_id)),
+        dismissals: all.dismissals.filter((dismissal) => caseIds.has(dismissal.case_id)),
+    };
 }
 
-/** Reads one case with its testimonies, votes and dismissals; `undefined` when the case doesn't exist. */
+/**
+ * Reads every case of an agent with its testimonies, votes and dismissals in one parallel round.
+ * Testimonies, votes and dismissals are read whole and scoped here: the data API can't filter them
+ * by agent, and chaining id filters cost three sequential round trips.
+ */
+export async function loadDocketRecords(client: DataClient, agentId: string): Promise<DocketRecords> {
+    const [cases, testimonies, votes, dismissals] = await Promise.all([
+        listCasesByAgent(client, agentId),
+        listAllTestimonies(client),
+        listAllVotes(client),
+        listAllCaseDismissals(client),
+    ]);
+    return scopeToCases(cases, { testimonies, votes, dismissals });
+}
+
+/** Reads one case with its testimonies, votes and dismissals in one parallel round; `undefined` when the case doesn't exist. */
 export async function loadCaseRecords(client: DataClient, caseId: string): Promise<DocketRecords | undefined> {
-    const record = await getCase(client, caseId);
-    if (!record) return undefined;
-    const [testimonies, dismissals] = await Promise.all([listTestimoniesForCases(client, [caseId]), listCaseDismissals(client, [caseId])]);
-    const votes = await listVotesForTestimonies(
-        client,
-        testimonies.map((testimony) => testimony.id),
-    );
-    return { cases: [record], testimonies, votes, dismissals };
+    const [record, testimonies, votes, dismissals] = await Promise.all([
+        getCase(client, caseId),
+        listTestimonies(client, caseId),
+        listAllVotes(client),
+        listCaseDismissals(client, [caseId]),
+    ]);
+    return record ? scopeToCases([record], { testimonies, votes, dismissals }) : undefined;
 }

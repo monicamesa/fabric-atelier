@@ -27,8 +27,6 @@ function connect(): { client?: AppRayfinClient; error?: unknown } {
     }
 }
 
-const EMPTY_JURORS: JurorRow[] = [];
-
 /** Loads one agent's docket; keyed by agent so switching agents starts a fresh load. */
 function WithDocket({
     client,
@@ -39,7 +37,7 @@ function WithDocket({
 }: {
     client: AppRayfinClient;
     agentId: string;
-    jurors: JurorRow[];
+    jurors?: JurorRow[];
     viewer: Viewer;
     children: (docket: DocketState) => ReactNode;
 }) {
@@ -70,7 +68,6 @@ function App() {
     const jury = useAsync(() => (client ? listJurors(client) : Promise.reject(connectError)));
     const agentList = useAsync(() => (client ? listAgents(client) : Promise.reject(connectError)));
 
-    const jurors = jury.data ?? EMPTY_JURORS;
     const session = client?.auth.getSession();
     const sessionUserId = session?.isAuthenticated ? session.user?.id : undefined;
     const sessionEmail = session?.isAuthenticated ? session.user?.email : undefined;
@@ -128,11 +125,10 @@ function App() {
             />,
         );
     }
-    if (!jury.data || !agentList.data) return layout(<Deliberating />);
-
     if (route.page === "case") {
-        return layout(<CaseDetail key={route.caseId} client={client} caseId={route.caseId} agents={agentList.data} jurors={jurors} viewer={viewer} />);
+        return layout(<CaseDetail key={route.caseId} client={client} caseId={route.caseId} agents={agentList.data} jurors={jury.data} viewer={viewer} />);
     }
+    const ready = Boolean(jury.data && agentList.data);
 
     const renderPage = (docket?: DocketState) => {
         if (route.page === "cases" && agent && docket) {
@@ -173,10 +169,16 @@ function App() {
         );
     };
 
-    if (!agent) return layout(renderPage());
+    // With the agent in the URL, the docket loads in parallel with the jury and agent lists.
+    const docketAgentId = agent?.id ?? (agentList.data ? undefined : routeAgentId);
+    if (!docketAgentId) return layout(ready ? renderPage() : <Deliberating />);
     return (
-        <WithDocket key={agent.id} client={client} agentId={agent.id} jurors={jurors} viewer={viewer}>
-            {(docket) => layout(renderPage(docket), route.page === "home" ? <Ticker items={tickerItems(docket.data, t)} /> : undefined)}
+        <WithDocket key={docketAgentId} client={client} agentId={docketAgentId} jurors={jury.data} viewer={viewer}>
+            {(docket) =>
+                ready && agent
+                    ? layout(renderPage(docket), route.page === "home" ? <Ticker items={tickerItems(docket.data, t)} /> : undefined)
+                    : layout(<Deliberating />)
+            }
         </WithDocket>
     );
 }

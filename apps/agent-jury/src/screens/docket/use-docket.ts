@@ -7,9 +7,12 @@ import type { Me } from "@/rules/case-validity";
 
 export type DocketState = AsyncState<Docket> & { reload: () => void };
 
-/** Records for one agent, turned into states with the shared rules. Remount (key by agent) to switch agents. */
-export function useDocket(client: AppRayfinClient, agentId: string, jurors: readonly JurorRow[], me: Me | undefined): DocketState {
+/** Records for one agent, turned into states with the shared rules once the jury list is in. Remount (key by agent) to switch agents. */
+export function useDocket(client: AppRayfinClient, agentId: string, jurors: readonly JurorRow[] | undefined, me: Me | undefined): DocketState {
     const records = useAsync(() => loadDocketRecords(client, agentId));
-    const data = useMemo(() => (records.data ? buildDocket(records.data, jurors, me, new Date()) : undefined), [records.data, jurors, me]);
+    const data = useMemo(
+        () => (records.data && jurors ? buildDocket(records.data, jurors, me, new Date()) : undefined),
+        [records.data, jurors, me],
+    );
     return { ...records, data } as DocketState;
 }

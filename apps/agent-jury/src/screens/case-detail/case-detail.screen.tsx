@@ -25,8 +25,8 @@ import { TestimonyCard } from "./testimony-card";
 interface CaseDetailProps {
     client: AppRayfinClient;
     caseId: string;
-    agents: readonly AgentRow[];
-    jurors: readonly JurorRow[];
+    agents?: readonly AgentRow[];
+    jurors?: readonly JurorRow[];
     viewer: Viewer;
 }
 
@@ -42,13 +42,13 @@ export function CaseDetail({ client, caseId, agents, jurors, viewer }: CaseDetai
     const [reasonError, setReasonError] = useState<string>();
 
     const view = useMemo(() => {
-        if (!records.data) return undefined;
+        if (!records.data || !jurors) return undefined;
         const now = new Date();
         const docket = buildDocket(records.data, jurors, viewer.me, now);
         return { now, item: docket.cases[0] };
     }, [records.data, jurors, viewer.me]);
 
-    if (records.status === "loading" && !records.data) {
+    if ((records.status === "loading" && !records.data) || (records.status !== "error" && (!jurors || !agents))) {
         return (
             <Deliberating>
                 <Skeleton className="h-14 w-3/4" />
@@ -62,7 +62,7 @@ export function CaseDetail({ client, caseId, agents, jurors, viewer }: CaseDetai
     if (records.status === "error" && !records.data) {
         return <Objection message={t("errors.load")} reassurance={t("caseDetail.safe")} technicalDetails={String(records.error)} onRetry={records.reload} />;
     }
-    if (!view) {
+    if (!view || !jurors) {
         return (
             <EmptyState
                 message={t("caseDetail.notFound")}
@@ -77,7 +77,7 @@ export function CaseDetail({ client, caseId, agents, jurors, viewer }: CaseDetai
 
     const { item, now } = view;
     const { record, analysis } = item;
-    const agent = agents.find((row) => row.id === record.agent_id);
+    const agent = agents?.find((row) => row.id === record.agent_id);
     const letters = new Map(analysis.tallies.map((tally, index) => [tally.testimony.id, answerLetter(index)]));
     const testimonyById = new Map(item.testimonies.map((testimony) => [testimony.id, testimony]));
     const open = analysis.state !== "dismissed";

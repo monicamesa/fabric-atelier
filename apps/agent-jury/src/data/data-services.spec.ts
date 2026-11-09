@@ -7,8 +7,8 @@ import {
     createVote,
     listCaseDismissals,
     listCasesByAgent,
-    listVotesForTestimonies,
 } from "./cases.service";
+import { loadDocketRecords } from "./docket";
 import { listJurors, readAuthorActivity } from "./directory.service";
 import { NotSignedInError } from "./session-author";
 import { readAllPages } from "./pagination";
@@ -164,10 +164,26 @@ describe("create services", () => {
 
 describe("batched reads", () => {
     it("splits long id lists into `in` filters of 50", async () => {
-        const ids = Array.from({ length: 120 }, (_, index) => `t${index}`);
-        const { client, queries } = fakeClient({ Vote: [0, 1, 2].map(() => ({ items: [{ id: "v" }], hasNextPage: false })) });
-        expect(await listVotesForTestimonies(client, ids)).toHaveLength(3);
-        const sizes = queries.map((query) => (query.calls.find(([name]) => name === "where")![1] as { testimony_id: { in: string[] } }).testimony_id.in.length);
+        const ids = Array.from({ length: 120 }, (_, index) => `c${index}`);
+        const { client, queries } = fakeClient({ CaseDismissal: [0, 1, 2].map(() => ({ items: [{ id: "d" }], hasNextPage: false })) });
+        expect(await listCaseDismissals(client, ids)).toHaveLength(3);
+        const sizes = queries.map((query) => (query.calls.find(([name]) => name === "where")![1] as { case_id: { in: string[] } }).case_id.in.length);
         expect(sizes).toEqual([50, 50, 20]);
+    });
+
+    it("loads a docket in one parallel round and keeps only the agent's records", async () => {
+        const { client, queries } = fakeClient({
+            Case: [{ items: [{ id: "c1", agent_id: "agent-1" }], hasNextPage: false }],
+            Testimony: [{ items: [{ id: "t1", case_id: "c1" }, { id: "t9", case_id: "other-case" }], hasNextPage: false }],
+            Vote: [{ items: [{ id: "v1", testimony_id: "t1" }, { id: "v9", testimony_id: "t9" }], hasNextPage: false }],
+            CaseDismissal: [{ items: [{ id: "d9", case_id: "other-case" }], hasNextPage: false }],
+        });
+        const loading = loadDocketRecords(client, "agent-1");
+        // All four queries start before any of them answers.
+        expect(queries.map((query) => query.entity).sort()).toEqual(["Case", "CaseDismissal", "Testimony", "Vote"]);
+        const records = await loading;
+        expect(records.testimonies.map((row) => row.id)).toEqual(["t1"]);
+        expect(records.votes.map((row) => row.id)).toEqual(["v1"]);
+        expect(records.dismissals).toEqual([]);
     });
 });
