@@ -17,8 +17,8 @@
  */
 
 export type AppFunctionsSchema = {
-  helloWorld: {
-    input: { firstName: string; lastName: string };
-    output: string;
+  whoAmI: {
+    input: { expectedSub: string; expectedEmail: string };
+    output: { claimNames: string[]; subMatches: boolean; emailMatches: boolean };
   };
 };

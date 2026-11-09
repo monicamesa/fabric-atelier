@@ -2,10 +2,10 @@
   "schemaVersion": "2.0",
   "functions": [
     {
-      "functionName": "helloWorld",
+      "functionName": "whoAmI",
       "delegateParameters": [
         {
-          "name": "firstName",
+          "name": "expectedSub",
           "type": "string",
           "optional": false,
           "hasDefault": false,
@@ -13,11 +13,19 @@
           "isFabricParameter": false
         },
         {
-          "name": "lastName",
+          "name": "expectedEmail",
           "type": "string",
           "optional": false,
           "hasDefault": false,
           "position": 1,
+          "isFabricParameter": false
+        },
+        {
+          "name": "ctx",
+          "type": "RayfinContext<AgentJurySchema>",
+          "optional": false,
+          "hasDefault": false,
+          "position": 2,
           "isFabricParameter": false
         }
       ],
