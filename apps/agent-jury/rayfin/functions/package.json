@@ -10,10 +10,12 @@
     "clean": "rimraf dist"
   },
   "dependencies": {
-    "@microsoft/fabric-user-data-functions": "1.36.2"
+    "@microsoft/fabric-user-data-functions": "1.36.2",
+    "mssql": "12.7.14"
   },
   "devDependencies": {
-    "typescript": "^5.8.0",
-    "rimraf": "^6.0.0"
+    "@types/mssql": "12.3.0",
+    "rimraf": "^6.0.0",
+    "typescript": "^5.8.0"
   }
 }

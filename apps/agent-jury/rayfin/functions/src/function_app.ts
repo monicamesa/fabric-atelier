@@ -1,6 +1,7 @@
-import { UserDataFunctions, type RayfinContext } from '@microsoft/fabric-user-data-functions';
+import { UserDataFunctions, AudienceType, type RayfinContext } from '@microsoft/fabric-user-data-functions';
 import type { AgentJurySchema } from '../../data/schema.js';
 import { readTokenClaims } from './caller-identity.js';
+import { runSqlSpike, type SpikeSqlResult } from './spike-sql.js';
 
 const udf = new UserDataFunctions();
 
@@ -22,6 +23,19 @@ udf.func(
       subMatches: typeof claims.sub === 'string' && claims.sub === expectedSub,
       emailMatches: email !== '' && email.toLowerCase() === expectedEmail.toLowerCase(),
     };
+  },
+  [],
+);
+
+// Spike S-A (T-SQL): writes and reads a Juror with the app identity, never with the caller's data client.
+udf.func(
+  'spikeSqlJuror',
+  async (ctx: RayfinContext<AgentJurySchema, AudienceType.Sql>): Promise<SpikeSqlResult> => {
+    return runSqlSpike({
+      server: ctx.Secrets.APP_SQL_SERVER,
+      database: ctx.Secrets.APP_SQL_DATABASE,
+      token: ctx.Tokens.Sql,
+    });
   },
   [],
 );

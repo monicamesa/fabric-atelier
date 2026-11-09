@@ -21,4 +21,8 @@ export type AppFunctionsSchema = {
     input: { expectedSub: string; expectedEmail: string };
     output: { claimNames: string[]; subMatches: boolean; emailMatches: boolean };
   };
+  spikeSqlJuror: {
+    input: Record<string, never>;
+    output: { jurorId: string; jurorEmail: string; readBackMatches: boolean; exampleAgentReady: boolean; columns: { [k: string]: string[] }; error?: undefined | string };
+  };
 };
