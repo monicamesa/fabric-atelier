@@ -10,6 +10,7 @@ import { describeClerkError } from "@/data/clerk-errors";
 import { listAgents, readAuthorActivity, type JurorRow } from "@/data/directory.service";
 import { useAsync, type AsyncState } from "@/hooks/use-async";
 import { useClerkAction } from "@/hooks/use-clerk-action";
+import { useMediaQuery } from "@/hooks/use-media-query";
 import type { AppRayfinClient } from "@/lib/rayfin-client";
 import { AdminLogPanel, LatestChanges, type LogState } from "./admin-log";
 import { AgentsPanel } from "./agents-panel";
@@ -94,6 +95,7 @@ function AdminDesk({ client, jury, jurors, me }: { client: AppRayfinClient; jury
     const [tab, setTab] = useState<Tab>("jurors");
     const [notice, setNotice] = useState<string | null>(null);
     const [showChecks, setShowChecks] = useState(false);
+    const isPhone = useMediaQuery("(max-width: 639px)");
 
     const agents = useAsync(() => listAgents(client));
     const activity = useAsync(() => readAuthorActivity(client));
@@ -140,7 +142,7 @@ function AdminDesk({ client, jury, jurors, me }: { client: AppRayfinClient; jury
                 tabs={[
                     { id: "jurors", label: t("clerk.tabs.jurors", { count: jurors.length }) },
                     { id: "agents", label: agents.data ? t("clerk.tabs.agents", { count: agents.data.length }) : t("clerk.tabs.agentsPlain") },
-                    { id: "log", label: t("clerk.tabs.log") },
+                    { id: "log", label: t(isPhone ? "clerk.tabs.logShort" : "clerk.tabs.log") },
                 ]}
             />
             <ClerkNotice message={notice} />

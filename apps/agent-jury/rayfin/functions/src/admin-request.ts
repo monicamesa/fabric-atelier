@@ -36,7 +36,12 @@ const UNIQUE_VIOLATION = new Set([2601, 2627]);
 const done = (detail: string): Outcome => ({ code: 200, reason: 'ok', detail });
 const notFound = (detail: string): Outcome => ({ code: 404, reason: 'not_found', detail });
 
-async function runCommand(transaction: sql.Transaction, command: ClerkCommand): Promise<Outcome> {
+export interface AdminRequestOptions {
+  /** Log rows processed before this moment count as automated checks (LEGACY_CHECK_CUTOFF_UTC). */
+  legacyCheckCutoff?: Date;
+}
+
+async function runCommand(transaction: sql.Transaction, command: ClerkCommand, options: AdminRequestOptions): Promise<Outcome> {
   const request = () => new sql.Request(transaction);
   switch (command.action) {
     case 'swearInJuror': {
@@ -71,6 +76,14 @@ async function runCommand(transaction: sql.Transaction, command: ClerkCommand): 
         .query(`UPDATE dbo.[Jurors] SET active = @active WHERE id = @id`);
       return updated.rowsAffected[0] ? done(command.active ? 'Juror reinstated.' : 'Juror deactivated.') : notFound('Unknown juror.');
     }
+    case 'editJurorDetails': {
+      const updated = await request()
+        .input('id', sql.UniqueIdentifier, command.jurorId)
+        .input('displayName', sql.NVarChar(100), command.displayName ?? null)
+        .input('team', sql.NVarChar(100), command.team ?? null)
+        .query(`UPDATE dbo.[Jurors] SET displayName = @displayName, team = @team WHERE id = @id`);
+      return updated.rowsAffected[0] ? done('Details updated.') : notFound('Unknown juror.');
+    }
     case 'registerAgent': {
       const existing = await request()
         .input('workspaceId', sql.NVarChar(36), command.workspaceId)
@@ -101,26 +114,43 @@ async function runCommand(transaction: sql.Transaction, command: ClerkCommand): 
     }
     case 'readAdminLog': {
       // Successful log reads are recorded but not listed, so opening the log doesn't flood it.
+      // automatedCheck: marked by the check scripts (or older than the optional cutoff) and sent by an active admin,
+      // so nobody else can hide their own attempts by adding the marker.
       const rows = await request()
         .input('limit', sql.Int, command.limit)
+        .input('cutoff', sql.DateTime2, options.legacyCheckCutoff ?? null)
         .query<Omit<AdminLogEntry, 'processedAt'> & { processedAt: Date }>(
           `SELECT TOP (@limit)
              LOWER(CONVERT(NVARCHAR(36), r.requestId)) AS requestId,
              COALESCE(q.action, N'') AS action,
              COALESCE(q.payload, N'{}') AS payload,
-             r.requesterEmail, r.outcome, COALESCE(r.reason, N'') AS reason, r.detail, r.processedAt
+             r.requesterEmail, r.outcome, COALESCE(r.reason, N'') AS reason, r.detail, r.processedAt,
+             CAST(CASE WHEN EXISTS (
+                    SELECT 1 FROM dbo.[Jurors] AS j
+                    WHERE LOWER(LTRIM(RTRIM(j.email))) = LOWER(LTRIM(RTRIM(r.requesterEmail))) AND j.role = N'admin' AND j.active = 1)
+                  AND (JSON_VALUE(CASE WHEN ISJSON(q.payload) = 1 THEN q.payload END, '$.source') = N'check'
+                       OR (@cutoff IS NOT NULL AND r.processedAt < @cutoff))
+                  THEN 1 ELSE 0 END AS BIT) AS automatedCheck
            FROM dbo.[AdminRequestResults] AS r
            LEFT JOIN dbo.[AdminRequests] AS q ON q.id = r.requestId
            WHERE NOT (q.action = N'readAdminLog' AND r.outcome = N'done')
            ORDER BY r.processedAt DESC`,
         );
-      const log = rows.recordset.map((row) => ({ ...row, processedAt: new Date(row.processedAt).toISOString() }));
+      const log = rows.recordset.map((row) => ({
+        ...row,
+        automatedCheck: Boolean(row.automatedCheck),
+        processedAt: new Date(row.processedAt).toISOString(),
+      }));
       return { ...done(`${log.length} entries.`), log };
     }
   }
 }
 
-export async function executeAdminRequest(pool: sql.ConnectionPool, requestId: string): Promise<ClerkResult> {
+export async function executeAdminRequest(
+  pool: sql.ConnectionPool,
+  requestId: string,
+  options: AdminRequestOptions = {},
+): Promise<ClerkResult> {
   const lookup = await pool
     .request()
     .input('id', sql.UniqueIdentifier, requestId)
@@ -158,7 +188,7 @@ export async function executeAdminRequest(pool: sql.ConnectionPool, requestId: s
   await transaction.begin();
   try {
     if (command) {
-      outcome = await runCommand(transaction, command);
+      outcome = await runCommand(transaction, command, options);
     }
     const final = outcome as Outcome;
     // The unique requestId makes the request single-use, whatever the outcome.

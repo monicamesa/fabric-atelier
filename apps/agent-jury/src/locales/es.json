@@ -107,7 +107,8 @@
             "jurors": "Jurados · {{count}}",
             "agents": "Agentes · {{count}}",
             "agentsPlain": "Agentes",
-            "log": "Registro de admin"
+            "log": "Registro de admin",
+            "logShort": "Registro"
         },
         "jurors": {
             "title": "El jurado",
@@ -132,6 +133,9 @@
             "roleFor": "Rol de {{name}}",
             "changeRole": "Cambiar rol",
             "changeRoleNamed": "Cambiar el rol de {{name}}",
+            "editDetails": "Editar datos",
+            "editDetailsNamed": "Editar los datos de {{name}}",
+            "saveDetails": "Guardar datos",
             "cancel": "Cancelar",
             "saveRole": "Guardar rol",
             "deactivate": "Desactivar",
@@ -145,7 +149,8 @@
                 "swornIn": "{{name}} ya forma parte del jurado.",
                 "roleChanged": "{{name}} ahora es {{role}}.",
                 "deactivated": "{{name}} ha sido desactivado.",
-                "reinstated": "{{name}} vuelve al jurado."
+                "reinstated": "{{name}} vuelve al jurado.",
+                "detailsEdited": "Se han actualizado los datos de {{name}}."
             }
         },
         "swearIn": {
@@ -178,6 +183,11 @@
             "cases_one": "{{count}} caso",
             "cases_other": "{{count}} casos",
             "empty": "Todavía no hay agentes. Registra el primero.",
+            "filter": "Mostrar agentes",
+            "activeCount": "Activos · {{count}}",
+            "retiredCount": "Retirados · {{count}}",
+            "emptyActive": "No hay agentes activos. Reactiva uno o registra uno nuevo.",
+            "emptyRetired": "No hay agentes retirados. Los retirados conservan sus casos y aparecen aquí.",
             "done": {
                 "registered": "{{name}} está registrado.",
                 "retired": "{{name}} ha sido retirado.",
@@ -219,6 +229,7 @@
                 "setJurorRole": "{{who}} hizo {{role}} a {{target}}",
                 "deactivateJuror": "{{who}} desactivó a {{target}}",
                 "reinstateJuror": "{{who}} reactivó a {{target}}",
+                "editJurorDetails": "{{who}} editó los datos de {{target}}",
                 "registerAgent": "{{who}} registró el agente {{target}}",
                 "retireAgent": "{{who}} retiró el agente {{target}}",
                 "reinstateAgent": "{{who}} reactivó el agente {{target}}",
@@ -231,6 +242,7 @@
                 "setJurorRole": "{{who}} intentó hacer {{role}} a {{target}}",
                 "deactivateJuror": "{{who}} intentó desactivar a {{target}}",
                 "reinstateJuror": "{{who}} intentó reactivar a {{target}}",
+                "editJurorDetails": "{{who}} intentó editar los datos de {{target}}",
                 "registerAgent": "{{who}} intentó registrar el agente {{target}}",
                 "retireAgent": "{{who}} intentó retirar el agente {{target}}",
                 "reinstateAgent": "{{who}} intentó reactivar el agente {{target}}",

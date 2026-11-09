@@ -2,7 +2,7 @@ import { beforeAll, describe, expect, it } from "vitest";
 import type { AdminLogEntry } from "../../../rayfin/functions/src/clerk-actions";
 import type { AgentRow, JurorRow } from "@/data/directory.service";
 import { i18n, initI18n } from "@/i18n/i18n";
-import { describeLogEntry, isAutomatedCheck, UNMARKED_CHECKS_BEFORE, visibleLogLines } from "./log-entry";
+import { describeLogEntry, visibleLogLines } from "./log-entry";
 
 const jurors: JurorRow[] = [
     { id: "00000000-0000-4000-8000-000000000014", email: "dario.admin@example.com", displayName: null, role: "admin", active: true },
@@ -21,6 +21,7 @@ const entry = (fields: Partial<AdminLogEntry>): AdminLogEntry => ({
     reason: "ok",
     detail: "",
     processedAt: "2026-11-09T10:00:00.000Z",
+    automatedCheck: false,
     ...fields,
 });
 
@@ -51,6 +52,9 @@ describe("describeLogEntry", () => {
         expect(
             describeLogEntry(entry({ action: "setAgentActive", payload: JSON.stringify({ agentId: agents[0].id, active: false }) }), jurors, agents, t).text,
         ).toBe("dario.admin retired the agent Sales agent (example)");
+        expect(
+            describeLogEntry(entry({ action: "editJurorDetails", payload: JSON.stringify({ jurorId: jurors[1].id, team: "Sales" }) }), jurors, agents, t).text,
+        ).toBe("dario.admin edited the details of Ana E.");
     });
 
     it("marks rejected attempts with their reason", () => {
@@ -87,31 +91,25 @@ describe("describeLogEntry", () => {
 
 describe("automated check filter", () => {
     const t = i18n.t.bind(i18n);
-    const AFTER_MARKER = "2026-11-10T09:00:00.000Z";
-    const marked = entry({ requestId: "check", payload: JSON.stringify({ limit: 1, source: "check" }), processedAt: AFTER_MARKER });
-    const real = entry({ requestId: "real", action: "setJurorRole", payload: JSON.stringify({ jurorId: jurors[1].id, role: "approver" }), processedAt: AFTER_MARKER });
+    const check = entry({ requestId: "check", payload: JSON.stringify({ limit: 1, source: "check" }), automatedCheck: true });
+    const real = entry({ requestId: "real", action: "setJurorRole", payload: JSON.stringify({ jurorId: jurors[1].id, role: "approver" }) });
+    // clerkExecute never flags a non-admin's request, even when it carries the marker.
     const intruder = entry({
         requestId: "intruder",
         requesterEmail: "intruder@example.com",
         payload: JSON.stringify({ source: "check" }),
         outcome: "rejected",
         reason: "not_admin",
-        processedAt: AFTER_MARKER,
+        automatedCheck: false,
     });
 
-    it("recognises requests marked by the check scripts and unmarked rows from before the marker", () => {
-        expect(isAutomatedCheck(marked, jurors)).toBe(true);
-        expect(isAutomatedCheck(entry({ processedAt: "2026-11-09T15:11:05.662Z" }), jurors)).toBe(true);
-        expect(isAutomatedCheck(real, jurors)).toBe(false);
-        expect(Date.parse(UNMARKED_CHECKS_BEFORE)).toBeLessThan(Date.parse(AFTER_MARKER));
-    });
-
-    it("never treats a non-admin's request as a check, even if it carries the marker", () => {
-        expect(isAutomatedCheck(intruder, jurors)).toBe(false);
+    it("takes the classification from the server", () => {
+        const [checkLine, realLine, intruderLine] = [check, real, intruder].map((item) => describeLogEntry(item, jurors, agents, t));
+        expect([checkLine.automated, realLine.automated, intruderLine.automated]).toEqual([true, false, false]);
     });
 
     it("hides checks by default and shows everything when asked", () => {
-        const lines = [marked, real, intruder].map((item) => describeLogEntry(item, jurors, agents, t));
+        const lines = [check, real, intruder].map((item) => describeLogEntry(item, jurors, agents, t));
         expect(visibleLogLines(lines, false).map((line) => line.id)).toEqual(["real", "intruder"]);
         expect(visibleLogLines(lines, true).map((line) => line.id)).toEqual(["check", "real", "intruder"]);
     });

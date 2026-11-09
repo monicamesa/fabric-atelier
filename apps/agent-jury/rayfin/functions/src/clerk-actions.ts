@@ -8,6 +8,7 @@ export const CLERK_ACTIONS = [
   'swearInJuror',
   'setJurorRole',
   'setJurorActive',
+  'editJurorDetails',
   'registerAgent',
   'setAgentActive',
   'readAdminLog',
@@ -18,6 +19,8 @@ export type ClerkCommand =
   | { action: 'swearInJuror'; email: string; displayName?: string; team?: string; role: JurorRole }
   | { action: 'setJurorRole'; jurorId: string; role: JurorRole }
   | { action: 'setJurorActive'; jurorId: string; active: boolean }
+  // Empty or missing values clear the field. Allowed on any juror, including yourself.
+  | { action: 'editJurorDetails'; jurorId: string; displayName?: string; team?: string }
   | { action: 'registerAgent'; name: string; workspaceId: string; itemId: string }
   | { action: 'setAgentActive'; agentId: string; active: boolean }
   | { action: 'readAdminLog'; limit: number };
@@ -46,6 +49,8 @@ export interface AdminLogEntry {
   reason: string;
   detail: string;
   processedAt: string;
+  /** Sent by the deployed checks (payload source "check" from an active admin, or before LEGACY_CHECK_CUTOFF_UTC). */
+  automatedCheck: boolean;
 }
 
 export interface ClerkResult {
@@ -149,6 +154,16 @@ export function parseCommand(action: string, payloadText: string): ParseResult {
         return { ok: true, command: { action: 'setJurorRole', jurorId: guid(fields, 'jurorId'), role: role(fields) } };
       case 'setJurorActive':
         return { ok: true, command: { action: 'setJurorActive', jurorId: guid(fields, 'jurorId'), active: flag(fields, 'active') } };
+      case 'editJurorDetails':
+        return {
+          ok: true,
+          command: {
+            action: 'editJurorDetails',
+            jurorId: guid(fields, 'jurorId'),
+            displayName: optionalText(fields, 'displayName', 100),
+            team: optionalText(fields, 'team', 100),
+          },
+        };
       case 'registerAgent':
         return {
           ok: true,
@@ -176,6 +191,14 @@ export function parseCommand(action: string, payloadText: string): ParseResult {
     throw error;
   }
   return { ok: false, reason: 'unknown_action', detail: 'Unknown action.' };
+}
+
+/** Parses LEGACY_CHECK_CUTOFF_UTC; empty, missing or not an ISO UTC timestamp means "no cutoff". */
+export function parseLegacyCheckCutoff(value: string | undefined): Date | undefined {
+  const text = value?.trim();
+  if (!text || !/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(:\d{2}(\.\d+)?)?Z$/.test(text)) return undefined;
+  const date = new Date(text);
+  return Number.isNaN(date.getTime()) ? undefined : date;
 }
 
 /** What an admin may do to a juror row. Admins can't deactivate themselves or drop their own admin role. */

@@ -107,7 +107,8 @@
             "jurors": "Jurors · {{count}}",
             "agents": "Agents · {{count}}",
             "agentsPlain": "Agents",
-            "log": "Admin log"
+            "log": "Admin log",
+            "logShort": "Log"
         },
         "jurors": {
             "title": "The jury",
@@ -132,6 +133,9 @@
             "roleFor": "Role for {{name}}",
             "changeRole": "Change role",
             "changeRoleNamed": "Change the role of {{name}}",
+            "editDetails": "Edit details",
+            "editDetailsNamed": "Edit the details of {{name}}",
+            "saveDetails": "Save details",
             "cancel": "Cancel",
             "saveRole": "Save role",
             "deactivate": "Deactivate",
@@ -145,7 +149,8 @@
                 "swornIn": "{{name}} is now on the jury.",
                 "roleChanged": "{{name}} is now {{role}}.",
                 "deactivated": "{{name}} was deactivated.",
-                "reinstated": "{{name}} is back on the jury."
+                "reinstated": "{{name}} is back on the jury.",
+                "detailsEdited": "{{name}}'s details were updated."
             }
         },
         "swearIn": {
@@ -178,6 +183,11 @@
             "cases_one": "{{count}} case",
             "cases_other": "{{count}} cases",
             "empty": "No agents yet. Register the first one.",
+            "filter": "Show agents",
+            "activeCount": "Active · {{count}}",
+            "retiredCount": "Retired · {{count}}",
+            "emptyActive": "No active agents. Reinstate one or register a new one.",
+            "emptyRetired": "No retired agents. Retired agents keep their cases and appear here.",
             "done": {
                 "registered": "{{name}} is registered.",
                 "retired": "{{name}} was retired.",
@@ -219,6 +229,7 @@
                 "setJurorRole": "{{who}} made {{target}} {{role}}",
                 "deactivateJuror": "{{who}} deactivated {{target}}",
                 "reinstateJuror": "{{who}} reinstated {{target}}",
+                "editJurorDetails": "{{who}} edited the details of {{target}}",
                 "registerAgent": "{{who}} registered the agent {{target}}",
                 "retireAgent": "{{who}} retired the agent {{target}}",
                 "reinstateAgent": "{{who}} reinstated the agent {{target}}",
@@ -231,6 +242,7 @@
                 "setJurorRole": "{{who}} tried to make {{target}} {{role}}",
                 "deactivateJuror": "{{who}} tried to deactivate {{target}}",
                 "reinstateJuror": "{{who}} tried to reinstate {{target}}",
+                "editJurorDetails": "{{who}} tried to edit the details of {{target}}",
                 "registerAgent": "{{who}} tried to register the agent {{target}}",
                 "retireAgent": "{{who}} tried to retire the agent {{target}}",
                 "reinstateAgent": "{{who}} tried to reinstate the agent {{target}}",

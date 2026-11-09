@@ -4,6 +4,7 @@ import { Button } from "@/components/docket/button";
 import { Chip } from "@/components/docket/chip";
 import { TextField } from "@/components/docket/field";
 import { ShortId } from "@/components/docket/identity";
+import { Segmented } from "@/components/docket/segmented";
 import { EmptyState } from "@/components/docket/states";
 import type { AgentRow, AuthorActivity } from "@/data/directory.service";
 import { ClerkError } from "./clerk-feedback";
@@ -22,6 +23,9 @@ interface AgentsPanelProps {
 export function AgentsPanel({ agents, activity, clerk, registerClerk, onNotice }: AgentsPanelProps) {
     const { t } = useTranslation();
     const [registering, setRegistering] = useState(false);
+    const [filter, setFilter] = useState<"active" | "retired">("active");
+    const activeCount = agents.filter((agent) => agent.active).length;
+    const shown = agents.filter((agent) => agent.active === (filter === "active"));
 
     async function setActive(agent: AgentRow, active: boolean) {
         if (await clerk.run("setAgentActive", { agentId: agent.id, active })) {
@@ -55,6 +59,17 @@ export function AgentsPanel({ agents, activity, clerk, registerClerk, onNotice }
                 />
             )}
             <ClerkError view={clerk.error} />
+            {agents.length > 0 && (
+                <Segmented<"active" | "retired">
+                    label={t("clerk.agents.filter")}
+                    value={filter}
+                    onChange={setFilter}
+                    options={[
+                        { value: "active", label: t("clerk.agents.activeCount", { count: activeCount }) },
+                        { value: "retired", label: t("clerk.agents.retiredCount", { count: agents.length - activeCount }) },
+                    ]}
+                />
+            )}
             {agents.length === 0 ? (
                 !registering && (
                     <EmptyState
@@ -66,9 +81,11 @@ export function AgentsPanel({ agents, activity, clerk, registerClerk, onNotice }
                         }
                     />
                 )
+            ) : shown.length === 0 ? (
+                <EmptyState message={t(filter === "active" ? "clerk.agents.emptyActive" : "clerk.agents.emptyRetired")} />
             ) : (
                 <ul className="m-0 grid list-none grid-cols-1 gap-5 p-0 min-[900px]:grid-cols-2">
-                    {agents.map((agent) => (
+                    {shown.map((agent) => (
                         <li key={agent.id}>
                             <article
                                 aria-label={agent.name}

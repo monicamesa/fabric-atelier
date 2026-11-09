@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { jurorActionsFor, parseCommand, selfProtectionViolation, type ClerkCommand } from './clerk-actions';
+import { jurorActionsFor, parseCommand, parseLegacyCheckCutoff, selfProtectionViolation, type ClerkCommand } from './clerk-actions';
 
 const ME = '00000000-0000-4000-8000-000000000014';
 const OTHER = '00000000-0000-4000-8000-000000000011';
@@ -31,6 +31,9 @@ describe('parseCommand', () => {
     ['registerAgent', { name: '', workspaceId: AGENT, itemId: AGENT }],
     ['registerAgent', { name: 'Sales', workspaceId: 'w', itemId: AGENT }],
     ['setAgentActive', { agentId: AGENT }],
+    ['editJurorDetails', { jurorId: 'nope', displayName: 'Ana' }],
+    ['editJurorDetails', { jurorId: OTHER, team: 'x'.repeat(101) }],
+    ['editJurorDetails', { jurorId: OTHER, displayName: 42 }],
     ['readAdminLog', { limit: 201 }],
     ['readAdminLog', { limit: 1.5 }],
   ])('rejects an invalid %s payload', (action, payload) => {
@@ -58,7 +61,27 @@ describe('parseCommand', () => {
   });
 });
 
+describe('parseLegacyCheckCutoff', () => {
+  it('accepts an ISO UTC timestamp', () => {
+    expect(parseLegacyCheckCutoff(' 2026-01-31T12:00:00Z ')?.toISOString()).toBe('2026-01-31T12:00:00.000Z');
+  });
+
+  it('means no cutoff when empty, missing or malformed', () => {
+    expect(parseLegacyCheckCutoff(undefined)).toBeUndefined();
+    expect(parseLegacyCheckCutoff('')).toBeUndefined();
+    expect(parseLegacyCheckCutoff('9 Nov 2026')).toBeUndefined();
+    expect(parseLegacyCheckCutoff('2026-11-09T15:12:00+01:00')).toBeUndefined();
+    expect(parseLegacyCheckCutoff('2026-13-45T99:99:00Z')).toBeUndefined();
+  });
+});
+
 describe('self-protection', () => {
+  it('lets an admin edit their own display name and team, and clears empty values', () => {
+    const edit = command('editJurorDetails', { jurorId: ME, displayName: '  Dario A. ', team: '' });
+    expect(edit).toEqual({ action: 'editJurorDetails', jurorId: ME, displayName: 'Dario A.', team: undefined });
+    expect(selfProtectionViolation(edit, ME)).toBeNull();
+  });
+
   it('stops an admin from removing their own admin role', () => {
     expect(selfProtectionViolation(command('setJurorRole', { jurorId: ME, role: 'expert' }), ME)).toMatch(/own admin role/);
   });

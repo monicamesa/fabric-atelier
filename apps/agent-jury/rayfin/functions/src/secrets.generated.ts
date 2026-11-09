@@ -24,6 +24,7 @@ declare module '@microsoft/fabric-user-data-functions' {
   interface RayfinSecretRegistry {
     APP_SQL_DATABASE: string;
     APP_SQL_SERVER: string;
+    LEGACY_CHECK_CUTOFF_UTC: string;
   }
 }
 

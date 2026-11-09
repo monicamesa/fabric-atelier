@@ -71,6 +71,7 @@ describe("runClerkAction", () => {
             reason: "self_protection",
             detail: "An admin cannot deactivate themselves.",
             processedAt: "2026-11-09T10:00:00.000Z",
+            automatedCheck: false,
         };
         const { client } = fakeClient({ code: 200, outcome: "done", reason: "ok", detail: "1 entries.", log: [entry] });
         expect(await readAdminLog(client, 3)).toEqual([entry]);

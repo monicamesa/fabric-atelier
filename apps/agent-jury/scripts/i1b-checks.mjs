@@ -117,6 +117,18 @@ expect("B.18", "readAdminLog returns the admin log", log, [200]);
 const entries = log.log ?? [];
 record("B.19", "the log includes rejected attempts with their reason", entries.some((entry) => entry.outcome === "rejected" && entry.reason === "self_protection"));
 record("B.20", "successful log reads are not listed", !entries.some((entry) => entry.action === "readAdminLog" && entry.outcome === "done"));
+if (checkJuror) {
+    expect("B.21", "editJurorDetails updates the example juror's display name and team",
+        await clerk("editJurorDetails", { jurorId: checkJuror.id, displayName: "I1b check", team: "Checks" }), [200]);
+}
+const marked = entries.filter((entry) => {
+    try {
+        return JSON.parse(entry.payload).source === "check";
+    } catch {
+        return false;
+    }
+});
+record("B.22", "the log flags requests marked by the checks as automated", marked.length > 0 && marked.every((entry) => entry.automatedCheck === true), `${marked.length} marked`);
 
 const failed = results.filter((result) => !result.passed).length;
 console.log(`${results.length - failed} passed, ${failed} failed`);

@@ -31,3 +31,5 @@ secrets:
     description: Server FQDN of the app SQL database (admin Function T-SQL)
   - name: APP_SQL_DATABASE
     description: Database name of the app SQL database (admin Function T-SQL)
+  - name: LEGACY_CHECK_CUTOFF_UTC
+    description: Optional. Admin log rows before this ISO UTC time count as automated checks. Leave unset.

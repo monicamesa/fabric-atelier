@@ -66,11 +66,42 @@ describe("ClerksOffice", () => {
         const table = await screen.findByRole("table", { name: "Jurors" });
         const ownRow = within(table).getByText(/dario\.admin \(you\)/).closest("tr")!;
         expect(within(ownRow).getByText("You can't remove yourself")).toBeInTheDocument();
-        expect(within(ownRow).queryByRole("button")).not.toBeInTheDocument();
+        expect(within(ownRow).getAllByRole("button").map((button) => button.getAttribute("aria-label"))).toEqual([
+            "Edit the details of dario.admin",
+        ]);
         expect(within(ownRow).queryByRole("combobox")).not.toBeInTheDocument();
         const anaRow = within(table).getByText("Ana E.").closest("tr")!;
         expect(within(anaRow).getByRole("button", { name: "Deactivate Ana E." })).toBeInTheDocument();
         expect(within(anaRow).getByRole("button", { name: "Change the role of Ana E." })).toBeInTheDocument();
+    });
+
+    it("lets an admin edit their own display name and team through clerkExecute", async () => {
+        const { client, requests } = fakeClient({});
+        render(<ClerksOffice client={client} jury={jury([ANA, DARIO])} me={DARIO} />);
+        const table = await screen.findByRole("table", { name: "Jurors" });
+        const ownRow = within(table).getByText(/dario\.admin \(you\)/).closest("tr")!;
+        fireEvent.click(within(ownRow).getByRole("button", { name: "Edit the details of dario.admin" }));
+        fireEvent.change(within(ownRow).getByLabelText("Display name"), { target: { value: " Dario A. " } });
+        expect(within(ownRow).getByLabelText("Team")).toHaveValue("Data team");
+        fireEvent.change(within(ownRow).getByLabelText("Team"), { target: { value: "" } });
+        fireEvent.click(within(ownRow).getByRole("button", { name: "Save details" }));
+        await waitFor(() =>
+            expect([...requests.values()].find((request) => request.action === "editJurorDetails")?.payload).toEqual({
+                jurorId: DARIO.id,
+                displayName: "Dario A.",
+            }),
+        );
+    });
+
+    it("filters agents into Active and Retired, Active first", async () => {
+        const { client } = fakeClient({});
+        render(<ClerksOffice client={client} jury={jury([ANA, DARIO])} me={DARIO} />);
+        fireEvent.click(await screen.findByRole("tab", { name: /Agents/ }));
+        expect(await screen.findByRole("button", { name: "Active · 1" })).toHaveAttribute("aria-pressed", "true");
+        expect(screen.getByRole("article", { name: AGENT.name })).toBeInTheDocument();
+        fireEvent.click(screen.getByRole("button", { name: "Retired · 0" }));
+        expect(screen.queryByRole("article", { name: AGENT.name })).not.toBeInTheDocument();
+        expect(screen.getByText(/No retired agents/)).toBeInTheDocument();
     });
 
     it("shows the role once and opens the role choice only on Change role, with Save and Cancel", async () => {
@@ -168,6 +199,7 @@ describe("ClerksOffice", () => {
                         reason: "not_admin",
                         detail: "The requester is not an active admin.",
                         processedAt: new Date().toISOString(),
+                        automatedCheck: false,
                     },
                 ],
             }),

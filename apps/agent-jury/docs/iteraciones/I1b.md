@@ -177,10 +177,34 @@ Sigue [`admin.html`](../design/mockups/admin.html) y el componente "Admin table"
 
 **Ruido de las comprobaciones en el registro:**
 - Los scripts añaden `source: "check"` al payload de cada `AdminRequest` que crean. No se borra ni se edita nada.
-- Las filas anteriores a la marca (todas las de I1a e I1b hasta las 15:11 UTC del 2026-11-09, auditadas una a una) se reconocen por fecha (`UNMARKED_CHECKS_BEFORE` en `log-entry.ts`). En otros despliegues no hay filas anteriores, así que la regla no les afecta.
+- Las filas anteriores a la marca (todas las de I1a e I1b hasta las 15:11 UTC del 2026-11-09, auditadas una a una) se reconocen por fecha. La fecha ya no está en el código: ver la sección 11.
 - Solo cuenta como comprobación una petición de un admin activo: un no admin no puede ocultar sus intentos rechazados añadiendo la marca.
 - "Latest admin changes" y la pestaña del registro ocultan las comprobaciones por defecto, con la casilla "Show automated checks" / "Mostrar comprobaciones automáticas". El registro lee ahora hasta 200 entradas. Tests en `log-entry.spec.ts`.
 
 **Inicio y navegación:**
 - El anillo de foco solo aparece con teclado (`:focus-visible`). Una regla global quita el contorno tras un clic, aunque una librería lo ponga en `:focus`.
 - El enlace a la secretaría y el botón "Go to the clerk's office" solo se muestran a admins activos. Un no admin que abre `#clerk` ve el Inicio. `clerkExecute` sigue siendo la protección real.
+
+## 11. Arreglos de la aprobación (2026-11-09)
+
+**Corte de comprobaciones antiguas como ajuste opcional:**
+- La clasificación se hace ahora en `clerkExecute` (`readAdminLog` devuelve `automatedCheck` en cada entrada). Una entrada es comprobación si la pidió un admin activo y su payload lleva `source: "check"`, o si es anterior a `LEGACY_CHECK_CUTOFF_UTC`.
+- `LEGACY_CHECK_CUTOFF_UTC` es un secreto de Rayfin opcional, vacío por defecto. `rayfin.yml` solo declara el nombre; el valor se guarda en `.private/values.env` y se sube con `rayfin secret set --stdin` (instrucciones en `private.example.env`). Si no tiene valor, la Function no aplica corte (leer un secreto declarado sin valor lanza un error, y se trata como vacío). Solo este despliegue lo tiene.
+- La interfaz ya no contiene ninguna fecha.
+
+**Foco:** la regla global es exactamente `:focus:not(:focus-visible) { outline: none; }`, junto a `:focus-visible { outline: 3px solid var(--focus); outline-offset: 3px; }`.
+- `src/styles/focus.spec.ts` comprueba las dos reglas y que ningún componente de `src/components/docket/` use la variante `focus:` de Tailwind.
+- Comprobación manual en Edge (`.private/screenshots.mjs --focus`, recorre la secretaría con Tab): 39 de 39 elementos enfocados muestran el anillo de 3 px, y tras un clic con el ratón en el enlace "Home" el contorno es `none`. jsdom no distingue foco de teclado y de ratón, por eso esta parte se comprueba en el navegador.
+
+**Pestaña de agentes:** filtro "Active · n / Retired · n", con Activos por defecto.
+
+**Columna Team:** sin saltos de línea, con puntos suspensivos y el texto completo en el `title`.
+
+**Pestañas en móvil:** por debajo de 640 px la pestaña del registro se llama "Log" / "Registro", para que las tres quepan en una línea.
+
+**Nueva acción "Edit details" / "Editar datos" (`editJurorDetails`):**
+- Cambia el nombre visible y el equipo de un juror, también los propios. Un valor vacío borra el campo.
+- Pasa por `clerkExecute` como las demás y queda en el registro.
+- Tests: validación del payload y edición propia en `clerk-actions.spec.ts`, la pantalla en `clerks-office.screen.spec.tsx` y la descripción del registro en `log-entry.spec.ts`. En el despliegue, `i1b-checks.mjs` B.21.
+
+**Comprobaciones nuevas en `i1b-checks.mjs`:** B.21 (`editJurorDetails`) y B.22 (las entradas marcadas por las comprobaciones salen con `automatedCheck`).

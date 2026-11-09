@@ -3,6 +3,7 @@ import type { AgentJurySchema } from '../../data/schema.js';
 import { withAppSql } from './app-sql.js';
 import { executeAdminRequest } from './admin-request.js';
 import type { ClerkResult } from './clerk-actions.js';
+import { parseLegacyCheckCutoff } from './clerk-actions.js';
 
 const udf = new UserDataFunctions();
 
@@ -10,6 +11,15 @@ const GUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 function describe(error: unknown): string {
   return error instanceof Error ? `${error.name}: ${error.message}`.slice(0, 200) : String(error).slice(0, 200);
+}
+
+// Optional, set only in deployments with unmarked check rows; reading a declared secret with no value throws.
+function legacyCheckCutoff(ctx: RayfinContext<AgentJurySchema, AudienceType.Sql>): Date | undefined {
+  try {
+    return parseLegacyCheckCutoff(ctx.Secrets.LEGACY_CHECK_CUTOFF_UTC);
+  } catch {
+    return undefined;
+  }
 }
 
 // Admin entry point (fallback design). Takes only the id of an AdminRequest the caller inserted;
@@ -24,7 +34,7 @@ udf.func(
     try {
       return await withAppSql(
         { server: ctx.Secrets.APP_SQL_SERVER, database: ctx.Secrets.APP_SQL_DATABASE, token: ctx.Tokens.Sql },
-        (pool) => executeAdminRequest(pool, requestId),
+        (pool) => executeAdminRequest(pool, requestId, { legacyCheckCutoff: legacyCheckCutoff(ctx) }),
       );
     } catch (error) {
       return { code: 500, outcome: 'rejected', reason: 'server_error', detail: describe(error) };
