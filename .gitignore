@@ -1,0 +1,4 @@
+**/rayfin/.env
+**/rayfin/.deployments.json
+**/.env.local
+**/node_modules/
