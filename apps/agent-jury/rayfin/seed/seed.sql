@@ -1,5 +1,5 @@
 -- Example jurors and agents for Agent Jury (no personal data).
--- Run after the first `npx rayfin up` with data enabled; see rayfin/seed/README.md.
+-- Run after `npx rayfin up` with data enabled:  node scripts/run-sql.mjs rayfin/seed/seed.sql
 -- Rayfin pluralizes table names (Juror -> dbo.Jurors, Agent -> dbo.Agents).
 SET NOCOUNT ON;
 

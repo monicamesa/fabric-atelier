@@ -6,7 +6,7 @@ const udf = new UserDataFunctions();
 
 export interface AdminProbeResult {
   status: 200 | 403;
-  stage: 'insert' | 'read-back' | 'admin-check' | 'allowed';
+  stage: 'insert' | 'read-back' | 'admin-check' | 'allowed' | 'error';
   requestId?: string;
   detail?: string;
 }
@@ -21,7 +21,23 @@ udf.func(
   'adminProbe',
   async (claimedEmail: string, ctx: RayfinContext<AgentJurySchema, AudienceType.Sql>): Promise<AdminProbeResult> => {
     const data = ctx.getDataClient();
+    try {
+      return await probe(data, claimedEmail, ctx);
+    } catch (error) {
+      return { status: 403, stage: 'error', detail: describe(error) };
+    }
+  },
+  [],
+);
 
+// Diagnostic: confirms the Functions host runs code that has no context or audience.
+udf.func('ping', (): string => 'pong', []);
+
+async function probe(
+  data: ReturnType<RayfinContext<AgentJurySchema, AudienceType.Sql>['getDataClient']>,
+  claimedEmail: string,
+  ctx: RayfinContext<AgentJurySchema, AudienceType.Sql>,
+): Promise<AdminProbeResult> {
     let requestId: string;
     try {
       const created = await data.AdminRequest.create({
@@ -55,6 +71,4 @@ udf.func(
     return admin
       ? { status: 200, stage: 'allowed', requestId }
       : { status: 403, stage: 'admin-check', requestId, detail: 'The caller is not an active admin.' };
-  },
-  [],
-);
+}

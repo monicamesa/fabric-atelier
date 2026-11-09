@@ -24,6 +24,11 @@
       "contextAudiences": [
         "Sql"
       ]
+    },
+    {
+      "functionName": "ping",
+      "delegateParameters": [],
+      "contextAudiences": []
     }
   ]
 }

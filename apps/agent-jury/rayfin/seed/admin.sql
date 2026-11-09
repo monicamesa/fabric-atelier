@@ -1,7 +1,7 @@
 -- Creates or reactivates the first admin juror.
 -- The email is a SQLCMD variable supplied at run time and never stored in the repository:
---   sqlcmd ... -v AdminEmail="<ACCOUNT_EMAIL>" -i rayfin/seed/admin.sql
--- or, in the VS Code mssql extension with SQLCMD mode on, run `:setvar AdminEmail "<ACCOUNT_EMAIL>"` first.
+--   node scripts/run-sql.mjs rayfin/seed/admin.sql --var AdminEmail=ACCOUNT_EMAIL   (value read from .private/values.env)
+-- or sqlcmd ... -v AdminEmail="<ACCOUNT_EMAIL>" -i rayfin/seed/admin.sql
 SET NOCOUNT ON;
 
 DECLARE @email NVARCHAR(254) = LOWER(LTRIM(RTRIM(N'$(AdminEmail)')));

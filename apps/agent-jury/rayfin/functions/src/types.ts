@@ -19,6 +19,10 @@
 export type AppFunctionsSchema = {
   adminProbe: {
     input: { claimedEmail: string };
-    output: { status: 200 | 403; stage: 'insert' | 'read-back' | 'admin-check' | 'allowed'; requestId?: undefined | string; detail?: undefined | string };
+    output: { status: 200 | 403; stage: 'insert' | 'read-back' | 'admin-check' | 'allowed' | 'error'; requestId?: undefined | string; detail?: undefined | string };
+  };
+  ping: {
+    input: Record<string, never>;
+    output: string;
   };
 };

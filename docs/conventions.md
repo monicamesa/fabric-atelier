@@ -24,6 +24,12 @@ Rules shared by every app in Fabric Atelier.
 - After each `rayfin up`, discard that change with `git restore rayfin/rayfin.yml` (from the app folder). Commit any other change to `rayfin.yml` separately.
 - Always deploy with the full `npx rayfin up`, never with `--exclude-services staticHosting`, so the app URL is registered again on every deploy and sign-in keeps working.
 
+## Sign-in from scripts (`externalEntraExchange`)
+
+- `services.auth.fabric.externalEntraExchange: true` lets a delegated Entra token (scope `Item.Execute.All`) be exchanged for a Rayfin session without the Fabric portal. It does not grant extra permissions: the user still needs Execute permission on the item and every data policy still applies. It does add a sign-in path that does not go through the portal.
+- It is enabled only so that check scripts (for example `apps/agent-jury/scripts/i1a-checks.mjs`) and local automatic sign-in can act as the `rayfin login` user against the deployed app. The app itself does not use it.
+- **Templates ship with it off** (absent or `false`). Turn it on in a development deployment only while running checks or local sign-in, and off again before the app is shared with users.
+
 ## Language
 
 - The user interface is bilingual: English and Spanish, with English as the default.
