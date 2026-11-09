@@ -21,6 +21,18 @@ export type AppFunctionsSchema = {
     input: { requestId: string };
     output: { code: 200 | 403 | 404 | 409; outcome: 'done' | 'rejected'; detail: string };
   };
+  echoSync: {
+    input: { text: string };
+    output: string;
+  };
+  echoAsync: {
+    input: { text: string };
+    output: string;
+  };
+  echoAsyncCtx: {
+    input: { text: string };
+    output: string;
+  };
   dataPing: {
     input: Record<string, never>;
     output: { ok: boolean; detail?: undefined | string };

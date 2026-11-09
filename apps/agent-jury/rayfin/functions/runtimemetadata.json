@@ -26,6 +26,56 @@
       ]
     },
     {
+      "functionName": "echoSync",
+      "delegateParameters": [
+        {
+          "name": "text",
+          "type": "string",
+          "optional": false,
+          "hasDefault": false,
+          "position": 0,
+          "isFabricParameter": false
+        }
+      ],
+      "contextAudiences": []
+    },
+    {
+      "functionName": "echoAsync",
+      "delegateParameters": [
+        {
+          "name": "text",
+          "type": "string",
+          "optional": false,
+          "hasDefault": false,
+          "position": 0,
+          "isFabricParameter": false
+        }
+      ],
+      "contextAudiences": []
+    },
+    {
+      "functionName": "echoAsyncCtx",
+      "delegateParameters": [
+        {
+          "name": "text",
+          "type": "string",
+          "optional": false,
+          "hasDefault": false,
+          "position": 0,
+          "isFabricParameter": false
+        },
+        {
+          "name": "ctx",
+          "type": "RayfinContext<AgentJurySchema>",
+          "optional": false,
+          "hasDefault": false,
+          "position": 1,
+          "isFabricParameter": false
+        }
+      ],
+      "contextAudiences": []
+    },
+    {
       "functionName": "dataPing",
       "delegateParameters": [
         {

@@ -32,6 +32,15 @@ export interface DataPingResult {
   detail?: string;
 }
 
+// Diagnostics: which signatures can the host invoke? (sync/async, with/without an input and context)
+udf.func('echoSync', (text: string): string => `sync:${text.length}`, []);
+udf.func('echoAsync', async (text: string): Promise<string> => `async:${text.length}`, []);
+udf.func(
+  'echoAsyncCtx',
+  async (text: string, ctx: RayfinContext<AgentJurySchema>): Promise<string> => `ctx:${text.length}:${ctx.baseUrl ? 'base' : 'none'}`,
+  [],
+);
+
 // Diagnostic: the smallest possible read through the caller-scoped data client.
 udf.func(
   'dataPing',

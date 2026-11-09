@@ -93,6 +93,12 @@ if (sections.has("removed")) {
 
 // Admin requests (fallback design): the client inserts the request; adminExecute runs only that row.
 if (sections.has("probe")) {
+    for (const name of ["echoSync", "echoAsync", "echoAsyncCtx"]) {
+        if (client.functions[name]) {
+            const value = await expectSuccess(`E.${name}`, `${name} with a text input runs`, () => client.functions[name].invoke({ text: "hello" }));
+            if (value !== undefined) console.log(`        ${name} returned ${JSON.stringify(value)}`);
+        }
+    }
     const dataPing = await expectSuccess("F.0", "dataPing (getDataClient inside a Function) runs", () => client.functions.dataPing.invoke());
     if (dataPing) {
         record("F.0b", "getDataClient inside a Function can read data", dataPing.ok, dataPing.detail ?? "");
