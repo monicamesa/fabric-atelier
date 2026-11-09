@@ -28,13 +28,14 @@ export async function withAppSql<T>(target: AppSqlTarget, work: (pool: sql.Conne
   }
 }
 
-export async function isActiveAdmin(pool: sql.ConnectionPool, email: string): Promise<boolean> {
+/** Returns the id of the active admin juror with this email, or undefined. */
+export async function findActiveAdmin(pool: sql.ConnectionPool, email: string): Promise<string | undefined> {
   const result = await pool
     .request()
     .input('email', sql.NVarChar(254), email.trim().toLowerCase())
-    .query<{ found: number }>(
-      `SELECT COUNT(*) AS found FROM dbo.[Jurors]
+    .query<{ id: string }>(
+      `SELECT TOP (1) id FROM dbo.[Jurors]
        WHERE LOWER(LTRIM(RTRIM(email))) = @email AND role = N'admin' AND active = 1`,
     );
-  return (result.recordset[0]?.found ?? 0) > 0;
+  return result.recordset[0]?.id?.toLowerCase();
 }

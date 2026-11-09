@@ -99,9 +99,10 @@ if (sections.has("removed")) {
 }
 
 // Admin requests (fallback design): the client inserts the request; clerkExecute runs only that row.
+// I1b removed the probe action; readAdminLog is the harmless, read-only stand-in.
 if (sections.has("probe")) {
     const newRequest = (fields = {}) =>
-        client.data.AdminRequest.create({ requesterEmail: me.email, action: "probe", payload: "{}", createdAt: new Date(), ...fields });
+        client.data.AdminRequest.create({ requesterEmail: me.email, action: "readAdminLog", payload: '{"limit":1}', createdAt: new Date(), ...fields });
     const execute = (requestId) => client.functions.clerkExecute.invoke({ requestId });
 
     const own = await expectSuccess("F.1", "the caller can insert an AdminRequest with their own email", () => newRequest());

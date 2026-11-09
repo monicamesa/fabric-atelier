@@ -56,7 +56,205 @@
     "common": {
         "loading": "Cargando…",
         "retry": "Reintentar",
-        "empty": "Todavía no hay nada."
+        "empty": "Todavía no hay nada.",
+        "copyId": "Copiar el {{label}} completo"
+    },
+    "nav": {
+        "label": "Principal",
+        "home": "Inicio",
+        "clerk": "Secretaría"
+    },
+    "theme": {
+        "toDark": "Cambiar a modo oscuro",
+        "toLight": "Cambiar a modo claro"
+    },
+    "states": {
+        "objection": "¡Protesto!",
+        "technicalDetails": "Detalles técnicos",
+        "copyDetails": "Copiar detalles",
+        "copied": "Copiado"
+    },
+    "roles": {
+        "expert": {
+            "label": "Experto",
+            "description": "propone casos y respuestas, y los vota"
+        },
+        "approver": {
+            "label": "Aprobador",
+            "description": "además confirma los fallos: un caso necesita el voto de un aprobador para quedar fallado"
+        },
+        "admin": {
+            "label": "Admin",
+            "description": "además gestiona jurados y agentes en la secretaría"
+        }
+    },
+    "home": {
+        "title": "¿Quién juzga al juez?",
+        "help": "Un jurado de expertos de negocio se pone de acuerdo en las respuestas correctas para poner a prueba a los agentes de datos de Fabric.",
+        "empty": "La lista de casos se abre en el siguiente paso: aquí aparecerán los casos, las respuestas y los votos.",
+        "openClerk": "Ir a la secretaría"
+    },
+    "clerk": {
+        "kicker": "Solo la ven los admins",
+        "title": "Secretaría",
+        "help": "Decide quién forma parte del jurado y qué agentes van a juicio. Cada cambio se comprueba en el servidor y queda en el registro de admin.",
+        "protectedTitle": "Cómo se protege.",
+        "protectedBody": "El servidor comprueba que eres admin activo antes de guardar nada. Si no puede confirmarlo, no cambia nada.",
+        "notAdmin": "Solo los admins activos pueden usar la secretaría. Pídele acceso a un admin si lo necesitas.",
+        "loading": "La secretaría está buscando los expedientes…",
+        "tabs": {
+            "label": "Secciones de la secretaría",
+            "jurors": "Jurados · {{count}}",
+            "agents": "Agentes · {{count}}",
+            "agentsPlain": "Agentes",
+            "log": "Registro de admin"
+        },
+        "jurors": {
+            "title": "El jurado",
+            "filter": "Mostrar jurados",
+            "active": "Activos · {{count}}",
+            "inactive": "Inactivos · {{count}}",
+            "caption": "Jurados",
+            "columns": {
+                "juror": "Jurado",
+                "team": "Equipo",
+                "role": "Rol",
+                "activity": "Actividad",
+                "actions": "Acciones"
+            },
+            "you": "(tú)",
+            "activityCases_one": "{{count}} caso",
+            "activityCases_other": "{{count}} casos",
+            "activityAnswers_one": "{{count}} respuesta",
+            "activityAnswers_other": "{{count}} respuestas",
+            "noActivity": "Aún sin casos ni respuestas",
+            "selfNote": "No puedes quitarte a ti mismo",
+            "roleFor": "Rol de {{name}}",
+            "saveRole": "Guardar rol",
+            "deactivate": "Desactivar",
+            "deactivateNamed": "Desactivar a {{name}}",
+            "reinstate": "Reactivar",
+            "reinstateNamed": "Reactivar a {{name}}",
+            "footnote": "Al desactivar a un jurado, todo lo que dijo sigue en el acta; solo deja de poder votar o proponer. Nunca se borra a nadie.",
+            "emptyActive": "Todavía no hay jurados activos. Incorpora al primero con el formulario.",
+            "emptyInactive": "No hay nadie inactivo. Los jurados desactivados aparecen aquí.",
+            "done": {
+                "swornIn": "{{name}} ya forma parte del jurado.",
+                "roleChanged": "{{name}} ahora es {{role}}.",
+                "deactivated": "{{name}} ha sido desactivado.",
+                "reinstated": "{{name}} vuelve al jurado."
+            }
+        },
+        "swearIn": {
+            "title": "Incorporar a un jurado",
+            "email": "Email de trabajo",
+            "emailHint": "Debe ser el email con el que entra en Fabric.",
+            "emailInvalid": "Escribe un email de trabajo, como nombre@example.com.",
+            "displayName": "Nombre visible",
+            "displayNameHint": "Opcional. Si se deja vacío, se muestra la parte del email anterior a la @.",
+            "team": "Equipo",
+            "teamHint": "Opcional. Se muestra junto a su nombre.",
+            "role": "Rol",
+            "submit": "Añadir al jurado",
+            "submitting": "Añadiendo…"
+        },
+        "latest": {
+            "title": "Últimos cambios de admin",
+            "openLog": "Abrir el registro completo →",
+            "empty": "Todavía no hay cambios de admin. Aparecerán aquí en cuanto alguien haga uno."
+        },
+        "agents": {
+            "title": "Agentes a juicio",
+            "help": "Los agentes de datos de Fabric para los que el jurado escribe casos. Al retirar uno se conservan sus casos y vistas.",
+            "register": "+ Registrar un agente",
+            "active": "Activo",
+            "retired": "Retirado",
+            "retire": "Retirar",
+            "reinstate": "Reactivar",
+            "itemId": "ID",
+            "cases_one": "{{count}} caso",
+            "cases_other": "{{count}} casos",
+            "empty": "Todavía no hay agentes. Registra el primero.",
+            "done": {
+                "registered": "{{name}} está registrado.",
+                "retired": "{{name}} ha sido retirado.",
+                "reinstated": "{{name}} vuelve a juicio."
+            }
+        },
+        "registerAgent": {
+            "title": "Registrar un agente",
+            "name": "Nombre del agente",
+            "nameHint": "Cómo lo verá el jurado.",
+            "nameRequired": "Escribe un nombre.",
+            "workspaceId": "ID del workspace",
+            "itemId": "ID del agente",
+            "idHint": "Cópialo de la dirección del agente en Fabric.",
+            "invalidId": "Debe ser un ID como 1a2b3c4d-5e6f-…",
+            "submit": "Registrar el agente",
+            "submitting": "Registrando…",
+            "cancel": "Cancelar"
+        },
+        "log": {
+            "title": "Registro de admin",
+            "help": "Cada petición de admin y su resultado, incluidos los intentos rechazados. El registro nunca se edita.",
+            "caption": "Registro de admin",
+            "columns": {
+                "when": "Cuándo",
+                "what": "Qué pasó",
+                "result": "Resultado"
+            },
+            "done": "Hecho",
+            "rejected": "Rechazado",
+            "today": "Hoy",
+            "someone": "alguien",
+            "loadError": "No se ha podido cargar el registro de admin.",
+            "rejectedLine": "Rechazado: {{sentence}} ({{reason}})",
+            "entry": {
+                "swearInJuror": "{{who}} incorporó a {{target}} como {{role}}",
+                "setJurorRole": "{{who}} hizo {{role}} a {{target}}",
+                "deactivateJuror": "{{who}} desactivó a {{target}}",
+                "reinstateJuror": "{{who}} reactivó a {{target}}",
+                "registerAgent": "{{who}} registró el agente {{target}}",
+                "retireAgent": "{{who}} retiró el agente {{target}}",
+                "reinstateAgent": "{{who}} reactivó el agente {{target}}",
+                "readAdminLog": "{{who}} abrió el registro de admin",
+                "unknown": "{{who}} envió una petición que la secretaría no conoce"
+            },
+            "attempt": {
+                "swearInJuror": "{{who}} intentó incorporar a {{target}}",
+                "setJurorRole": "{{who}} intentó hacer {{role}} a {{target}}",
+                "deactivateJuror": "{{who}} intentó desactivar a {{target}}",
+                "reinstateJuror": "{{who}} intentó reactivar a {{target}}",
+                "registerAgent": "{{who}} intentó registrar el agente {{target}}",
+                "retireAgent": "{{who}} intentó retirar el agente {{target}}",
+                "reinstateAgent": "{{who}} intentó reactivar el agente {{target}}",
+                "readAdminLog": "{{who}} intentó abrir el registro de admin",
+                "unknown": "{{who}} envió una petición que la secretaría no conoce"
+            },
+            "reason": {
+                "not_admin": "no es admin activo",
+                "expired": "la petición caducó",
+                "self_protection": "un admin no puede quitarse a sí mismo",
+                "already_exists": "ya estaba registrado",
+                "invalid_payload": "había campos no válidos",
+                "not_found": "no existe",
+                "unknown_action": "petición desconocida",
+                "other": "no se pudo aplicar"
+            }
+        },
+        "errors": {
+            "onlyAdmins": "Solo los admins activos pueden hacer esto.",
+            "alreadyApplied": "Este cambio ya se había aplicado.",
+            "tryAgain": "Vuelve a intentarlo.",
+            "selfProtection": "No puedes desactivarte ni quitarte el rol de admin.",
+            "jurorExists": "Este email ya está en el jurado.",
+            "agentExists": "Este agente ya está registrado.",
+            "invalid": "Hay campos no válidos. Revísalos y vuelve a intentarlo.",
+            "notFound": "Ese jurado o agente ya no existe. Recarga la página.",
+            "notSignedIn": "Tienes que iniciar sesión para hacer esto.",
+            "unexpected": "Algo ha fallado por nuestra parte. Vuelve a intentarlo.",
+            "nothingChanged": "No se ha cambiado nada."
+        }
     },
     "errors": {
         "load": "No se han podido cargar los datos.",

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { formatDate, formatDateTime, formatNumber } from "./format";
+import { formatDate, formatDateTime, formatLogDay, formatNumber } from "./format";
 
 // Noon UTC keeps the calendar day stable in any test time zone.
 const sample = new Date(Date.UTC(2026, 10, 9, 12, 0, 0));
@@ -26,5 +26,14 @@ describe("format", () => {
     it("formats percentages", () => {
         expect(formatNumber(0.875, "en", { style: "percent", maximumFractionDigits: 1 })).toBe("87.5%");
         expect(formatNumber(0.875, "es", { style: "percent", maximumFractionDigits: 1 })).toBe("87,5\u00a0%");
+    });
+
+    it("shows the time for today's log entries and the day for older ones", () => {
+        const sameDay = formatLogDay(sample, "en", new Date(sample.getTime() + 60_000));
+        expect(sameDay.today).toBe(true);
+        expect(sameDay.text).toMatch(/^\d{2}:\d{2}$/);
+        const later = new Date(sample.getTime() + 3 * 86_400_000);
+        expect(formatLogDay(sample, "en", later)).toEqual({ today: false, text: "9 Nov" });
+        expect(formatLogDay(sample, "es", later)).toEqual({ today: false, text: "9 nov" });
     });
 });

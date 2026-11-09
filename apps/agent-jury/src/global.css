@@ -135,6 +135,28 @@
   gap: var(--grid-gap, calc(var(--spacing) * 4));
 }
 
+/* Docket tokens (src/styles/docket-tokens.css) exposed as Tailwind colours: bg-paper, text-ink, border-rule… */
+@theme inline {
+  --color-paper: var(--paper);
+  --color-paper-raised: var(--paper-raised);
+  --color-paper-hover: var(--paper-hover);
+  --color-ink: var(--ink);
+  --color-ink-inverse: var(--ink-inverse);
+  --color-text: var(--text);
+  --color-text-muted: var(--text-muted);
+  --color-rule: var(--rule);
+  --color-track: var(--track);
+  --color-ruled: var(--ruled);
+  --color-ruled-fill: var(--ruled-fill);
+  --color-action: var(--action);
+  --color-action-text: var(--action-text);
+  --color-dispute-bg: var(--dispute-bg);
+  --color-dispute-text: var(--dispute-text);
+  --color-review: var(--review);
+  --color-review-text: var(--review-text);
+  --color-focus: var(--focus);
+}
+
 @utility icon-size-* {
   width: --value(--icon-size-*);
   height: --value(--icon-size-*);
@@ -177,7 +199,26 @@
   }
 
   body {
-    @apply bg-background text-foreground antialiased;
+    @apply antialiased;
+    background-color: var(--paper);
+    color: var(--text);
+    font-family: var(--font-sans);
+    font-size: 16px;
+  }
+
+  :focus-visible {
+    outline: 3px solid var(--focus);
+    outline-offset: 3px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
   }
 }
 

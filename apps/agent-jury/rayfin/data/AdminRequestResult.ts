@@ -11,6 +11,8 @@ export class AdminRequestResult {
   @uuid({ unique: true }) requestId!: string;
   @email({ max: 254 }) requesterEmail!: string;
   @set('done', 'rejected') outcome!: 'done' | 'rejected';
+  // Machine-readable cause (see ClerkReason in functions/src/clerk-actions.ts); the UI translates it.
+  @text({ max: 40, optional: true }) reason?: string;
   @text({ max: 500 }) detail!: string;
   @date() processedAt!: Date;
 }

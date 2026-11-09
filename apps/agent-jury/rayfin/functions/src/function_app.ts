@@ -1,7 +1,8 @@
 import { UserDataFunctions, AudienceType, type RayfinContext } from '@microsoft/fabric-user-data-functions';
 import type { AgentJurySchema } from '../../data/schema.js';
 import { withAppSql } from './app-sql.js';
-import { executeAdminRequest, type AdminExecuteResult } from './admin-request.js';
+import { executeAdminRequest } from './admin-request.js';
+import type { ClerkResult } from './clerk-actions.js';
 
 const udf = new UserDataFunctions();
 
@@ -16,9 +17,9 @@ function describe(error: unknown): string {
 // Named clerk*, not admin*: the Azure Functions host reserves routes starting with admin or runtime.
 udf.func(
   'clerkExecute',
-  async (requestId: string, ctx: RayfinContext<AgentJurySchema, AudienceType.Sql>): Promise<AdminExecuteResult> => {
+  async (requestId: string, ctx: RayfinContext<AgentJurySchema, AudienceType.Sql>): Promise<ClerkResult> => {
     if (!GUID.test(requestId)) {
-      return { code: 404, outcome: 'rejected', detail: 'Unknown request.' };
+      return { code: 404, outcome: 'rejected', reason: 'unknown_request', detail: 'Unknown request.' };
     }
     try {
       return await withAppSql(
@@ -26,7 +27,7 @@ udf.func(
         (pool) => executeAdminRequest(pool, requestId),
       );
     } catch (error) {
-      return { code: 500, outcome: 'rejected', detail: describe(error) };
+      return { code: 500, outcome: 'rejected', reason: 'server_error', detail: describe(error) };
     }
   },
   [],

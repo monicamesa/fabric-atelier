@@ -27,8 +27,9 @@ export function useAppTheme() {
     });
 
     useEffect(() => {
-        // Sync the .dark class on <html> for Tailwind dark mode
+        // Sync the .dark class on <html> for Tailwind dark mode, and data-theme for the Docket tokens
         document.documentElement.classList.toggle("dark", isDark);
+        document.documentElement.dataset.theme = isDark ? "dark" : "light";
     }, [isDark]);
 
     useEffect(() => {

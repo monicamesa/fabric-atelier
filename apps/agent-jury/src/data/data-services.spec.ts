@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
 import type { AppRayfinClient } from "@/lib/rayfin-client";
 import { createCase, createCaseDismissal, createTestimony, listCaseDismissals, listCasesByAgent } from "./cases.service";
-import { listJurors } from "./directory.service";
+import { listJurors, readAuthorActivity } from "./directory.service";
 import { NotSignedInError } from "./session-author";
 import { readAllPages } from "./pagination";
 
@@ -80,13 +80,32 @@ describe("list services", () => {
     it("selects the juror fields used by the validity rules", async () => {
         const { client, queries } = fakeClient({ Juror: [{ items: [], hasNextPage: false }] });
         await listJurors(client);
-        expect(queries[0].calls[0]).toEqual(["select", ["id", "email", "role", "team", "active"]]);
+        expect(queries[0].calls[0]).toEqual(["select", ["id", "email", "displayName", "role", "team", "active"]]);
     });
 
     it("does not query dismissals for an empty list of cases", async () => {
         const { client, queries } = fakeClient({});
         expect(await listCaseDismissals(client, [])).toEqual([]);
         expect(queries).toHaveLength(0);
+    });
+
+    it("counts cases and testimonies per author email and cases per agent", async () => {
+        const { client } = fakeClient({
+            Case: [
+                {
+                    items: [
+                        { id: "c1", agent_id: "agent-1", authorEmail: "Ana.Expert@example.com" },
+                        { id: "c2", agent_id: "agent-1", authorEmail: "ana.expert@example.com" },
+                    ],
+                    hasNextPage: false,
+                },
+            ],
+            Testimony: [{ items: [{ id: "t1", authorEmail: "bruno.expert@example.com" }], hasNextPage: false }],
+        });
+        const activity = await readAuthorActivity(client);
+        expect(activity.casesByEmail.get("ana.expert@example.com")).toBe(2);
+        expect(activity.testimoniesByEmail.get("bruno.expert@example.com")).toBe(1);
+        expect(activity.casesByAgent.get("agent-1")).toBe(2);
     });
 });
 

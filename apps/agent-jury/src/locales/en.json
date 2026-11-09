@@ -56,7 +56,205 @@
     "common": {
         "loading": "Loading…",
         "retry": "Try again",
-        "empty": "Nothing here yet."
+        "empty": "Nothing here yet.",
+        "copyId": "Copy the full {{label}}"
+    },
+    "nav": {
+        "label": "Main",
+        "home": "Home",
+        "clerk": "Clerk's office"
+    },
+    "theme": {
+        "toDark": "Switch to dark mode",
+        "toLight": "Switch to light mode"
+    },
+    "states": {
+        "objection": "Objection!",
+        "technicalDetails": "Technical details",
+        "copyDetails": "Copy details",
+        "copied": "Copied"
+    },
+    "roles": {
+        "expert": {
+            "label": "Expert",
+            "description": "proposes cases and answers, and votes on them"
+        },
+        "approver": {
+            "label": "Approver",
+            "description": "also confirms rulings: a case needs an approver's vote to be ruled"
+        },
+        "admin": {
+            "label": "Admin",
+            "description": "also manages jurors and agents in the clerk's office"
+        }
+    },
+    "home": {
+        "title": "Who judges the judge?",
+        "help": "A jury of business experts agrees on the right answers, so Fabric data agents can be tested against them.",
+        "empty": "The docket opens in the next step: cases, answers and votes will appear here.",
+        "openClerk": "Go to the clerk's office"
+    },
+    "clerk": {
+        "kicker": "Only visible to admins",
+        "title": "Clerk's office",
+        "help": "Decide who sits on the jury and which agents stand trial. Every change is checked on the server and written to the admin log.",
+        "protectedTitle": "How this is protected.",
+        "protectedBody": "The server checks that you are an active admin before saving anything. If it can't confirm it, nothing changes.",
+        "notAdmin": "Only active admins can use the clerk's office. Ask an admin if you need access.",
+        "loading": "The clerk is fetching the records…",
+        "tabs": {
+            "label": "Clerk's office sections",
+            "jurors": "Jurors · {{count}}",
+            "agents": "Agents · {{count}}",
+            "agentsPlain": "Agents",
+            "log": "Admin log"
+        },
+        "jurors": {
+            "title": "The jury",
+            "filter": "Show jurors",
+            "active": "Active · {{count}}",
+            "inactive": "Inactive · {{count}}",
+            "caption": "Jurors",
+            "columns": {
+                "juror": "Juror",
+                "team": "Team",
+                "role": "Role",
+                "activity": "Activity",
+                "actions": "Actions"
+            },
+            "you": "(you)",
+            "activityCases_one": "{{count}} case",
+            "activityCases_other": "{{count}} cases",
+            "activityAnswers_one": "{{count}} answer",
+            "activityAnswers_other": "{{count}} answers",
+            "noActivity": "No cases or answers yet",
+            "selfNote": "You can't remove yourself",
+            "roleFor": "Role for {{name}}",
+            "saveRole": "Save role",
+            "deactivate": "Deactivate",
+            "deactivateNamed": "Deactivate {{name}}",
+            "reinstate": "Reinstate",
+            "reinstateNamed": "Reinstate {{name}}",
+            "footnote": "Deactivating keeps everything a juror said in the court record; they just can't vote or propose any more. Nobody is ever deleted.",
+            "emptyActive": "No active jurors yet. Swear in the first one with the form.",
+            "emptyInactive": "Nobody is inactive. Deactivated jurors appear here.",
+            "done": {
+                "swornIn": "{{name}} is now on the jury.",
+                "roleChanged": "{{name}} is now {{role}}.",
+                "deactivated": "{{name}} was deactivated.",
+                "reinstated": "{{name}} is back on the jury."
+            }
+        },
+        "swearIn": {
+            "title": "Swear in a juror",
+            "email": "Work email",
+            "emailHint": "Must be the email they use to sign in to Fabric.",
+            "emailInvalid": "Enter a work email such as name@example.com.",
+            "displayName": "Display name",
+            "displayNameHint": "Optional. If empty, the part of the email before the @ is shown.",
+            "team": "Team",
+            "teamHint": "Optional. Shown next to their name.",
+            "role": "Role",
+            "submit": "Add to the jury",
+            "submitting": "Adding…"
+        },
+        "latest": {
+            "title": "Latest admin changes",
+            "openLog": "Open the full admin log →",
+            "empty": "No admin changes yet. They appear here as soon as someone makes one."
+        },
+        "agents": {
+            "title": "Agents on trial",
+            "help": "The Fabric data agents the jury writes cases for. Retiring one keeps its cases and hearings.",
+            "register": "+ Register an agent",
+            "active": "Active",
+            "retired": "Retired",
+            "retire": "Retire",
+            "reinstate": "Reinstate",
+            "itemId": "ID",
+            "cases_one": "{{count}} case",
+            "cases_other": "{{count}} cases",
+            "empty": "No agents yet. Register the first one.",
+            "done": {
+                "registered": "{{name}} is registered.",
+                "retired": "{{name}} was retired.",
+                "reinstated": "{{name}} is back on trial."
+            }
+        },
+        "registerAgent": {
+            "title": "Register an agent",
+            "name": "Agent name",
+            "nameHint": "How the jury will see it.",
+            "nameRequired": "Enter a name.",
+            "workspaceId": "Workspace ID",
+            "itemId": "Agent ID",
+            "idHint": "Copy it from the agent's address in Fabric.",
+            "invalidId": "This must be an ID like 1a2b3c4d-5e6f-…",
+            "submit": "Register the agent",
+            "submitting": "Registering…",
+            "cancel": "Cancel"
+        },
+        "log": {
+            "title": "Admin log",
+            "help": "Every admin request and its result, including rejected attempts. The record is never edited.",
+            "caption": "Admin log",
+            "columns": {
+                "when": "When",
+                "what": "What happened",
+                "result": "Result"
+            },
+            "done": "Done",
+            "rejected": "Rejected",
+            "today": "Today",
+            "someone": "someone",
+            "loadError": "The admin log could not be loaded.",
+            "rejectedLine": "Rejected: {{sentence}} ({{reason}})",
+            "entry": {
+                "swearInJuror": "{{who}} swore in {{target}} as {{role}}",
+                "setJurorRole": "{{who}} made {{target}} {{role}}",
+                "deactivateJuror": "{{who}} deactivated {{target}}",
+                "reinstateJuror": "{{who}} reinstated {{target}}",
+                "registerAgent": "{{who}} registered the agent {{target}}",
+                "retireAgent": "{{who}} retired the agent {{target}}",
+                "reinstateAgent": "{{who}} reinstated the agent {{target}}",
+                "readAdminLog": "{{who}} opened the admin log",
+                "unknown": "{{who}} sent a request the office doesn't know"
+            },
+            "attempt": {
+                "swearInJuror": "{{who}} tried to swear in {{target}}",
+                "setJurorRole": "{{who}} tried to make {{target}} {{role}}",
+                "deactivateJuror": "{{who}} tried to deactivate {{target}}",
+                "reinstateJuror": "{{who}} tried to reinstate {{target}}",
+                "registerAgent": "{{who}} tried to register the agent {{target}}",
+                "retireAgent": "{{who}} tried to retire the agent {{target}}",
+                "reinstateAgent": "{{who}} tried to reinstate the agent {{target}}",
+                "readAdminLog": "{{who}} tried to open the admin log",
+                "unknown": "{{who}} sent a request the office doesn't know"
+            },
+            "reason": {
+                "not_admin": "not an active admin",
+                "expired": "the request expired",
+                "self_protection": "admins can't remove themselves",
+                "already_exists": "already registered",
+                "invalid_payload": "some fields were not valid",
+                "not_found": "not found",
+                "unknown_action": "unknown request",
+                "other": "could not be applied"
+            }
+        },
+        "errors": {
+            "onlyAdmins": "Only active admins can do this.",
+            "alreadyApplied": "This change was already applied.",
+            "tryAgain": "Please try again.",
+            "selfProtection": "You can't deactivate yourself or remove your own admin role.",
+            "jurorExists": "This email is already on the jury.",
+            "agentExists": "This agent is already registered.",
+            "invalid": "Some fields are not valid. Check them and try again.",
+            "notFound": "That juror or agent no longer exists. Reload the page.",
+            "notSignedIn": "You need to be signed in to do this.",
+            "unexpected": "Something went wrong on our side. Please try again.",
+            "nothingChanged": "Nothing was changed."
+        }
     },
     "errors": {
         "load": "The data could not be loaded.",
