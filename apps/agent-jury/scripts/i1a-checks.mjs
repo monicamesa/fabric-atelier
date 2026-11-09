@@ -112,13 +112,13 @@ if (sections.has("probe")) {
             record(
                 expectAdmin ? "F.4a" : "F.4b",
                 expectAdmin ? "(a) an active admin is allowed" : "(b) a user who is not an admin is rejected",
-                expectAdmin ? first.status === 200 && first.outcome === "done" : first.status === 403 && /not an active admin/.test(first.detail),
-                `status ${first.status}: ${first.detail}`,
+                expectAdmin ? first.code === 200 && first.outcome === "done" : first.code === 403 && /not an active admin/.test(first.detail),
+                `status ${first.code}: ${first.detail}`,
             );
         }
         const second = await expectSuccess("F.5", "adminExecute runs a second time on the same request", () => execute(own.id));
         if (second) {
-            record("F.6", "a request is single-use", second.status === 409, `status ${second.status}: ${second.detail}`);
+            record("F.6", "a request is single-use", second.code === 409, `status ${second.code}: ${second.detail}`);
         }
         const [result] = (await client.data.AdminRequestResult.select(["requestId", "outcome"]).where({ requestId: { eq: own.id } }).execute()) ?? [];
         record("F.7", "the author can read the result of their own request", !!result, result ? `outcome ${result.outcome}` : "");
@@ -129,25 +129,25 @@ if (sections.has("probe")) {
     );
     if (expired) {
         const response = await expectSuccess("F.9", "adminExecute runs on the old request", () => execute(expired.id));
-        if (response) record("F.10", "a request older than 2 minutes is rejected", response.status === 403 && /expired/.test(response.detail), `status ${response.status}: ${response.detail}`);
+        if (response) record("F.10", "a request older than 2 minutes is rejected", response.code === 403 && /expired/.test(response.detail), `status ${response.code}: ${response.detail}`);
     }
     const future = await expectSuccess("F.11", "an AdminRequest dated 10 minutes ahead can be inserted", () =>
         newRequest({ createdAt: new Date(Date.now() + 10 * 60_000) }),
     );
     if (future) {
         const response = await expectSuccess("F.12", "adminExecute runs on the future-dated request", () => execute(future.id));
-        if (response) record("F.13", "a future-dated request is rejected", response.status === 403 && /expired|invalid date/.test(response.detail), `status ${response.status}: ${response.detail}`);
+        if (response) record("F.13", "a future-dated request is rejected", response.code === 403 && /expired|invalid date/.test(response.detail), `status ${response.code}: ${response.detail}`);
     }
     if (expectAdmin) {
         const unknown = await expectSuccess("F.14", "an AdminRequest with an unknown action can be inserted", () => newRequest({ action: "dropEverything" }));
         if (unknown) {
             const response = await expectSuccess("F.15", "adminExecute runs on the unknown action", () => execute(unknown.id));
-            if (response) record("F.16", "an unknown action is rejected", response.status === 403 && /Unknown action/.test(response.detail), `status ${response.status}: ${response.detail}`);
+            if (response) record("F.16", "an unknown action is rejected", response.code === 403 && /Unknown action/.test(response.detail), `status ${response.code}: ${response.detail}`);
         }
     }
 
     const missing = await expectSuccess("F.17", "adminExecute runs for an id that does not exist", () => execute("00000000-0000-4000-8000-0000000000ff"));
-    if (missing) record("F.18", "an unknown request id is rejected", missing.status === 404, `status ${missing.status}`);
+    if (missing) record("F.18", "an unknown request id is rejected", missing.code === 404, `status ${missing.code}`);
     await expectRejection("F.19", "(d) adminExecute without a session is rejected", () =>
         anonymous.functions.adminExecute.invoke({ requestId: "00000000-0000-4000-8000-0000000000ff" }),
     );

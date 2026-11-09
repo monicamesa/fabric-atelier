@@ -19,7 +19,7 @@
 export type AppFunctionsSchema = {
   adminExecute: {
     input: { requestId: string };
-    output: { status: 200 | 403 | 404 | 409; outcome: 'done' | 'rejected'; detail: string };
+    output: { code: 200 | 403 | 404 | 409; outcome: 'done' | 'rejected'; detail: string };
   };
   dataPing: {
     input: Record<string, never>;

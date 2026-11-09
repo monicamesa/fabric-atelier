@@ -17,7 +17,7 @@ udf.func(
   'adminExecute',
   async (requestId: string, ctx: RayfinContext<AgentJurySchema, AudienceType.Sql>): Promise<AdminExecuteResult> => {
     if (!GUID.test(requestId)) {
-      return { status: 404, outcome: 'rejected', detail: 'Unknown request.' };
+      return { code: 404, outcome: 'rejected', detail: 'Unknown request.' };
     }
     return withAppSql(
       { server: ctx.Secrets.APP_SQL_SERVER, database: ctx.Secrets.APP_SQL_DATABASE, token: ctx.Tokens.Sql },
