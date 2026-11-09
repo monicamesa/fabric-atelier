@@ -149,7 +149,7 @@ These rules come from [docs/especificacion-general.md](docs/especificacion-gener
 ### Scope and workflow
 
 1. Read the specification before planning any change. Work iteration by iteration (section 12); do not build features from later iterations.
-2. This app persists data in its own Rayfin database (section 7). That overrides template critical rule 2 for the entities defined there; it still never stores credentials or tokens.
+2. Domain data (`Case`, `Testimony`, `Vote`, `Appeal`, `Hearing` and the other entities in section 7) is persisted in the app database through Rayfin entities. This is the only exception to template critical rule 2. In the browser the rule still applies: no user data in `localStorage`, `sessionStorage` or IndexedDB, except the language preference. Never store credentials or tokens.
 3. Run every npm and `npx rayfin` command from `apps/agent-jury`. Never commit tenant IDs or workspace IDs.
 4. Pin the Rayfin CLI and `fabric-data-agent-sdk` versions and document them in `README.md`.
 

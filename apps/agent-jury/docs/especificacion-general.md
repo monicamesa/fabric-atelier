@@ -2,7 +2,7 @@
 
 > **Who judges the judge?**
 > Documento pensado para vivir en `docs/especificacion-general.md` del repositorio y servir de guía a agentes de código (plan → especificación → implementación → testing → despliegue).
-> Fecha: 2026-11-09 · Estado: borrador v0.2
+> Fecha: 2026-11-09 · Estado: borrador v0.3
 >
 > **Idioma:** la interfaz es **bilingüe (inglés y español)**, con un selector de idioma en la cabecera. Inglés por defecto. Esta especificación está en español; los nombres de entidades y campos del código van siempre en inglés (ver sección 9.1).
 
@@ -58,7 +58,7 @@ Las organizaciones están publicando Fabric Data Agents, pero nadie puede afirma
 ### F1. Proponer una pregunta
 1. Un experto elige un agente y escribe la pregunta, una categoría y la respuesta que considera correcta.
 2. Junto a la respuesta indica **la definición usada**: periodo, filtros, criterio ("clientes activos = al menos un pedido en los últimos 90 días").
-3. La pregunta queda en estado **En revisión**.
+3. La pregunta queda en estado `under_review` (en revisión).
 
 ### F2. Revisar y votar
 1. Otros expertos y aprobadores del dominio ven la pregunta y sus propuestas.
@@ -78,7 +78,7 @@ Las organizaciones están publicando Fabric Data Agents, pero nadie puede afirma
 ### F5. Revisar veredictos del juez
 1. Una cola muestra cada resultado: pregunta, respuesta esperada, respuesta del agente y veredicto del juez.
 2. El revisor confirma o corrige el veredicto y, si corrige, indica el motivo: juez demasiado estricto, juez demasiado laxo, respuesta esperada incorrecta u otro.
-3. Si el motivo es "respuesta esperada incorrecta", la pregunta vuelve a **En revisión**.
+3. Si el motivo es "respuesta esperada incorrecta", la pregunta vuelve a `under_review`.
 
 ### F6. Exportar el banco aprobado
 El admin exporta las preguntas aprobadas de un agente a un CSV con columnas `question, expected_answer, category, tags`, compatible con Quality Lab.
@@ -87,10 +87,10 @@ El admin exporta las preguntas aprobadas de un agente a un CSV con columnas `que
 
 - **R1. Votos inmutables.** Un voto no se edita ni se borra. Para cambiar de opinión se emite un voto nuevo; cuenta el último de cada persona.
 - **R2. Nadie se aprueba a sí mismo.** El voto del autor de una propuesta no cuenta para su consenso.
-- **R3. Consenso (configurable).** Una propuesta queda **Aprobada** cuando tiene al menos `N` votos a favor de revisores válidos del dominio, al menos uno de un aprobador, y ningún voto en contra vigente de un aprobador. Valor por defecto: `N = 1`, pensado para equipos pequeños.
-- **R4. Conflicto.** Una pregunta está **En conflicto** si tiene dos o más propuestas con algún voto a favor, o si una propuesta tiene votos a favor y en contra de aprobadores a la vez.
-- **R5. Solo se evalúa lo aprobado.** Las evaluaciones solo usan preguntas aprobadas, con la propuesta aprobada como respuesta esperada.
-- **R6. La verdad se calcula, no se escribe.** El estado de una pregunta no es un campo editable por el cliente: se deriva de propuestas y votos (sección 7).
+- **R3. Consenso (configurable).** Una propuesta queda aprobada, y su pregunta pasa a `ruled`, cuando tiene al menos `N` votos a favor de revisores válidos del dominio, al menos uno de un aprobador, y ningún voto en contra vigente de un aprobador. Valor por defecto: `N = 1`, pensado para equipos pequeños.
+- **R4. Conflicto.** Una pregunta está en estado `disputed` (en conflicto) si tiene dos o más propuestas con algún voto a favor, o si una propuesta tiene votos a favor y en contra de aprobadores a la vez.
+- **R5. Solo se evalúa lo aprobado.** Las evaluaciones solo usan preguntas en estado `ruled`, con la propuesta aprobada como respuesta esperada.
+- **R6. La verdad se calcula, no se escribe.** El estado de una pregunta (`under_review`, `ruled`, `disputed` o `dismissed`) no es un campo editable por el cliente: se deriva de propuestas y votos (sección 7).
 
 ## 7. Modelo de datos (base de datos de la app)
 
@@ -104,16 +104,16 @@ Convenciones de Rayfin a respetar:
 
 | Entidad | Campos principales | Permisos |
 |---|---|---|
-| `Dominio` | `nombre` | Lectura: autenticados. Escritura: admin (ver nota) |
-| `Revisor` | `email`, `dominio_id`, `rol` (`experto` · `aprobador` · `admin`), `activo` | Lectura: autenticados. Escritura: admin (ver nota) |
-| `Agente` | `nombre`, `workspace_id`, `item_id`, `dominio_id`, `activo` | Lectura: autenticados. Escritura: admin (ver nota) |
-| `Pregunta` | `agente_id`, `texto` (max 1000), `categoria`, `tags`, `autor_user_id`, `retirada` | Crear: autenticados con `claims.sub.eq(item.autor_user_id)`. Leer: autenticados. Sin actualizar ni borrar |
-| `Propuesta` | `pregunta_id`, `respuesta` (max 2000), `definicion` (max 1000), `autor_user_id`, `autor_email` | Crear: igual que `Pregunta`. Leer: autenticados. Sin actualizar ni borrar |
-| `Voto` | `propuesta_id`, `valor` (`a_favor` · `en_contra`), `comentario` (max 1000), `votante_user_id`, `votante_email` | Crear: `claims.sub.eq(item.votante_user_id)`. Leer: autenticados. Sin actualizar ni borrar |
-| `Ejecucion` | `agente_id`, `etapa`, `lanzada_por_user_id`, `job_instance_id`, `evaluation_id`, `estado`, `n_preguntas` | Crear y actualizar: solo desde la Function |
-| `VeredictoHumano` | `ejecucion_id`, `pregunta_id`, `veredicto_juez`, `veredicto_humano` (`correcto` · `incorrecto` · `ambiguo`), `motivo`, `comentario` (max 1000), `revisor_user_id` | Crear: `claims.sub.eq(item.revisor_user_id)`. Leer: autenticados. Sin actualizar ni borrar |
+| `Domain` | `name` | Lectura: autenticados. Escritura: admin (ver nota) |
+| `Juror` | `email`, `domain_id`, `role` (`expert` · `approver` · `admin`), `active` | Lectura: autenticados. Escritura: admin (ver nota) |
+| `Agent` | `name`, `workspace_id`, `item_id`, `domain_id`, `active` | Lectura: autenticados. Escritura: admin (ver nota) |
+| `Case` | `agent_id`, `text` (max 1000), `category`, `tags`, `author_user_id`, `dismissed` | Crear: autenticados con `claims.sub.eq(item.author_user_id)`. Leer: autenticados. Sin actualizar ni borrar |
+| `Testimony` | `case_id`, `answer` (max 2000), `definition` (max 1000), `author_user_id`, `author_email` | Crear: igual que `Case`. Leer: autenticados. Sin actualizar ni borrar |
+| `Vote` | `testimony_id`, `value` (`for` · `against`), `comment` (max 1000), `voter_user_id`, `voter_email` | Crear: `claims.sub.eq(item.voter_user_id)`. Leer: autenticados. Sin actualizar ni borrar |
+| `Hearing` | `agent_id`, `stage`, `launched_by_user_id`, `job_instance_id`, `evaluation_id`, `status`, `case_count` | Crear y actualizar: solo desde la Function |
+| `Appeal` | `hearing_id`, `case_id`, `judge_verdict`, `human_verdict` (`correct` · `incorrect` · `ambiguous`), `reason`, `comment` (max 1000), `reviewer_user_id` | Crear: `claims.sub.eq(item.reviewer_user_id)`. Leer: autenticados. Sin actualizar ni borrar |
 
-**Nota sobre la escritura de admin:** las políticas no permiten comprobar pertenencia a una lista. Para el MVP, `Dominio`, `Revisor` y `Agente` se escriben a través de Functions que comprueban que el llamante figura como `admin` en `Revisor` antes de escribir (usando `ctx.getDataClient()`, que conserva la identidad del llamante). El primer admin se siembra directamente en la base de datos.
+**Nota sobre la escritura de admin:** las políticas no permiten comprobar pertenencia a una lista. Para el MVP, `Domain`, `Juror` y `Agent` se escriben a través de Functions que comprueban que el llamante figura como `admin` en `Juror` antes de escribir (usando `ctx.getDataClient()`, que conserva la identidad del llamante). El primer admin se siembra directamente en la base de datos.
 
 **Cálculo del estado:** en el MVP, el frontend calcula el estado de cada pregunta a partir de propuestas, votos y revisores para mostrarlo. El cálculo autoritativo (el que decide qué entra en una evaluación o en el export) se hace en el notebook o la Function correspondiente, con la misma lógica. Esa lógica vive en un único módulo compartido con tests.
 
@@ -121,30 +121,30 @@ Convenciones de Rayfin a respetar:
 
 ```
 [Fabric App: frontend React]
-   │ GraphQL (Rayfin client)                 → BD de la app: Pregunta, Propuesta, Voto, VeredictoHumano…
-   │ Connector fabric-sqlanalytics (lectura) → Lakehouse "tribunal_lh": tablas de resultados del SDK
+   │ GraphQL (Rayfin client)                 → BD de la app: Case, Testimony, Vote, Appeal…
+   │ Connector fabric-sqlanalytics (lectura) → Lakehouse "jury_lh": tablas de resultados del SDK
    │ Functions (identidad de la app)
    │    ├─ registrar/gestionar agentes y revisores (comprobando rol admin)
    │    └─ lanzar evaluación → API Job Scheduler: ejecutar notebook con parámetros
    ▼
-[Notebook "evaluar_agente"]
+[Notebook "evaluate_agent"]
    1. Lee las preguntas aprobadas de la BD de la app (cálculo autoritativo de estado)
    2. evaluate_data_agent(df, agente, workspace, table_name, data_agent_stage)
-   3. Escribe resultados en tribunal_lh (tablas del SDK + tabla de metadatos de ejecución)
-[Notebook "exportar_banco"]
-   → Files/ground_truth/<agente>.csv con question, expected_answer, category, tags
+   3. Escribe resultados en jury_lh (tablas del SDK + tabla de metadatos de ejecución)
+[Notebook "export_case_law"]
+   → Files/ground_truth/<agent>.csv con question, expected_answer, category, tags
 ```
 
 Decisiones:
 - **Plantilla:** Data App de Rayfin (framework de visuales y validación con Playwright). Activar datos en `rayfin.yml`.
-- **Lectura de resultados:** connector `fabric-sqlanalytics` sobre `tribunal_lh`. Con CLI 1.36.2 usa por defecto la identidad de la app; acceso protegido con `@role` en las entidades del connector.
+- **Lectura de resultados:** connector `fabric-sqlanalytics` sobre `jury_lh`. Con CLI 1.36.2 usa por defecto la identidad de la app; acceso protegido con `@role` en las entidades del connector.
 - **Lanzar evaluaciones:** Function con *audience* `Fabric` que llama a *Run On Demand Item Job* del notebook. Límite de 240 s por ejecución de Function: solo lanza el job y devuelve el `job_instance_id`; el seguimiento del estado se hace por consulta posterior.
 - **Región:** app, Lakehouse, notebooks y capacidad en la misma región (las conexiones al endpoint SQL entre regiones no están soportadas). Región con Fabric Apps disponible.
 
 ## 9. Pantallas
 
 1. **Agentes:** lista de agentes registrados con dominio, nº de preguntas por estado y % de acuerdo juez-humano.
-2. **Banco de preguntas (por agente):** columnas por estado (En revisión · Aprobada · En conflicto · Retirada), filtros por categoría.
+2. **Banco de preguntas (por agente):** columnas por estado (`under_review` · `ruled` · `disputed` · `dismissed`), filtros por categoría.
 3. **Detalle de pregunta:** propuestas con su definición, votos con comentarios, historial; acciones de votar y proponer alternativa.
 4. **Conflictos:** propuestas enfrentadas lado a lado con sus definiciones y quién respalda cada una.
 5. **Ejecuciones:** lanzar evaluación, estado de cada ejecución, resumen de resultados.
@@ -165,15 +165,15 @@ Requisitos de idioma:
 | Concepto | UI (EN) | UI (ES) | Nombre en código |
 |---|---|---|---|
 | El LLM que evalúa | **Judge** | **Juez** | `judgeVerdict` |
-| Expertos de negocio | **Jury** / **Juror** | **Jurado** / **Miembro del jurado** | `Juror` (sustituye a `Revisor`) |
+| Expertos de negocio | **Jury** / **Juror** | **Jurado** / **Miembro del jurado** | `Juror` |
 | El Data Agent evaluado | **Defendant** (ayuda) / **Agent** (listas) | **Acusado** (ayuda) / **Agente** (listas) | `Agent` |
-| Pregunta con su historial | **Case** | **Caso** | `Case` (sustituye a `Pregunta`) |
-| Respuesta esperada propuesta | **Testimony** | **Testimonio** | `Testimony` (sustituye a `Propuesta`) |
+| Pregunta con su historial | **Case** | **Caso** | `Case` |
+| Respuesta esperada propuesta | **Testimony** | **Testimonio** | `Testimony` |
 | Voto | **Vote** | **Voto** | `Vote` |
 | Conflicto entre áreas | **Dispute** | **Disputa** | estado `disputed` |
-| Corregir el veredicto del juez | **Appeal** | **Recurso** | `Appeal` (sustituye a `VeredictoHumano`) |
+| Corregir el veredicto del juez | **Appeal** | **Recurso** | `Appeal` |
 | Respuestas aprobadas y conflictos resueltos | **Case law** | **Jurisprudencia** | vista `caseLaw` |
-| Ejecución de evaluación | **Hearing** | **Vista** | `Hearing` (sustituye a `Ejecucion`) |
+| Ejecución de evaluación | **Hearing** | **Vista** | `Hearing` |
 
 Estados de un case: `under_review`, `ruled` (aprobado), `disputed`, `dismissed` (retirado).
 
@@ -203,8 +203,8 @@ La app no necesita un modelo propio, pero sí **algo que juzgar**: al menos un D
 
 | Workspace | Contenido |
 |---|---|
-| `agent-jury-app` | La Fabric App con su base de datos, el Lakehouse `jury_lh` (resultados del SDK y bancos exportados) y los notebooks `evaluate_agent` y `export_case_law` |
-| `agent-jury-demo` | Datos de origen, modelo semántico y los Data Agents a evaluar |
+| `FabricApp-AgentJury` | La Fabric App con su base de datos, el Lakehouse `jury_lh` (resultados del SDK y bancos exportados) y los notebooks `evaluate_agent` y `export_case_law` |
+| `FabricApp-AgentJury-Demo` | Datos de origen, modelo semántico y los Data Agents a evaluar |
 
 Ambos en la misma capacidad de pago (F2 o superior) y en una región con Fabric Apps disponible.
 
@@ -224,11 +224,11 @@ Configuración de tenant necesaria: Data Agents habilitados y, según la región
 
 | Iteración | Contenido | Criterio de salida |
 |---|---|---|
-| **I1** | Esqueleto con plantilla Data App + datos activados; entidades `Dominio`, `Revisor`, `Agente`, `Pregunta`, `Propuesta`; pantallas 1–3 sin votos | Un experto crea preguntas y propuestas; despliegue en Fabric correcto |
-| **I2** | `Voto`, módulo de cálculo de estado con tests, reglas R1–R6, pantalla 4 | Los estados se calculan bien en todos los casos de prueba, incluidos conflictos y autoaprobación |
-| **I3** | Lakehouse, notebook `evaluar_agente`, Function de lanzamiento, connector de lectura, pantalla 5. Verificar S1–S5 | Una evaluación lanzada desde la app produce resultados visibles en la app |
-| **I4** | `VeredictoHumano`, pantallas 6 y 7, vuelta a revisión por respuesta esperada incorrecta | Se calcula el % de acuerdo juez-humano por agente y categoría |
-| **I5** | Notebook `exportar_banco` y prueba de importación en Quality Lab | El CSV exportado se carga sin errores en Quality Lab |
+| **I1** | Esqueleto con plantilla Data App + datos activados; entidades `Domain`, `Juror`, `Agent`, `Case`, `Testimony`; pantallas 1–3 sin votos | Un experto crea preguntas y propuestas; despliegue en Fabric correcto |
+| **I2** | `Vote`, módulo de cálculo de estado con tests, reglas R1–R6, pantalla 4 | Los estados se calculan bien en todos los casos de prueba, incluidos conflictos y autoaprobación |
+| **I3** | Lakehouse `jury_lh`, notebook `evaluate_agent`, Function de lanzamiento, connector de lectura, pantalla 5. Verificar S1–S5 | Una evaluación lanzada desde la app produce resultados visibles en la app |
+| **I4** | `Appeal`, pantallas 6 y 7, vuelta a revisión por respuesta esperada incorrecta | Se calcula el % de acuerdo juez-humano por agente y categoría |
+| **I5** | Notebook `export_case_law` y prueba de importación en Quality Lab | El CSV exportado se carga sin errores en Quality Lab |
 
 ## 13. Criterios de aceptación del MVP
 
