@@ -1,15 +1,12 @@
 // Runs the I1b post-deploy checks of clerkExecute's actions as the `rayfin login` user, who must be an active admin.
 // Prints only pass/fail lines: never tokens, emails or identifiers.
-//   node scripts/i1b-checks.mjs
+//   node scripts/i1b-checks.mjs [--target=production --allow-production]   (default: the test deployment)
 // Leaves an inactive example juror (i1b.check@example.com) and a retired example agent: nothing is ever deleted.
-import { readFileSync } from "node:fs";
-import { resolve } from "node:path";
 import { getAuthenticatedToken } from "@microsoft/rayfin-cli/auth";
 import { RayfinClient } from "@microsoft/rayfin-client";
 import { signInWithEntraToken } from "@microsoft/rayfin-auth-provider-fabric";
+import { resolveTarget } from "./lib/deployment-target.mjs";
 
-const appRoot = resolve(import.meta.dirname, "..");
-const GUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const CHECK_JUROR_EMAIL = "i1b.check@example.com";
 const CHECK_AGENT = {
     name: "I1b check agent (example)",
@@ -18,23 +15,8 @@ const CHECK_AGENT = {
 };
 const MISSING_ID = "00000000-0000-4000-8000-000000000059";
 
-function readEnvFile(path) {
-    const values = {};
-    for (const line of readFileSync(path, "utf8").split(/\r?\n/)) {
-        const match = line.match(/^\s*([A-Z0-9_]+)\s*=\s*(.*?)\s*$/);
-        if (match) values[match[1]] = match[2].replace(/^["']|["']$/g, "");
-    }
-    return values;
-}
-
-const privateValues = readEnvFile(resolve(appRoot, "..", "..", ".private", "values.env"));
-const rayfinEnv = readEnvFile(resolve(appRoot, "rayfin", ".env"));
-const tenantId = privateValues.TENANT_ID;
-const baseUrl = rayfinEnv.RAYFIN_PUBLIC_API_URL;
-const publishableKey = rayfinEnv.RAYFIN_PUBLIC_PUBLISHABLE_KEY;
-if (!GUID.test(tenantId ?? "") || !baseUrl?.startsWith("https://") || !publishableKey) {
-    throw new Error("Missing TENANT_ID in .private/values.env or the deployment values in rayfin/.env.");
-}
+const { target, tenantId, baseUrl, publishableKey } = resolveTarget();
+console.log(`Target: ${target} deployment`);
 
 const results = [];
 function record(id, description, passed, detail = "") {

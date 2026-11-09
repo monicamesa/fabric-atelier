@@ -1,38 +1,21 @@
 // Runs the I1a post-deploy checks against the deployed app as the `rayfin login` user.
 // Prints only pass/fail lines: never tokens, emails or identifiers.
-//   node scripts/i1a-checks.mjs [--only=removed,probe,r1] [--expect-admin]
+//   node scripts/i1a-checks.mjs [--only=removed,probe,r1] [--expect-admin] [--target=production --allow-production]
 // --expect-admin: the signed-in user is an active admin juror; without it, the user must not be one.
-import { readFileSync } from "node:fs";
-import { resolve } from "node:path";
+// Default target: the test deployment (rayfin/.env.test).
 import { getAuthenticatedToken } from "@microsoft/rayfin-cli/auth";
 import { RayfinClient } from "@microsoft/rayfin-client";
 import { signInWithEntraToken } from "@microsoft/rayfin-auth-provider-fabric";
+import { resolveTarget } from "./lib/deployment-target.mjs";
 
-const appRoot = resolve(import.meta.dirname, "..");
-const GUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const onlyArg = process.argv.find((arg) => arg.startsWith("--only="));
 const sections = new Set((onlyArg ? onlyArg.slice("--only=".length) : "removed,probe,r1").split(","));
 const expectAdmin = process.argv.includes("--expect-admin");
 // A seeded example admin: claiming its email must be rejected at the insert.
 const OTHER_ADMIN_EMAIL = "dario.admin@example.com";
 
-function readEnvFile(path) {
-    const values = {};
-    for (const line of readFileSync(path, "utf8").split(/\r?\n/)) {
-        const match = line.match(/^\s*([A-Z0-9_]+)\s*=\s*(.*?)\s*$/);
-        if (match) values[match[1]] = match[2].replace(/^["']|["']$/g, "");
-    }
-    return values;
-}
-
-const privateValues = readEnvFile(resolve(appRoot, "..", "..", ".private", "values.env"));
-const rayfinEnv = readEnvFile(resolve(appRoot, "rayfin", ".env"));
-const tenantId = privateValues.TENANT_ID;
-const baseUrl = rayfinEnv.RAYFIN_PUBLIC_API_URL;
-const publishableKey = rayfinEnv.RAYFIN_PUBLIC_PUBLISHABLE_KEY;
-if (!GUID.test(tenantId ?? "") || !baseUrl?.startsWith("https://") || !publishableKey) {
-    throw new Error("Missing TENANT_ID in .private/values.env or the deployment values in rayfin/.env.");
-}
+const { target, tenantId, baseUrl, publishableKey } = resolveTarget();
+console.log(`Target: ${target} deployment`);
 
 // Same delegated scope and token source as @microsoft/rayfin-local-dev's automatic sign-in.
 async function getEntraToken() {

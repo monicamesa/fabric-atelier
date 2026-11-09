@@ -1,6 +1,7 @@
 // Runs a T-SQL file against the agent-jury app database as the signed-in Azure CLI user (the item owner).
-//   node scripts/run-sql.mjs <file.sql> [--var Name=VALUES_KEY ...]
-// Server and database come from .private/values.env (APP_SQL_SERVER_AGENT_JURY, APP_SQL_DATABASE_AGENT_JURY).
+//   node scripts/run-sql.mjs <file.sql> [--target=test] [--var Name=VALUES_KEY ...]
+// Server and database come from .private/values.env (APP_SQL_SERVER_AGENT_JURY, APP_SQL_DATABASE_AGENT_JURY,
+// or the *_TEST keys with --target=test).
 // Each --var replaces $(Name) in the script with the value of VALUES_KEY from .private/values.env,
 // so private values such as the admin email never appear in tracked files or on the command line.
 import { readFileSync } from "node:fs";
@@ -8,7 +9,9 @@ import { execFileSync } from "node:child_process";
 import { resolve } from "node:path";
 import sql from "mssql";
 
-const [file, ...rest] = process.argv.slice(2);
+const args = process.argv.slice(2);
+const isTest = args.includes("--target=test");
+const [file, ...rest] = args.filter((arg) => !arg.startsWith("--target="));
 if (!file) {
     throw new Error("Usage: node scripts/run-sql.mjs <file.sql> [--var Name=VALUES_KEY ...]");
 }
@@ -36,10 +39,11 @@ if (unresolved) {
     throw new Error(`Unresolved SQLCMD variable ${unresolved[0]}; pass --var.`);
 }
 
-const serverFqdn = values.APP_SQL_SERVER_AGENT_JURY;
-const database = values.APP_SQL_DATABASE_AGENT_JURY;
+const suffix = isTest ? "_TEST" : "";
+const serverFqdn = values[`APP_SQL_SERVER_AGENT_JURY${suffix}`];
+const database = values[`APP_SQL_DATABASE_AGENT_JURY${suffix}`];
 if (!serverFqdn || !database) {
-    throw new Error("APP_SQL_SERVER_AGENT_JURY or APP_SQL_DATABASE_AGENT_JURY missing; run scripts/find-app-sql-database.mjs.");
+    throw new Error(`APP_SQL_SERVER_AGENT_JURY${suffix} or APP_SQL_DATABASE_AGENT_JURY${suffix} missing; run scripts/find-app-sql-database.mjs${isTest ? " --target=test" : ""}.`);
 }
 // Fabric reports serverFqdn as "host,port".
 const [server, port] = serverFqdn.split(",");

@@ -97,12 +97,14 @@ El admin exporta las preguntas aprobadas de un agente a un CSV con columnas `que
 
 - **R1. Votos inmutables.** Un voto no se edita ni se borra. Para cambiar de opinión se emite un voto nuevo; cuenta el último de cada persona.
 - **R2. Nadie se aprueba a sí mismo.** El voto del autor de una propuesta no cuenta para su consenso.
-- **R3. Consenso (configurable).** Una propuesta queda aprobada, y su pregunta pasa a `ruled`, cuando tiene al menos `N` votos a favor de revisores válidos (jurors activos), al menos uno de un aprobador, y ningún voto en contra vigente de un aprobador. Valor por defecto: `N = 1`, pensado para equipos pequeños.
+- **R3. Consenso (configurable).** Una propuesta queda aprobada, y su pregunta pasa a `ruled`, cuando tiene al menos `N` votos a favor de revisores válidos (jurors activos), al menos uno de un aprobador, y ningún voto en contra vigente de un aprobador. Valor por defecto: `N = 2`, en una sola constante (`CONSENSUS_MIN_VOTES`) que usan el cálculo y los textos de la interfaz; con `N = 1` un aprobador fallaría solo. El voto de un admin cuenta como el de un experto, nunca como el de un aprobador.
 - **R4. Conflicto.** Una pregunta está en estado `disputed` (en conflicto) si tiene dos o más propuestas con algún voto a favor, o si una propuesta tiene votos a favor y en contra de aprobadores a la vez.
 - **R5. Solo se evalúa lo aprobado.** Las evaluaciones solo usan preguntas en estado `ruled`, con la propuesta aprobada como respuesta esperada.
 - **R6. La verdad se calcula, no se escribe.** El estado de una pregunta (`under_review`, `ruled`, `disputed` o `dismissed`) no es un campo editable por el cliente: se deriva de propuestas, votos y retiradas (sección 7).
 - **R7. Cases no verificados.** Cualquier usuario autenticado puede insertar un case, pero solo cuentan los que tiene como autor un juror activo. Los demás se muestran como "no verificados" (*unverified*) y nunca entran en una evaluación ni en el export. Lo mismo vale para los testimonies: solo cuentan los de jurors activos.
 - **R8. Retirada.** Un case está `dismissed` si tiene al menos un `CaseDismissal` válido: insertado por el autor del case o por un admin. Las retiradas de otros usuarios se ignoran.
+
+**Riesgo conocido: las fechas las pone el cliente.** Rayfin no genera `createdAt` en el servidor (el `default` de `@date` es un valor fijo y las tablas no tienen columnas de fecha del sistema). Un cliente podría fechar un voto en el futuro para que fuera siempre el último (R1). Mitigación: el cálculo ignora los registros fechados más de 5 minutos en el futuro y el acta los marca. Revisar si una versión futura de Rayfin admite fechas generadas por el servidor.
 
 ## 7. Modelo de datos (base de datos de la app)
 
@@ -267,7 +269,8 @@ Configuración de tenant necesaria: Data Agents habilitados y, según la región
 |---|---|---|
 | **I1a** | Datos activados; entidades `Juror`, `Agent`, `Case`, `Testimony` y `CaseDismissal`; seed; i18n EN/ES; tests; verificación de R1, S-A y S-B; pantallas 1–3 sin votos | Un juror crea preguntas y propuestas en la app desplegada; R1, S-A y S-B confirmados |
 | **I1b** | Function de admin (T-SQL con identidad de la app) y pantalla 8 para gestionar jurors y agentes | Solo un admin puede dar de alta o modificar jurors y agentes; cualquier otro intento se rechaza |
-| **I2** | `Vote`, módulo de cálculo de estado con tests, reglas R1–R8, pantalla 4 | Los estados se calculan bien en todos los casos de prueba, incluidos conflictos, autoaprobación, cases no verificados y retiradas |
+| **I1c** | Despliegue de pruebas; `Vote`; cálculo de estado con R1–R8 y tests; pantallas 1–3 (Home, Cases, Case detail) | Dos jurados llevan un case a `ruled` y otro a `disputed` en el despliegue de pruebas; las tres pantallas muestran el mismo estado |
+| **I2** | Pantalla 4 (conflictos) y lo que surja de I1c | La vista de conflictos muestra las propuestas enfrentadas lado a lado |
 | **I3** | Lakehouse `jury_lh`, notebook `evaluate_agent`, Function de lanzamiento, connector de lectura, pantalla 5. Verificar S1–S5 | Una evaluación lanzada desde la app produce resultados visibles en la app |
 | **I4** | `Appeal`, pantallas 6 y 7, vuelta a revisión por respuesta esperada incorrecta | Se calcula el % de acuerdo juez-humano por agente y categoría |
 | **I5** | Notebook `export_case_law` y prueba de importación en Quality Lab | El CSV exportado se carga sin errores en Quality Lab |

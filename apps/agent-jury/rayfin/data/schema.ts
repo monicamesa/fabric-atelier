@@ -3,6 +3,7 @@ import { Agent } from './Agent.js';
 import { Case } from './Case.js';
 import { Testimony } from './Testimony.js';
 import { CaseDismissal } from './CaseDismissal.js';
+import { Vote } from './Vote.js';
 import { AdminRequest } from './AdminRequest.js';
 import { AdminRequestResult } from './AdminRequestResult.js';
 
@@ -12,8 +13,9 @@ export type AgentJurySchema = {
   Case: Case;
   Testimony: Testimony;
   CaseDismissal: CaseDismissal;
+  Vote: Vote;
   AdminRequest: AdminRequest;
   AdminRequestResult: AdminRequestResult;
 };
 
-export const schema = [Juror, Agent, Case, Testimony, CaseDismissal, AdminRequest, AdminRequestResult];
+export const schema = [Juror, Agent, Case, Testimony, CaseDismissal, Vote, AdminRequest, AdminRequestResult];

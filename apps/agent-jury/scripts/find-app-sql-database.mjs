@@ -1,6 +1,6 @@
 // Looks up the app's SQL database coordinates with the Fabric REST API and stores them in
 // .private/values.env (APP_SQL_SERVER_AGENT_JURY, APP_SQL_DATABASE_AGENT_JURY) without printing them.
-//   node scripts/find-app-sql-database.mjs
+//   node scripts/find-app-sql-database.mjs [--target=test]   (--target=test stores the *_TEST keys)
 import { appendFileSync, readFileSync } from "node:fs";
 import { spawnSync } from "node:child_process";
 import { resolve } from "node:path";
@@ -15,9 +15,10 @@ const values = Object.fromEntries(
         .filter(Boolean)
         .map((match) => [match[1], match[2]]),
 );
-const { TENANT_ID: tenantId, WORKSPACE_ID_AGENT_JURY: workspaceId } = values;
+const suffix = process.argv.includes("--target=test") ? "_TEST" : "";
+const { TENANT_ID: tenantId, [`WORKSPACE_ID_AGENT_JURY${suffix}`]: workspaceId } = values;
 if (!GUID.test(tenantId ?? "") || !GUID.test(workspaceId ?? "")) {
-    throw new Error("TENANT_ID or WORKSPACE_ID_AGENT_JURY is missing in .private/values.env.");
+    throw new Error(`TENANT_ID or WORKSPACE_ID_AGENT_JURY${suffix} is missing in .private/values.env.`);
 }
 
 const token = spawnSync(
@@ -54,8 +55,8 @@ if (!server || !name) {
 }
 
 const missing = [
-    ["APP_SQL_SERVER_AGENT_JURY", server],
-    ["APP_SQL_DATABASE_AGENT_JURY", name],
+    [`APP_SQL_SERVER_AGENT_JURY${suffix}`, server],
+    [`APP_SQL_DATABASE_AGENT_JURY${suffix}`, name],
 ].filter(([key]) => !(key in values));
 for (const [key, value] of missing) {
     appendFileSync(valuesPath, `${key}=${value}\n`);
