@@ -211,6 +211,11 @@
     outline-offset: 3px;
   }
 
+  /* Keyboard focus only: no ring after a mouse click, whatever a library sets on :focus. */
+  :focus:not(:focus-visible) {
+    outline: none;
+  }
+
   /* Native controls (radios, selects, scrollbars) follow the Docket theme. */
   [data-theme="dark"] {
     color-scheme: dark;

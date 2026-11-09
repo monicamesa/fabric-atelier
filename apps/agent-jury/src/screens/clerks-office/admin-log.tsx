@@ -8,12 +8,30 @@ import { isAppLanguage } from "@/i18n/language-preference";
 import { formatDateTime, formatLogDay } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import type { LogLine } from "./log-entry";
+import { visibleLogLines } from "./log-entry";
 
 interface LogState {
     status: "loading" | "success" | "error";
     lines?: LogLine[];
     technicalDetails?: string;
     reload: () => void;
+    showChecks: boolean;
+    onShowChecksChange: (show: boolean) => void;
+}
+
+function ChecksToggle({ log }: { log: LogState }) {
+    const { t } = useTranslation();
+    return (
+        <label className="inline-flex min-h-11 cursor-pointer items-center gap-2 self-start text-[14px] text-text">
+            <input
+                type="checkbox"
+                checked={log.showChecks}
+                onChange={(event) => log.onShowChecksChange(event.target.checked)}
+                className="size-4 accent-[var(--ink)]"
+            />
+            {t("clerk.log.showChecks")}
+        </label>
+    );
 }
 
 function useLanguage() {
@@ -30,7 +48,7 @@ function LogFailure({ log }: { log: LogState }) {
 export function LatestChanges({ log, onOpenLog }: { log: LogState; onOpenLog: () => void }) {
     const { t } = useTranslation();
     const language = useLanguage();
-    const lines = log.lines?.slice(0, 3);
+    const lines = log.lines && visibleLogLines(log.lines, log.showChecks).slice(0, 3);
 
     return (
         <section aria-labelledby="clerk-latest-title" className="flex flex-col gap-2">
@@ -46,7 +64,9 @@ export function LatestChanges({ log, onOpenLog }: { log: LogState; onOpenLog: ()
                     <Skeleton className="h-5 w-4/5" />
                 </div>
             ) : lines.length === 0 ? (
-                <p className="m-0 py-2 text-[14px] text-text-muted">{t("clerk.latest.empty")}</p>
+                <p className="m-0 py-2 text-[14px] text-text-muted">
+                    {t(log.lines?.length ? "clerk.log.onlyChecks" : "clerk.latest.empty")}
+                </p>
             ) : (
                 <ol className="m-0 list-none p-0">
                     {lines.map((line, index) => {
@@ -69,6 +89,7 @@ export function LatestChanges({ log, onOpenLog }: { log: LogState; onOpenLog: ()
                     })}
                 </ol>
             )}
+            <ChecksToggle log={log} />
             <Button variant="link" compact className="self-start text-ruled" onClick={onOpenLog}>
                 {t("clerk.latest.openLog")}
             </Button>
@@ -80,6 +101,7 @@ export function LatestChanges({ log, onOpenLog }: { log: LogState; onOpenLog: ()
 export function AdminLogPanel({ log }: { log: LogState }) {
     const { t } = useTranslation();
     const language = useLanguage();
+    const lines = log.lines && visibleLogLines(log.lines, log.showChecks);
 
     return (
         <section aria-labelledby="clerk-log-title" className="flex flex-col gap-3">
@@ -88,18 +110,19 @@ export function AdminLogPanel({ log }: { log: LogState }) {
                     {t("clerk.log.title")}
                 </h2>
                 <p className="m-0 text-[15px] text-text-muted">{t("clerk.log.help")}</p>
+                <ChecksToggle log={log} />
             </div>
-            {log.status === "error" && !log.lines ? (
+            {log.status === "error" && !lines ? (
                 <LogFailure log={log} />
-            ) : !log.lines ? (
+            ) : !lines ? (
                 <div className="flex flex-col gap-2">
                     <LoadingLine>{t("clerk.loading")}</LoadingLine>
                     {[0, 1, 2, 3].map((row) => (
                         <Skeleton key={row} className="h-11 w-full" />
                     ))}
                 </div>
-            ) : log.lines.length === 0 ? (
-                <EmptyState message={t("clerk.latest.empty")} />
+            ) : lines.length === 0 ? (
+                <EmptyState message={t(log.lines?.length ? "clerk.log.onlyChecks" : "clerk.latest.empty")} />
             ) : (
                 <AdminTable
                     caption={t("clerk.log.caption")}
@@ -109,7 +132,7 @@ export function AdminLogPanel({ log }: { log: LogState }) {
                         { key: "result", header: t("clerk.log.columns.result"), align: "right" },
                     ]}
                 >
-                    {log.lines.map((line) => (
+                    {lines.map((line) => (
                         <AdminRow key={line.id}>
                             <AdminCell className="whitespace-nowrap font-mono text-[13px] text-text-muted">
                                 <time dateTime={line.processedAt}>{formatDateTime(line.processedAt, language)}</time>

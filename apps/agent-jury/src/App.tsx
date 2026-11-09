@@ -31,9 +31,11 @@ function App() {
         return email ? jury.data?.find((juror) => juror.email.toLowerCase() === email) : undefined;
     }, [client, jury.data]);
     const isAdmin = me?.active === true && me.role === "admin";
+    // A #clerk link waits for the jury list; non-admins then land on Home. clerkExecute is the real check.
+    const current: Page = page === "clerk" && (isAdmin || !jury.data) ? "clerk" : "home";
 
     const items: NavItem<Page>[] = [{ id: "home", label: t("nav.home") }];
-    if (isAdmin || page === "clerk") items.push({ id: "clerk", label: t("nav.clerk") });
+    if (isAdmin) items.push({ id: "clerk", label: t("nav.clerk") });
 
     function navigate(next: Page) {
         setPage(next);
@@ -42,11 +44,11 @@ function App() {
 
     return (
         <div className="min-h-full bg-paper text-text">
-            <Masthead items={items} current={page} onNavigate={navigate} />
+            <Masthead items={items} current={current} onNavigate={navigate} />
             <main className="mx-auto flex w-full max-w-[1360px] flex-col gap-6 px-4 pb-8 pt-5 sm:px-6">
                 {!client ? (
                     <Objection message={t("errors.load")} technicalDetails={String(connectError)} />
-                ) : page === "clerk" ? (
+                ) : current === "clerk" ? (
                     <ClerksOffice client={client} jury={jury} me={me} />
                 ) : (
                     <>

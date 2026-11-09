@@ -130,6 +130,9 @@
             "noActivity": "Sin actividad aún",
             "selfNote": "No puedes quitarte a ti mismo",
             "roleFor": "Rol de {{name}}",
+            "changeRole": "Cambiar rol",
+            "changeRoleNamed": "Cambiar el rol de {{name}}",
+            "cancel": "Cancelar",
             "saveRole": "Guardar rol",
             "deactivate": "Desactivar",
             "deactivateNamed": "Desactivar a {{name}}",
@@ -208,6 +211,8 @@
             "today": "Hoy",
             "someone": "alguien",
             "loadError": "No se ha podido cargar el registro de admin.",
+            "showChecks": "Mostrar comprobaciones automáticas",
+            "onlyChecks": "De momento solo hay comprobaciones automáticas. Marca \"Mostrar comprobaciones automáticas\" para verlas.",
             "rejectedLine": "Rechazado: {{sentence}} ({{reason}})",
             "entry": {
                 "swearInJuror": "{{who}} incorporó a {{target}} como {{role}}",

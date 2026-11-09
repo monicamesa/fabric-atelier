@@ -52,7 +52,8 @@ async function clerk(action, payload) {
         const request = await client.data.AdminRequest.create({
             requesterEmail: email,
             action,
-            payload: JSON.stringify(payload),
+            // Marks the request as automated; the Clerk's office hides it by default.
+            payload: JSON.stringify({ ...payload, source: "check" }),
             createdAt: new Date(),
         });
         return await client.functions.clerkExecute.invoke({ requestId: request.id });

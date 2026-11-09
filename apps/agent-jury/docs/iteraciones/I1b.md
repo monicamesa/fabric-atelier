@@ -163,3 +163,24 @@ Sigue [`admin.html`](../design/mockups/admin.html) y el componente "Admin table"
 - Las etiquetas `sr-only` de la tabla salían del contenedor con scroll y desbordaban la página en móvil.
 - Los controles nativos (radios, selects) siguen el tema oscuro con `color-scheme`.
 - Las filas antiguas del registro (I1a, sin `reason`) se describen a partir del detalle, y `probe` aparece como "petición de prueba".
+
+## 10. Revisión del 2026-11-09
+
+**Tabla de admin:**
+- Actividad se oculta por debajo de 1024 px y Equipo por debajo de 768 px (antes, las dos a 1200 px).
+- Por debajo de 640 px cada juror es una tarjeta: avatar y nombre, chip de rol y las acciones como botones a todo el ancho. Sin scroll lateral. La decisión se toma con `useMediaQuery`, así que solo se pinta una de las dos vistas.
+- El rol ya no aparece dos veces: queda el chip, y la acción de texto "Change role" / "Cambiar rol" abre un desplegable en la propia fila con Guardar y Cancelar.
+- Los desplegables siguen la guía: esquinas rectas, borde de 1 px en tinta, 44 px de alto y colores de los tokens en ambos temas (`SelectField`).
+- Rol y Acciones tienen ancho fijo, para que chips y acciones se alineen en todas las filas.
+- Avatares con un color estable por persona, derivado de su id, de la paleta (verde de fallo, azul de revisión, coral, tinta). Cada par fondo/texto llega a 4,5:1 en los dos temas.
+- La separación entre las pestañas y "The jury" se reduce a la mitad.
+
+**Ruido de las comprobaciones en el registro:**
+- Los scripts añaden `source: "check"` al payload de cada `AdminRequest` que crean. No se borra ni se edita nada.
+- Las filas anteriores a la marca (todas las de I1a e I1b hasta las 15:11 UTC del 2026-11-09, auditadas una a una) se reconocen por fecha (`UNMARKED_CHECKS_BEFORE` en `log-entry.ts`). En otros despliegues no hay filas anteriores, así que la regla no les afecta.
+- Solo cuenta como comprobación una petición de un admin activo: un no admin no puede ocultar sus intentos rechazados añadiendo la marca.
+- "Latest admin changes" y la pestaña del registro ocultan las comprobaciones por defecto, con la casilla "Show automated checks" / "Mostrar comprobaciones automáticas". El registro lee ahora hasta 200 entradas. Tests en `log-entry.spec.ts`.
+
+**Inicio y navegación:**
+- El anillo de foco solo aparece con teclado (`:focus-visible`). Una regla global quita el contorno tras un clic, aunque una librería lo ponga en `:focus`.
+- El enlace a la secretaría y el botón "Go to the clerk's office" solo se muestran a admins activos. Un no admin que abre `#clerk` ve el Inicio. `clerkExecute` sigue siendo la protección real.

@@ -1,4 +1,5 @@
 import { useId, type InputHTMLAttributes, type ReactNode } from "react";
+import { ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface TextFieldProps extends Omit<InputHTMLAttributes<HTMLInputElement>, "id"> {
@@ -21,7 +22,7 @@ export function TextField({ label, hint, error, className, ...props }: TextField
                 aria-describedby={[hintId, errorId].filter(Boolean).join(" ") || undefined}
                 aria-invalid={error ? true : undefined}
                 className={cn(
-                    "min-h-11 border bg-paper-raised px-3 text-[15px] text-ink placeholder:text-text-muted",
+                    "min-h-11 rounded-none border bg-paper-raised px-3 text-[15px] text-ink placeholder:text-text-muted",
                     error ? "border-2 border-action" : "border-ink",
                 )}
                 {...props}
@@ -80,24 +81,29 @@ export function RadioField<T extends string>({ legend, name, value, options, onC
 
 interface SelectFieldProps {
     label: string;
+    /** Keep the label for screen readers only (row actions). */
+    hiddenLabel?: boolean;
     value: string;
     onChange: (value: string) => void;
     children: ReactNode;
     className?: string;
 }
 
-/** Compact select with a visually hidden label, for row actions. */
-export function CompactSelect({ label, value, onChange, children, className }: SelectFieldProps) {
+/** Docket select: square, 1 px ink border, 44 px tall, token colours in both themes. */
+export function SelectField({ label, hiddenLabel = false, value, onChange, children, className }: SelectFieldProps) {
     return (
-        <label className={cn("inline-flex", className)}>
-            <span className="sr-only">{label}</span>
-            <select
-                value={value}
-                onChange={(event) => onChange(event.target.value)}
-                className="min-h-9 border border-ink bg-paper-raised px-2 text-[14px] font-semibold text-ink"
-            >
-                {children}
-            </select>
+        <label className={cn("inline-flex flex-col gap-1.5", className)}>
+            <span className={hiddenLabel ? "sr-only" : "text-[14px] font-semibold text-ink"}>{label}</span>
+            <span className="relative flex">
+                <select
+                    value={value}
+                    onChange={(event) => onChange(event.target.value)}
+                    className="min-h-11 w-full appearance-none rounded-none border border-ink bg-paper-raised py-0 pl-3 pr-9 text-[15px] font-semibold text-ink"
+                >
+                    {children}
+                </select>
+                <ChevronDown aria-hidden="true" className="pointer-events-none absolute right-2.5 top-1/2 size-4 -translate-y-1/2 text-ink" />
+            </span>
         </label>
     );
 }

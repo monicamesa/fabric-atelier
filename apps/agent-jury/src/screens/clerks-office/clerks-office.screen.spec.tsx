@@ -70,7 +70,48 @@ describe("ClerksOffice", () => {
         expect(within(ownRow).queryByRole("combobox")).not.toBeInTheDocument();
         const anaRow = within(table).getByText("Ana E.").closest("tr")!;
         expect(within(anaRow).getByRole("button", { name: "Deactivate Ana E." })).toBeInTheDocument();
-        expect(within(anaRow).getByRole("combobox", { name: "Role for Ana E." })).toBeInTheDocument();
+        expect(within(anaRow).getByRole("button", { name: "Change the role of Ana E." })).toBeInTheDocument();
+    });
+
+    it("shows the role once and opens the role choice only on Change role, with Save and Cancel", async () => {
+        const { client, requests } = fakeClient({});
+        render(<ClerksOffice client={client} jury={jury([ANA, DARIO])} me={DARIO} />);
+        const table = await screen.findByRole("table", { name: "Jurors" });
+        const anaRow = within(table).getByText("Ana E.").closest("tr")!;
+        expect(within(anaRow).queryByRole("combobox")).not.toBeInTheDocument();
+
+        fireEvent.click(within(anaRow).getByRole("button", { name: "Change the role of Ana E." }));
+        const select = within(anaRow).getByRole("combobox", { name: "Role for Ana E." });
+        fireEvent.click(within(anaRow).getByRole("button", { name: "Cancel" }));
+        expect(select).not.toBeInTheDocument();
+
+        fireEvent.click(within(anaRow).getByRole("button", { name: "Change the role of Ana E." }));
+        fireEvent.change(within(anaRow).getByRole("combobox", { name: "Role for Ana E." }), { target: { value: "approver" } });
+        fireEvent.click(within(anaRow).getByRole("button", { name: "Save role" }));
+        await waitFor(() =>
+            expect([...requests.values()].find((request) => request.action === "setJurorRole")?.payload).toEqual({ jurorId: ANA.id, role: "approver" }),
+        );
+    });
+
+    it("stacks jurors as cards with full-width actions on phones, without a table", async () => {
+        const original = window.matchMedia;
+        window.matchMedia = ((query: string) => ({
+            matches: query === "(max-width: 639px)",
+            media: query,
+            addEventListener: () => {},
+            removeEventListener: () => {},
+        })) as unknown as typeof window.matchMedia;
+        try {
+            const { client } = fakeClient({});
+            render(<ClerksOffice client={client} jury={jury([ANA, DARIO])} me={DARIO} />);
+            const list = await screen.findByRole("list", { name: "Jurors" });
+            expect(screen.queryByRole("table", { name: "Jurors" })).not.toBeInTheDocument();
+            const card = within(list).getByText("Ana E.").closest("li")!;
+            expect(within(card).getByRole("button", { name: "Deactivate Ana E." })).toHaveClass("w-full");
+            expect(within(card).getByRole("button", { name: "Change the role of Ana E." })).toHaveClass("w-full");
+        } finally {
+            window.matchMedia = original;
+        }
     });
 
     it("shows the display name, or the email's local part when it is empty", async () => {

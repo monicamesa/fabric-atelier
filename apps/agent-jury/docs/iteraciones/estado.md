@@ -101,6 +101,12 @@ Solo las que no están ya en la especificación ni en `conventions.md`.
      - "Hasn't signed in yet" en la tabla de jurors: exige leer `dbo.Users` de Rayfin con T-SQL desde la Function.
      - "Copy invite link": el enlace de la app en Fabric es un dato privado del despliegue; habría que decidir de dónde se lee.
      - Nombre del workspace en las tarjetas de agentes (D4): con la API de Fabric, en I3.
+   - **Comprobaciones contra un despliegue de pruebas (a largo plazo, sin construir).** Hoy `i1a-checks.mjs` e `i1b-checks.mjs` escriben en la app de producción. Sus peticiones llevan `source: "check"` y la secretaría las oculta por defecto, pero el juror y el agente de ejemplo y las filas del registro se quedan para siempre. Propuesta con Rayfin CLI 1.36.2:
+     1. Un segundo item de Rayfin para pruebas, por ejemplo `npx rayfin up --workspace FabricApp-AgentJury-Test --item-name agent-jury-test --env-file rayfin/.env.test`. Se crea con su propia base de datos y sus propias Functions; el workspace de pruebas puede compartir la capacidad.
+     2. `npx rayfin up list` muestra los despliegues registrados y `npx rayfin up switch <workspace>` cambia el activo (reescribe `rayfin/.env`). La CLI no tiene un `rayfin switch` de primer nivel; es `rayfin up switch`.
+     3. Los scripts de comprobación leen la URL y la clave publicable de un fichero propio (`rayfin/.env.test`) en lugar de `rayfin/.env`, y se niegan a ejecutarse contra producción salvo con un `--allow-production` explícito.
+     4. Los secretos de la Function (`APP_SQL_SERVER`, `APP_SQL_DATABASE`) se configuran aparte en el item de pruebas, y su seed y `admin.sql` apuntan a su propia base de datos (nuevas claves en `.private/values.env`).
+     5. Antes de crearlo hay que comprobar que `--env-file` deja intacto `rayfin/.env` de producción y que `rayfin up switch` no mezcla los IDs de los dos items en `.deployments.json`.
    - Especificación v0.4: sin dominios, roles globales de juror, cases no verificados (R7) y retiradas con `CaseDismissal` (R8).
    - Criterio de salida de I1: un experto crea preguntas y propuestas en la app desplegada.
 

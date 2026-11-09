@@ -1,17 +1,20 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Copy, Check } from "lucide-react";
-import { initials, shortId } from "@/lib/people";
+import { avatarTone, initials, shortId } from "@/lib/people";
 import { cn } from "@/lib/utils";
 
-/** Round initials badge; dashed when the person is inactive. */
-export function Avatar({ label, inactive = false }: { label: string; inactive?: boolean }) {
+// Each pair reaches 4.5:1 in both themes (the dark-theme tokens are light, --ink-inverse turns dark).
+const AVATAR_TONES = ["bg-ruled text-ink-inverse", "bg-review-text text-ink-inverse", "bg-action-text text-ink-inverse", "bg-ink text-ink-inverse"];
+
+/** Round initials badge in a stable colour per person; dashed when the person is inactive. */
+export function Avatar({ id, label, inactive = false }: { id: string; label: string; inactive?: boolean }) {
     return (
         <span
             aria-hidden="true"
             className={cn(
                 "flex size-9 shrink-0 items-center justify-center rounded-full text-[13px] font-bold",
-                inactive ? "border-2 border-dashed border-text-muted text-text-muted" : "bg-ink text-ink-inverse",
+                inactive ? "border-2 border-dashed border-text-muted text-text-muted" : AVATAR_TONES[avatarTone(id, AVATAR_TONES.length)],
             )}
         >
             {initials(label)}

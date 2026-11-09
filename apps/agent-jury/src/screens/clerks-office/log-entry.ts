@@ -9,7 +9,16 @@ export interface LogLine {
     who: string;
     text: string;
     rejected: boolean;
+    /** Sent by the deployed checks (scripts/i1a-checks.mjs, i1b-checks.mjs); hidden by default. */
+    automated: boolean;
 }
+
+/** Payload field the deployed check scripts add to every AdminRequest they create. */
+export const CHECK_SOURCE = "check";
+
+// Every request before this moment came from the deployed checks of I1a and I1b, sent before the
+// marker existed (audited 2026-11-09). Later deployments have no rows before it.
+export const UNMARKED_CHECKS_BEFORE = "2026-11-09T15:12:00.000Z";
 
 function parsePayload(payload: string): Record<string, unknown> {
     try {
@@ -36,6 +45,20 @@ function reasonOf(entry: AdminLogEntry): string {
     if (KNOWN_REASONS.includes(entry.reason)) return entry.reason;
     if (entry.reason) return "other";
     return LEGACY_REASONS.find(([pattern]) => pattern.test(entry.detail))?.[1] ?? "other";
+}
+
+/**
+ * Whether an entry was sent by the automated checks. Only requests from an active admin qualify,
+ * so a non-admin can't hide their own rejected attempts by adding the marker.
+ */
+export function isAutomatedCheck(entry: AdminLogEntry, jurors: JurorRow[]): boolean {
+    const requester = jurors.find((juror) => juror.email.toLowerCase() === entry.requesterEmail.toLowerCase());
+    if (!requester?.active || requester.role !== "admin") return false;
+    return parsePayload(entry.payload).source === CHECK_SOURCE || Date.parse(entry.processedAt) < Date.parse(UNMARKED_CHECKS_BEFORE);
+}
+
+export function visibleLogLines(lines: LogLine[], showChecks: boolean): LogLine[] {
+    return showChecks ? lines : lines.filter((line) => !line.automated);
 }
 
 /** Turns an admin log entry into one plain sentence. Emails are reduced to their local part. */
@@ -96,5 +119,6 @@ export function describeLogEntry(entry: AdminLogEntry, jurors: JurorRow[], agent
         who,
         text: rejected ? t("clerk.log.rejectedLine", { sentence, reason }) : sentence,
         rejected,
+        automated: isAutomatedCheck(entry, jurors),
     };
 }

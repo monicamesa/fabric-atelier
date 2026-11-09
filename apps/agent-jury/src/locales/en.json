@@ -130,6 +130,9 @@
             "noActivity": "No activity yet",
             "selfNote": "You can't remove yourself",
             "roleFor": "Role for {{name}}",
+            "changeRole": "Change role",
+            "changeRoleNamed": "Change the role of {{name}}",
+            "cancel": "Cancel",
             "saveRole": "Save role",
             "deactivate": "Deactivate",
             "deactivateNamed": "Deactivate {{name}}",
@@ -208,6 +211,8 @@
             "today": "Today",
             "someone": "someone",
             "loadError": "The admin log could not be loaded.",
+            "showChecks": "Show automated checks",
+            "onlyChecks": "Only automated checks so far. Tick \"Show automated checks\" to see them.",
             "rejectedLine": "Rejected: {{sentence}} ({{reason}})",
             "entry": {
                 "swearInJuror": "{{who}} swore in {{target}} as {{role}}",

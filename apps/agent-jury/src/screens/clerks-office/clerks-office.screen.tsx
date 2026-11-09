@@ -19,7 +19,7 @@ import { describeLogEntry } from "./log-entry";
 import { SwearInForm } from "./swear-in-form";
 
 type Tab = "jurors" | "agents" | "log";
-const LOG_SIZE = 50;
+const LOG_SIZE = 200;
 
 interface ClerksOfficeProps {
     client: AppRayfinClient;
@@ -93,6 +93,7 @@ function AdminDesk({ client, jury, jurors, me }: { client: AppRayfinClient; jury
     const { t } = useTranslation();
     const [tab, setTab] = useState<Tab>("jurors");
     const [notice, setNotice] = useState<string | null>(null);
+    const [showChecks, setShowChecks] = useState(false);
 
     const agents = useAsync(() => listAgents(client));
     const activity = useAsync(() => readAuthorActivity(client));
@@ -118,14 +119,16 @@ function AdminDesk({ client, jury, jurors, me }: { client: AppRayfinClient; jury
             lines: log.data?.map((entry) => describeLogEntry(entry, jurors, agents.data ?? [], t)),
             technicalDetails: technical(log.error),
             reload: log.reload,
+            showChecks,
+            onShowChecksChange: setShowChecks,
         }),
-        [log.status, log.data, log.error, log.reload, jurors, agents.data, t],
+        [log.status, log.data, log.error, log.reload, jurors, agents.data, t, showChecks],
     );
 
     const showNotice = (message: string) => setNotice(message);
 
     return (
-        <>
+        <div className="flex flex-col gap-3">
             <Tabs<Tab>
                 label={t("clerk.tabs.label")}
                 idPrefix="clerk"
@@ -175,6 +178,6 @@ function AdminDesk({ client, jury, jurors, me }: { client: AppRayfinClient; jury
                     ))}
                 {tab === "log" && <AdminLogPanel log={logState} />}
             </div>
-        </>
+        </div>
     );
 }

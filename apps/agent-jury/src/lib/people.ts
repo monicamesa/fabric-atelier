@@ -21,3 +21,12 @@ export function initials(label: string): string {
 export function shortId(id: string): string {
     return id.length <= 9 ? id : `${id.slice(0, 4)}…${id.slice(-4)}`;
 }
+
+/** A stable index in [0, count) derived from an id, so a person keeps their avatar colour. */
+export function avatarTone(id: string, count: number): number {
+    let hash = 0;
+    for (const char of id.toLowerCase()) {
+        hash = (hash * 31 + char.charCodeAt(0)) >>> 0;
+    }
+    return hash % count;
+}
