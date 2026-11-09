@@ -127,7 +127,7 @@
             "activityCases_other": "{{count}} cases",
             "activityAnswers_one": "{{count}} answer",
             "activityAnswers_other": "{{count}} answers",
-            "noActivity": "No cases or answers yet",
+            "noActivity": "No activity yet",
             "selfNote": "You can't remove yourself",
             "roleFor": "Role for {{name}}",
             "saveRole": "Save role",
@@ -218,6 +218,7 @@
                 "retireAgent": "{{who}} retired the agent {{target}}",
                 "reinstateAgent": "{{who}} reinstated the agent {{target}}",
                 "readAdminLog": "{{who}} opened the admin log",
+                "probe": "{{who}} sent a test request",
                 "unknown": "{{who}} sent a request the office doesn't know"
             },
             "attempt": {
@@ -229,6 +230,7 @@
                 "retireAgent": "{{who}} tried to retire the agent {{target}}",
                 "reinstateAgent": "{{who}} tried to reinstate the agent {{target}}",
                 "readAdminLog": "{{who}} tried to open the admin log",
+                "probe": "{{who}} sent a test request",
                 "unknown": "{{who}} sent a request the office doesn't know"
             },
             "reason": {

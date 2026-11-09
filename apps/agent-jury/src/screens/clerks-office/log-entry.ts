@@ -25,6 +25,19 @@ const sameId = (a: string, b: unknown) => typeof b === "string" && a.toLowerCase
 
 const KNOWN_REASONS = ["not_admin", "expired", "self_protection", "already_exists", "invalid_payload", "not_found", "unknown_action"];
 
+// Rows written before AdminRequestResult.reason existed (I1a) only have the server detail.
+const LEGACY_REASONS: [RegExp, string][] = [
+    [/not an active admin/i, "not_admin"],
+    [/expired/i, "expired"],
+    [/unknown action/i, "unknown_action"],
+];
+
+function reasonOf(entry: AdminLogEntry): string {
+    if (KNOWN_REASONS.includes(entry.reason)) return entry.reason;
+    if (entry.reason) return "other";
+    return LEGACY_REASONS.find(([pattern]) => pattern.test(entry.detail))?.[1] ?? "other";
+}
+
 /** Turns an admin log entry into one plain sentence. Emails are reduced to their local part. */
 export function describeLogEntry(entry: AdminLogEntry, jurors: JurorRow[], agents: AgentRow[], t: TFunction): LogLine {
     const payload = parsePayload(entry.payload);
@@ -67,7 +80,8 @@ export function describeLogEntry(entry: AdminLogEntry, jurors: JurorRow[], agent
             target = agentName();
             break;
         case "readAdminLog":
-            key = "readAdminLog";
+        case "probe":
+            key = entry.action;
             break;
         default:
             key = "unknown";
@@ -75,7 +89,7 @@ export function describeLogEntry(entry: AdminLogEntry, jurors: JurorRow[], agent
 
     const rejected = entry.outcome === "rejected";
     const sentence = t(`clerk.log.${rejected ? "attempt" : "entry"}.${key}`, { who, target, role: roleLabel });
-    const reason = t(`clerk.log.reason.${KNOWN_REASONS.includes(entry.reason) ? entry.reason : "other"}`);
+    const reason = t(`clerk.log.reason.${reasonOf(entry)}`);
     return {
         id: entry.requestId,
         processedAt: entry.processedAt,

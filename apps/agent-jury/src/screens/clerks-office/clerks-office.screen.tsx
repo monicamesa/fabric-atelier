@@ -144,7 +144,7 @@ function AdminDesk({ client, jury, jurors, me }: { client: AppRayfinClient; jury
 
             <div id={`clerk-panel-${tab}`} role="tabpanel" aria-labelledby={`clerk-tab-${tab}`} tabIndex={0}>
                 {tab === "jurors" && (
-                    <div className="grid items-start gap-10 min-[900px]:grid-cols-[minmax(0,1fr)_380px]">
+                    <div className="grid grid-cols-[minmax(0,1fr)] items-start gap-10 min-[900px]:grid-cols-[minmax(0,1fr)_380px]">
                         <div className="flex flex-col gap-3">
                             <ClerkError view={rowClerk.error} />
                             <JurorsPanel jurors={jurors} me={me} activity={activity.data} clerk={rowClerk} onNotice={showNotice} />

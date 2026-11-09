@@ -92,7 +92,15 @@ Solo las que no están ya en la especificación ni en `conventions.md`.
      - `externalEntraExchange: true` está activado para los scripts de comprobación (ver `docs/conventions.md`).
      - La guía de diseño "The Docket" ya está en `docs/design/`, con sus tokens en `src/styles/docket-tokens.css`.
      - Pendiente: pantallas 1–3.
-   - **I1b:** acciones de `clerkExecute` y pantalla del secretario para gestionar jurors y agentes. **Plan propuesto en [I1b.md](I1b.md), pendiente de revisión.**
+   - **I1b:** acciones de `clerkExecute` y pantalla "Clerk's office" (Secretaría) para gestionar jurors y agentes. **Implementada y desplegada (2026-11-09)**; detalle y resultados en [I1b.md](I1b.md), secciones 7 y 9.
+     - Decisiones D1–D5 aplicadas: `displayName` opcional (si falta, la parte del email antes de la @; emails completos solo en la secretaría), tres roles con descripción, ID del agente abreviado con copia, y base común de componentes en `src/components/docket/`.
+     - Errores en lenguaje claro (403, 409, caducada…) con el detalle técnico plegado; autoprotección del admin en la interfaz y en `clerkExecute`; "Latest admin changes" incluye los rechazos.
+     - Comprobaciones: tests unitarios y de pantalla, `i1b-checks.mjs` 21/21 e `i1a-checks.mjs` 22/22 tras el despliegue.
+     - **Parado para la revisión visual** (capturas en claro y oscuro, EN y ES) antes de empezar las pantallas 1–3.
+   - **Candidatos para más adelante** (fuera de I1b, decisión D3):
+     - "Hasn't signed in yet" en la tabla de jurors: exige leer `dbo.Users` de Rayfin con T-SQL desde la Function.
+     - "Copy invite link": el enlace de la app en Fabric es un dato privado del despliegue; habría que decidir de dónde se lee.
+     - Nombre del workspace en las tarjetas de agentes (D4): con la API de Fabric, en I3.
    - Especificación v0.4: sin dominios, roles globales de juror, cases no verificados (R7) y retiradas con `CaseDismissal` (R8).
    - Criterio de salida de I1: un experto crea preguntas y propuestas en la app desplegada.
 

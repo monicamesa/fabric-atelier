@@ -210,6 +210,11 @@
     outline: 3px solid var(--focus);
     outline-offset: 3px;
   }
+
+  /* Native controls (radios, selects, scrollbars) follow the Docket theme. */
+  [data-theme="dark"] {
+    color-scheme: dark;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

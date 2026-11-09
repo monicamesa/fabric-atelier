@@ -69,8 +69,18 @@ describe("describeLogEntry", () => {
         expect(line.text).toBe("Rejected: dario.admin tried to deactivate dario.admin (admins can't remove themselves)");
     });
 
-    it("copes with unknown actions, broken payloads and old rows without a reason", () => {
-        const line = describeLogEntry(entry({ action: "probe", payload: "not json", outcome: "rejected", reason: "" }), jurors, agents, t);
+    it("copes with unknown actions, broken payloads and unknown reasons", () => {
+        const line = describeLogEntry(entry({ action: "dropTables", payload: "not json", outcome: "rejected", reason: "weird" }), jurors, agents, t);
         expect(line.text).toBe("Rejected: dario.admin sent a request the office doesn't know (could not be applied)");
+    });
+
+    it("reads I1a rows written before the reason column existed", () => {
+        const line = describeLogEntry(
+            entry({ action: "probe", outcome: "rejected", reason: "", detail: "The requester is not an active admin." }),
+            jurors,
+            agents,
+            t,
+        );
+        expect(line.text).toBe("Rejected: dario.admin sent a test request (not an active admin)");
     });
 });

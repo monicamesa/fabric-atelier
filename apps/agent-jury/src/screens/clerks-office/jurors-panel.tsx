@@ -21,6 +21,8 @@ interface JurorsPanelProps {
 }
 
 type Filter = "active" | "inactive";
+// Team and activity give way first on narrow screens, so the row actions stay visible.
+const SECONDARY = "hidden min-[1200px]:table-cell";
 
 export function JurorsPanel({ jurors, me, activity, clerk, onNotice }: JurorsPanelProps) {
     const { t } = useTranslation();
@@ -51,9 +53,9 @@ export function JurorsPanel({ jurors, me, activity, clerk, onNotice }: JurorsPan
                     caption={t("clerk.jurors.caption")}
                     columns={[
                         { key: "juror", header: t("clerk.jurors.columns.juror") },
-                        { key: "team", header: t("clerk.jurors.columns.team") },
+                        { key: "team", header: t("clerk.jurors.columns.team"), className: SECONDARY },
                         { key: "role", header: t("clerk.jurors.columns.role") },
-                        { key: "activity", header: t("clerk.jurors.columns.activity") },
+                        { key: "activity", header: t("clerk.jurors.columns.activity"), className: SECONDARY },
                         { key: "actions", header: t("clerk.jurors.columns.actions"), hiddenHeader: true, align: "right" },
                     ]}
                 >
@@ -99,15 +101,15 @@ function JurorTableRow({ juror, me, activity, clerk, onNotice }: { juror: JurorR
                             {name}
                             {isMe && ` ${t("clerk.jurors.you")}`}
                         </b>
-                        <span className="break-all font-mono text-[13px] text-text-muted">{juror.email}</span>
+                        <span className="whitespace-nowrap font-mono text-[13px] text-text-muted">{juror.email}</span>
                     </span>
                 </div>
             </AdminCell>
-            <AdminCell>{juror.team ?? "—"}</AdminCell>
+            <AdminCell className={SECONDARY}>{juror.team ?? "—"}</AdminCell>
             <AdminCell>
                 <RoleChip role={juror.role} />
             </AdminCell>
-            <AdminCell className="text-text-muted">
+            <AdminCell className={`${SECONDARY} whitespace-nowrap text-text-muted`}>
                 {activity
                     ? cases + answers === 0
                         ? t("clerk.jurors.noActivity")

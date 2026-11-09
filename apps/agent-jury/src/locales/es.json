@@ -127,7 +127,7 @@
             "activityCases_other": "{{count}} casos",
             "activityAnswers_one": "{{count}} respuesta",
             "activityAnswers_other": "{{count}} respuestas",
-            "noActivity": "Aún sin casos ni respuestas",
+            "noActivity": "Sin actividad aún",
             "selfNote": "No puedes quitarte a ti mismo",
             "roleFor": "Rol de {{name}}",
             "saveRole": "Guardar rol",
@@ -218,6 +218,7 @@
                 "retireAgent": "{{who}} retiró el agente {{target}}",
                 "reinstateAgent": "{{who}} reactivó el agente {{target}}",
                 "readAdminLog": "{{who}} abrió el registro de admin",
+                "probe": "{{who}} envió una petición de prueba",
                 "unknown": "{{who}} envió una petición que la secretaría no conoce"
             },
             "attempt": {
@@ -229,6 +230,7 @@
                 "retireAgent": "{{who}} intentó retirar el agente {{target}}",
                 "reinstateAgent": "{{who}} intentó reactivar el agente {{target}}",
                 "readAdminLog": "{{who}} intentó abrir el registro de admin",
+                "probe": "{{who}} envió una petición de prueba",
                 "unknown": "{{who}} envió una petición que la secretaría no conoce"
             },
             "reason": {

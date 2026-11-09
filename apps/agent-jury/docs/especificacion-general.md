@@ -119,7 +119,7 @@ Convenciones de Rayfin a respetar:
 
 | Entidad | Campos principales | Permisos |
 |---|---|---|
-| `Juror` | `email` (único), `role` (`expert` · `approver` · `admin`), `team` (opcional, solo informativo), `active` | Lectura: autenticados. Escritura: solo la Function de admin (ver nota) |
+| `Juror` | `email` (único), `displayName` (opcional; si falta se muestra la parte del email anterior a la @), `role` (`expert` · `approver` · `admin`), `team` (opcional, solo informativo), `active` | Lectura: autenticados. Escritura: solo la Function de admin (ver nota) |
 | `Agent` | `name`, `workspaceId`, `itemId`, `active` | Lectura: autenticados. Escritura: solo la Function de admin (ver nota) |
 | `Case` | `agent_id`, `text` (max 1000), `category`, `tags`, `authorUserId`, `authorEmail`, `createdAt` | Crear: autenticados con `claims.sub.eq(item.authorUserId)`. Leer: autenticados. Sin actualizar ni borrar |
 | `Testimony` | `case_id`, `answer` (max 2000), `definition` (max 1000), `authorUserId`, `authorEmail`, `createdAt` | Crear: igual que `Case`. Leer: autenticados. Sin actualizar ni borrar |
@@ -139,6 +139,7 @@ Convenciones de Rayfin a respetar:
   4. Ejecuta solo la acción y el payload guardados, y escribe el `AdminRequestResult` (`done` o `rejected`, con el motivo) en la misma transacción. `requestId` es único, así que cada petición se usa una sola vez.
   5. `AdminRequest` y `AdminRequestResult` solo los lee su autor, y nadie los modifica ni borra. Juntos son el registro de admin.
 - Los nombres de Function no pueden empezar por `admin` ni `runtime` (rutas reservadas por el host de Azure Functions).
+- Un admin no puede desactivarse ni quitarse su propio rol de admin. La interfaz oculta esas acciones y `clerkExecute` las rechaza, así que siempre queda al menos un admin activo.
 - El primer admin lo crea el script de seed, con el email pasado como variable al ejecutarlo; nunca se guarda en el repositorio.
 
 **Cálculo del estado:** en el MVP, el frontend calcula el estado de cada pregunta (y si está verificada) a partir de propuestas, votos, retiradas y jurors para mostrarlo. El cálculo autoritativo (el que decide qué entra en una evaluación o en el export) se hace en el notebook o la Function correspondiente, con la misma lógica. Esa lógica vive en un único módulo compartido con tests.
