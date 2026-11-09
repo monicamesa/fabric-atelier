@@ -155,7 +155,7 @@ These rules come from [docs/especificacion-general.md](docs/especificacion-gener
 
 ### Naming and language
 
-5. Code is in English. Use the code names from section 9.1: `Domain`, `Juror`, `Agent`, `Case`, `Testimony`, `Vote`, `Hearing`, `Appeal`, `judgeVerdict`, view `caseLaw`. Case states: `under_review`, `ruled`, `disputed`, `dismissed`.
+5. Code is in English. Use the code names from section 9.1: `Juror`, `Agent`, `Case`, `Testimony`, `CaseDismissal`, `Vote`, `Hearing`, `Appeal`, `judgeVerdict`, view `caseLaw`. Case states: `under_review`, `ruled`, `disputed`, `dismissed`. There are no domains: juror roles are global and `Juror.team` is display-only.
 6. The UI is bilingual with an **EN | ES** selector in the header on every screen. English is the default, and the choice is remembered per user in the browser.
 7. No visible text is written directly in components: all of it comes from `locales/en.json` and `locales/es.json` through an i18n library. A test checks that both files have the same keys.
 8. Dates and numbers follow the selected language (`en-GB`, `es-ES`). User-written content (cases, testimonies, comments) is shown as written, never translated.
@@ -171,12 +171,12 @@ These rules come from [docs/especificacion-general.md](docs/especificacion-gener
 
 ### Business rules and security
 
-15. `Case`, `Testimony`, `Vote` and `Appeal` are insert-only: no update or delete. Their policies require `claims.sub.eq(item.<role>UserId)` (for example `authorUserId`, `voterUserId`) so nobody inserts on behalf of someone else.
+15. `Case`, `Testimony`, `CaseDismissal`, `Vote` and `Appeal` are insert-only: no update or delete. Their policies require `claims.sub.eq(item.<role>UserId)` (for example `authorUserId`, `voterUserId`) so nobody inserts on behalf of someone else.
 16. Votes are immutable; a juror's latest vote counts (R1). An author's vote on their own testimony does not count (R2).
-17. Consensus (R3): at least `N` valid votes in favour from the domain (default `N = 1`), at least one from an approver, and no current vote against from an approver. A case is disputed (R4) when two or more testimonies have votes in favour, or one testimony has approver votes both for and against.
+17. Consensus (R3): at least `N` valid votes in favour from active jurors (default `N = 1`), at least one from an approver, and no current vote against from an approver. A case is disputed (R4) when two or more testimonies have votes in favour, or one testimony has approver votes both for and against. Only cases and testimonies authored by active jurors count; the rest are shown as unverified (R7). A case is dismissed by a `CaseDismissal` from its author or an admin (R8).
 18. A case's state is computed, never written by the client (R6). The logic lives in a single shared module with tests. The frontend uses it for display; the notebook or Function uses it for anything authoritative.
 19. Only ruled cases enter a hearing or the export, with the ruled testimony as the expected answer (R5).
-20. `Domain`, `Juror` and `Agent` are written only through Functions that check the caller is an `admin` juror, using `ctx.getDataClient()`.
+20. The client has only `read` on `Juror` and `Agent`. They are written only through the admin Function, which reads the caller's `sub` and `email` from the invocation's Rayfin token, checks in `Juror` that the caller is an active `admin`, and writes with T-SQL using the `AudienceType.Sql` token (app identity), never through `ctx.getDataClient()`.
 21. No token leaves a Function. The client is not an authorization boundary: enforce every restriction with `@role`, policies and Functions.
 22. The Function that launches a hearing only starts the notebook job and returns `jobInstanceId` (240-second Function limit). Status is checked with later queries.
 23. Nothing is ever deleted: every vote, testimony and appeal keeps its author and date.

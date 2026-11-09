@@ -78,10 +78,10 @@ Solo las que no están ya en la especificación ni en `conventions.md`.
 
 ## Qué queda pendiente (en orden)
 
-1. **Abrir `apps/agent-jury` como carpeta en VS Code,** para que Copilot cargue `.vscode/mcp.json` y lea `AGENTS.md` desde la raíz del proyecto.
-2. **Iteración 1**, dividida en dos partes:
-   - **I1a:** datos activados; entidades `Domain`, `Juror`, `Agent`, `Case` y `Testimony` con sus políticas; seed de `Domain`, `Juror` y `Agent` cargado directamente en la base de datos; selector EN/ES; pantallas 1–3 sin votos. Plan en [I1a.md](I1a.md), **pendiente de revisión**.
-   - **I1b:** Functions de administración de `Domain`, `Juror` y `Agent`, que comprueban que quien llama es un juror `admin`. Antes de planificarla hay que resolver el riesgo R2 de [I1a.md](I1a.md): `ctx.getDataClient()` escribe con los permisos de quien llama.
+1. **Iteración 1**, dividida en dos partes:
+   - **I1a:** datos activados; entidades `Juror`, `Agent`, `Case`, `Testimony` y `CaseDismissal`; seed; base de i18n EN/ES; tests; verificación de R1, S-A y S-B; pantallas 1–3 sin votos (cuando llegue la guía de diseño). Plan en [I1a.md](I1a.md).
+   - **I1b:** Function de admin (T-SQL con identidad de la app) y pantalla de administración de jurors y agentes.
+   - Especificación v0.4: sin dominios, roles globales de juror, cases no verificados (R7) y retiradas con `CaseDismissal` (R8).
    - Criterio de salida de I1: un experto crea preguntas y propuestas en la app desplegada.
 
 ## Problemas conocidos del entorno

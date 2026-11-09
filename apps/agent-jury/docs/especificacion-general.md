@@ -2,7 +2,7 @@
 
 > **Who judges the judge?**
 > Documento pensado para vivir en `docs/especificacion-general.md` del repositorio y servir de guía a agentes de código (plan → especificación → implementación → testing → despliegue).
-> Fecha: 2026-11-09 · Estado: borrador v0.3
+> Fecha: 2026-11-09 · Estado: borrador v0.4 (sin dominios; roles globales; Function de admin con T-SQL; cases no verificados; `CaseDismissal`; I1 dividida en I1a e I1b)
 >
 > **Idioma:** la interfaz es **bilingüe (inglés y español)**, con un selector de idioma en la cabecera. Inglés por defecto. Esta especificación está en español; los nombres de entidades y campos del código van siempre en inglés (ver sección 9.1).
 
@@ -46,12 +46,14 @@ Las organizaciones están publicando Fabric Data Agents, pero nadie puede afirma
 
 | Rol | Quién | Puede |
 |---|---|---|
-| **Experto** | Persona de negocio de un dominio (Finanzas, Ventas…) | Proponer preguntas y respuestas esperadas; votar propuestas de su dominio |
-| **Aprobador** | Responsable de un dominio | Todo lo del experto; su voto cuenta para el consenso y puede rechazar |
+| **Experto** | Persona de negocio | Proponer preguntas y respuestas esperadas; votar propuestas |
+| **Aprobador** | Responsable de negocio | Todo lo del experto; su voto cuenta para el consenso y puede rechazar |
 | **Revisor de veredictos** | Experto o aprobador | Confirmar o corregir el veredicto del juez LLM |
-| **Admin** | Equipo de datos | Registrar agentes, gestionar revisores, lanzar evaluaciones, exportar |
+| **Admin** | Equipo de datos | Registrar agentes, gestionar jurors, retirar cases, lanzar evaluaciones, exportar |
 
-**Limitación de la plataforma que condiciona el diseño:** las políticas de `@role` solo comparan *claims* del usuario (`sub`, `email`, `role`) con campos de la fila mediante `.eq()`. No pueden consultar otra tabla, por lo que no es posible expresar "el votante es aprobador de este dominio" como política. Ver el patrón de la sección 7.
+El rol de cada juror es **global** (`expert`, `approver` o `admin`): no hay dominios ni áreas con permisos propios. El campo opcional `team` (texto libre, por ejemplo "Finanzas") solo se muestra en la interfaz y no tiene ningún efecto en permisos ni en el consenso.
+
+**Limitación de la plataforma que condiciona el diseño:** las políticas de `@role` solo comparan *claims* del usuario (`sub`, `email`, `role`) con campos de la fila mediante `.eq()`. No pueden consultar otra tabla, por lo que no es posible expresar "el votante es aprobador" ni "el autor es juror" como política. Ver el patrón de la sección 7.
 
 ## 5. Flujos principales
 
@@ -61,13 +63,13 @@ Las organizaciones están publicando Fabric Data Agents, pero nadie puede afirma
 3. La pregunta queda en estado `under_review` (en revisión).
 
 ### F2. Revisar y votar
-1. Otros expertos y aprobadores del dominio ven la pregunta y sus propuestas.
+1. Otros expertos y aprobadores ven la pregunta y sus propuestas.
 2. Pueden votar a favor, en contra (con comentario obligatorio) o añadir **una propuesta alternativa**.
 3. La app calcula el estado según las reglas de consenso (sección 6).
 
 ### F3. Resolver conflictos
 1. La vista de conflictos muestra preguntas con propuestas enfrentadas, con sus definiciones lado a lado.
-2. Los aprobadores de los dominios implicados acuerdan una propuesta o reformulan la pregunta para que sea inequívoca.
+2. Los aprobadores acuerdan una propuesta o reformulan la pregunta para que sea inequívoca.
 3. El conflicto resuelto queda registrado: es una **decisión de definición de métrica**, útil más allá de la app.
 
 ### F4. Lanzar una evaluación
@@ -83,18 +85,28 @@ Las organizaciones están publicando Fabric Data Agents, pero nadie puede afirma
 ### F6. Exportar el banco aprobado
 El admin exporta las preguntas aprobadas de un agente a un CSV con columnas `question, expected_answer, category, tags`, compatible con Quality Lab.
 
+### F7. Retirar una pregunta
+1. El autor de la pregunta o un admin la retira indicando un motivo.
+2. La app inserta un `CaseDismissal`; la pregunta pasa a `dismissed` si la retirada es válida (R8). Nada se borra.
+
+### F8. Administrar jurors y agentes
+1. Un admin da de alta, cambia el rol o desactiva jurors, y registra o desactiva agentes, en la pantalla de administración.
+2. Cada cambio pasa por la Function de admin (sección 7), que comprueba que quien llama es admin.
+
 ## 6. Reglas de negocio
 
 - **R1. Votos inmutables.** Un voto no se edita ni se borra. Para cambiar de opinión se emite un voto nuevo; cuenta el último de cada persona.
 - **R2. Nadie se aprueba a sí mismo.** El voto del autor de una propuesta no cuenta para su consenso.
-- **R3. Consenso (configurable).** Una propuesta queda aprobada, y su pregunta pasa a `ruled`, cuando tiene al menos `N` votos a favor de revisores válidos del dominio, al menos uno de un aprobador, y ningún voto en contra vigente de un aprobador. Valor por defecto: `N = 1`, pensado para equipos pequeños.
+- **R3. Consenso (configurable).** Una propuesta queda aprobada, y su pregunta pasa a `ruled`, cuando tiene al menos `N` votos a favor de revisores válidos (jurors activos), al menos uno de un aprobador, y ningún voto en contra vigente de un aprobador. Valor por defecto: `N = 1`, pensado para equipos pequeños.
 - **R4. Conflicto.** Una pregunta está en estado `disputed` (en conflicto) si tiene dos o más propuestas con algún voto a favor, o si una propuesta tiene votos a favor y en contra de aprobadores a la vez.
 - **R5. Solo se evalúa lo aprobado.** Las evaluaciones solo usan preguntas en estado `ruled`, con la propuesta aprobada como respuesta esperada.
-- **R6. La verdad se calcula, no se escribe.** El estado de una pregunta (`under_review`, `ruled`, `disputed` o `dismissed`) no es un campo editable por el cliente: se deriva de propuestas y votos (sección 7).
+- **R6. La verdad se calcula, no se escribe.** El estado de una pregunta (`under_review`, `ruled`, `disputed` o `dismissed`) no es un campo editable por el cliente: se deriva de propuestas, votos y retiradas (sección 7).
+- **R7. Cases no verificados.** Cualquier usuario autenticado puede insertar un case, pero solo cuentan los que tiene como autor un juror activo. Los demás se muestran como "no verificados" (*unverified*) y nunca entran en una evaluación ni en el export. Lo mismo vale para los testimonies: solo cuentan los de jurors activos.
+- **R8. Retirada.** Un case está `dismissed` si tiene al menos un `CaseDismissal` válido: insertado por el autor del case o por un admin. Las retiradas de otros usuarios se ignoran.
 
 ## 7. Modelo de datos (base de datos de la app)
 
-Patrón general: **registros de solo inserción con identidad verificada + estado calculado**. Las políticas garantizan que nadie inserta en nombre de otro (`claims.sub.eq(item.authorUserId)` y equivalentes); la validez de cada voto (rol, dominio, no autoaprobación) se calcula al derivar el estado. Así se respetan las limitaciones de `@role` sin perder garantías.
+Patrón general: **registros de solo inserción con identidad verificada + estado calculado**. Las políticas garantizan que nadie inserta en nombre de otro (`claims.sub.eq(item.authorUserId)` y equivalentes); la validez de cada registro (autor juror activo, rol, no autoaprobación, retirada por autor o admin) se calcula al derivar el estado. Así se respetan las limitaciones de `@role` sin perder garantías.
 
 Convenciones de Rayfin a respetar:
 - Clave primaria siempre `id` UUID; sin claves compuestas.
@@ -103,21 +115,25 @@ Convenciones de Rayfin a respetar:
 - Relaciones con `@one()` / `@many()` y claves foráneas con el formato `{propiedad}_id` que exige Rayfin (`case_id`, `testimony_id`). Sin muchos a muchos.
 - La identidad del usuario se guarda en un campo de texto `*UserId` (max 255) rellenado desde `claims.sub`. No es una clave foránea: no se puede relacionar con la entidad de sistema `USER`.
 - Las claves foráneas son texto con max 36. Los valores cerrados usan `@set()`.
+- Los emails de autor (`authorEmail`, `voterEmail`…) se guardan para comparar con `Juror.email` al calcular la validez; la política de inserción también exige `claims.email.eq(item.<role>Email)` si el token de Fabric trae ese claim.
 
 | Entidad | Campos principales | Permisos |
 |---|---|---|
-| `Domain` | `name` | Lectura: autenticados. Escritura: admin (ver nota) |
-| `Juror` | `email`, `domain_id`, `role` (`expert` · `approver` · `admin`), `active` | Lectura: autenticados. Escritura: admin (ver nota) |
-| `Agent` | `name`, `workspaceId`, `itemId`, `domain_id`, `active` | Lectura: autenticados. Escritura: admin (ver nota) |
-| `Case` | `agent_id`, `text` (max 1000), `category`, `tags`, `authorUserId`, `dismissed`, `createdAt` | Crear: autenticados con `claims.sub.eq(item.authorUserId)`. Leer: autenticados. Sin actualizar ni borrar |
+| `Juror` | `email` (único), `role` (`expert` · `approver` · `admin`), `team` (opcional, solo informativo), `active` | Lectura: autenticados. Escritura: solo la Function de admin (ver nota) |
+| `Agent` | `name`, `workspaceId`, `itemId`, `active` | Lectura: autenticados. Escritura: solo la Function de admin (ver nota) |
+| `Case` | `agent_id`, `text` (max 1000), `category`, `tags`, `authorUserId`, `authorEmail`, `createdAt` | Crear: autenticados con `claims.sub.eq(item.authorUserId)`. Leer: autenticados. Sin actualizar ni borrar |
 | `Testimony` | `case_id`, `answer` (max 2000), `definition` (max 1000), `authorUserId`, `authorEmail`, `createdAt` | Crear: igual que `Case`. Leer: autenticados. Sin actualizar ni borrar |
+| `CaseDismissal` | `case_id`, `reason` (max 1000), `dismissedByUserId`, `dismissedByEmail`, `createdAt` | Crear: `claims.sub.eq(item.dismissedByUserId)`. Leer: autenticados. Sin actualizar ni borrar |
 | `Vote` | `testimony_id`, `value` (`for` · `against`), `comment` (max 1000), `voterUserId`, `voterEmail`, `createdAt` | Crear: `claims.sub.eq(item.voterUserId)`. Leer: autenticados. Sin actualizar ni borrar |
 | `Hearing` | `agent_id`, `stage`, `launchedByUserId`, `jobInstanceId`, `evaluationId`, `status`, `caseCount`, `createdAt` | Crear y actualizar: solo desde la Function |
 | `Appeal` | `hearing_id`, `case_id`, `judgeVerdict`, `humanVerdict` (`correct` · `incorrect` · `ambiguous`), `reason`, `comment` (max 1000), `reviewerUserId`, `createdAt` | Crear: `claims.sub.eq(item.reviewerUserId)`. Leer: autenticados. Sin actualizar ni borrar |
 
-**Nota sobre la escritura de admin:** las políticas no permiten comprobar pertenencia a una lista. Para el MVP, `Domain`, `Juror` y `Agent` se escriben a través de Functions que comprueban que el llamante figura como `admin` en `Juror` antes de escribir (usando `ctx.getDataClient()`, que conserva la identidad del llamante). El primer admin se siembra directamente en la base de datos.
+**Nota sobre la escritura de admin:** las políticas no permiten comprobar pertenencia a una lista, y `ctx.getDataClient()` escribe con los permisos de quien llama. Por eso:
+- El cliente solo tiene `read` sobre `Juror` y `Agent`; ningún rol tiene `create`, `update` ni `delete`.
+- Toda escritura de admin pasa por una Function que (1) obtiene la identidad de quien llama (`sub` y `email`) del token Rayfin de la invocación, (2) comprueba en `Juror` que es un admin activo y rechaza la llamada si no, y (3) escribe con T-SQL usando el token `AudienceType.Sql` (identidad de la app), nunca con el cliente de datos de quien llama.
+- El primer admin lo crea el script de seed, con el email pasado como variable al ejecutarlo; nunca se guarda en el repositorio.
 
-**Cálculo del estado:** en el MVP, el frontend calcula el estado de cada pregunta a partir de propuestas, votos y revisores para mostrarlo. El cálculo autoritativo (el que decide qué entra en una evaluación o en el export) se hace en el notebook o la Function correspondiente, con la misma lógica. Esa lógica vive en un único módulo compartido con tests.
+**Cálculo del estado:** en el MVP, el frontend calcula el estado de cada pregunta (y si está verificada) a partir de propuestas, votos, retiradas y jurors para mostrarlo. El cálculo autoritativo (el que decide qué entra en una evaluación o en el export) se hace en el notebook o la Function correspondiente, con la misma lógica. Esa lógica vive en un único módulo compartido con tests.
 
 ## 8. Arquitectura e integraciones
 
@@ -125,8 +141,9 @@ Convenciones de Rayfin a respetar:
 [Fabric App: frontend React]
    │ GraphQL (Rayfin client)                 → BD de la app: Case, Testimony, Vote, Appeal…
    │ Connector fabric-sqlanalytics (lectura) → Lakehouse "jury_lh": tablas de resultados del SDK
-   │ Functions (identidad de la app)
-   │    ├─ registrar/gestionar agentes y revisores (comprobando rol admin)
+   │ Functions
+   │    ├─ admin: identidad de quien llama (token Rayfin) → comprueba admin en Juror
+   │    │         → escribe Juror/Agent con T-SQL y el token AudienceType.Sql (identidad de la app)
    │    └─ lanzar evaluación → API Job Scheduler: ejecutar notebook con parámetros
    ▼
 [Notebook "evaluate_agent"]
@@ -145,13 +162,14 @@ Decisiones:
 
 ## 9. Pantallas
 
-1. **Agentes:** lista de agentes registrados con dominio, nº de preguntas por estado y % de acuerdo juez-humano.
-2. **Banco de preguntas (por agente):** columnas por estado (`under_review` · `ruled` · `disputed` · `dismissed`), filtros por categoría.
-3. **Detalle de pregunta:** propuestas con su definición, votos con comentarios, historial; acciones de votar y proponer alternativa.
+1. **Agentes:** lista de agentes registrados, nº de preguntas por estado y % de acuerdo juez-humano.
+2. **Banco de preguntas (por agente):** columnas por estado (`under_review` · `ruled` · `disputed` · `dismissed`), filtros por categoría. Los cases no verificados (R7) se marcan como tales.
+3. **Detalle de pregunta:** propuestas con su definición, votos con comentarios, historial; acciones de votar, proponer alternativa y retirar (autor o admin).
 4. **Conflictos:** propuestas enfrentadas lado a lado con sus definiciones y quién respalda cada una.
 5. **Ejecuciones:** lanzar evaluación, estado de cada ejecución, resumen de resultados.
 6. **Revisión de veredictos:** cola con pregunta, respuesta esperada, respuesta del agente, veredicto del juez y botones de confirmar o corregir.
 7. **Calidad del juez:** matriz juez frente a humano, % de acuerdo por agente y categoría, motivos de desacuerdo más frecuentes.
+8. **Administración:** solo para admins. Alta, cambio de rol y desactivación de jurors; alta y desactivación de agentes. Todo pasa por la Function de admin.
 
 Requisitos visuales: estados vacíos y de error útiles; sin datos simulados si falla una consulta.
 
@@ -189,7 +207,19 @@ Regla: la metáfora se usa en títulos y navegación, pero cada pantalla incluye
 - **Trazabilidad:** todo voto, propuesta y veredicto humano queda registrado con autor y fecha; nada se borra.
 - **Preview:** Fabric Apps, el SDK de evaluación y los Data Agents están en preview. Fijar versiones (CLI de Rayfin y `fabric-data-agent-sdk`) y documentarlas en el README.
 
-## 11. Supuestos por verificar antes o durante la iteración 3
+## 11. Supuestos por verificar
+
+### En la iteración I1a, tras el primer despliegue y antes de construir pantallas
+
+Si alguno falla, se para y se replantea el diseño.
+
+| # | Supuesto | Cómo verificarlo |
+|---|---|---|
+| R1 | Las políticas de `create` (`claims.sub.eq(item.authorUserId)`) se aplican de verdad. Data API builder documenta que sus *database policies* no se aplican a `create`; Rayfin documenta políticas de `create` | Prueba negativa: insertar un `Case` con un `authorUserId` ajeno debe fallar |
+| S-A | Una Function puede conectarse a la base de datos SQL de la propia app con el token `AudienceType.Sql` (identidad de la app), insertar y leer una fila de `Juror`, y obtener `sub` y `email` de quien llama del token Rayfin | Function mínima desplegada e invocada desde el cliente |
+| S-B | Una fila insertada con T-SQL aparece correctamente en la API de datos de Rayfin (columnas, `id`, campos de sistema que Rayfin espere) | Leer con el cliente la fila insertada por S-A y comparar con una fila creada por GraphQL |
+
+### Durante la iteración 3
 
 | # | Supuesto | Cómo verificarlo |
 |---|---|---|
@@ -226,15 +256,19 @@ Configuración de tenant necesaria: Data Agents habilitados y, según la región
 
 | Iteración | Contenido | Criterio de salida |
 |---|---|---|
-| **I1** | Esqueleto con plantilla Data App + datos activados; entidades `Domain`, `Juror`, `Agent`, `Case`, `Testimony`; pantallas 1–3 sin votos | Un experto crea preguntas y propuestas; despliegue en Fabric correcto |
-| **I2** | `Vote`, módulo de cálculo de estado con tests, reglas R1–R6, pantalla 4 | Los estados se calculan bien en todos los casos de prueba, incluidos conflictos y autoaprobación |
+| **I1a** | Datos activados; entidades `Juror`, `Agent`, `Case`, `Testimony` y `CaseDismissal`; seed; i18n EN/ES; tests; verificación de R1, S-A y S-B; pantallas 1–3 sin votos | Un juror crea preguntas y propuestas en la app desplegada; R1, S-A y S-B confirmados |
+| **I1b** | Function de admin (T-SQL con identidad de la app) y pantalla 8 para gestionar jurors y agentes | Solo un admin puede dar de alta o modificar jurors y agentes; cualquier otro intento se rechaza |
+| **I2** | `Vote`, módulo de cálculo de estado con tests, reglas R1–R8, pantalla 4 | Los estados se calculan bien en todos los casos de prueba, incluidos conflictos, autoaprobación, cases no verificados y retiradas |
 | **I3** | Lakehouse `jury_lh`, notebook `evaluate_agent`, Function de lanzamiento, connector de lectura, pantalla 5. Verificar S1–S5 | Una evaluación lanzada desde la app produce resultados visibles en la app |
 | **I4** | `Appeal`, pantallas 6 y 7, vuelta a revisión por respuesta esperada incorrecta | Se calcula el % de acuerdo juez-humano por agente y categoría |
 | **I5** | Notebook `export_case_law` y prueba de importación en Quality Lab | El CSV exportado se carga sin errores en Quality Lab |
 
 ## 13. Criterios de aceptación del MVP
 
-- [ ] Un usuario no puede crear un voto, propuesta o veredicto en nombre de otro.
+- [ ] Un usuario no puede crear un voto, propuesta, retirada o veredicto en nombre de otro.
+- [ ] Solo un admin puede crear o modificar jurors y agentes; el cliente no tiene permisos de escritura sobre ellos.
+- [ ] Un case cuyo autor no es juror activo aparece como no verificado y no entra en evaluaciones ni en el export.
+- [ ] Una retirada solo cuenta si la hace el autor del case o un admin.
 - [ ] El voto de un autor sobre su propia propuesta no cuenta para el consenso.
 - [ ] Una pregunta con propuestas enfrentadas aparece en la vista de conflictos.
 - [ ] Solo las preguntas aprobadas entran en una evaluación y en el export.
