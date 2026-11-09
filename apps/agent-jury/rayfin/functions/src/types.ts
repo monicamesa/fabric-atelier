@@ -25,4 +25,8 @@ export type AppFunctionsSchema = {
     input: Record<string, never>;
     output: string;
   };
+  sqlPing: {
+    input: Record<string, never>;
+    output: { ok: boolean; activeAdmins?: undefined | number; detail?: undefined | string };
+  };
 };

@@ -93,6 +93,11 @@ if (sections.has("removed")) {
 
 // Proof by insert: getDataClient() inside the Function must carry the caller's identity.
 if (sections.has("probe")) {
+    await expectSuccess("P.0", "ping (no context, no audience) runs", () => client.functions.ping.invoke());
+    const sqlPing = await expectSuccess("P.0b", "sqlPing (Sql audience only) runs", () => client.functions.sqlPing.invoke());
+    if (sqlPing) {
+        record("P.0c", "sqlPing reads Jurors as the app identity", sqlPing.ok, sqlPing.ok ? `active admins: ${sqlPing.activeAdmins}` : sqlPing.detail);
+    }
     const own = await expectSuccess("P.1", "adminProbe runs for the caller's own email", () =>
         client.functions.adminProbe.invoke({ claimedEmail: me.email ?? "" }),
     );

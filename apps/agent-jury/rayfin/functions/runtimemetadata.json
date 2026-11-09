@@ -14,21 +14,35 @@
         },
         {
           "name": "ctx",
-          "type": "RayfinContext<AgentJurySchema, AudienceType.Sql>",
+          "type": "RayfinContext<AgentJurySchema>",
           "optional": false,
           "hasDefault": false,
           "position": 1,
           "isFabricParameter": false
         }
       ],
-      "contextAudiences": [
-        "Sql"
-      ]
+      "contextAudiences": []
     },
     {
       "functionName": "ping",
       "delegateParameters": [],
       "contextAudiences": []
+    },
+    {
+      "functionName": "sqlPing",
+      "delegateParameters": [
+        {
+          "name": "ctx",
+          "type": "RayfinContext<AgentJurySchema, AudienceType.Sql>",
+          "optional": false,
+          "hasDefault": false,
+          "position": 0,
+          "isFabricParameter": false
+        }
+      ],
+      "contextAudiences": [
+        "Sql"
+      ]
     }
   ]
 }

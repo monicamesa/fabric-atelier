@@ -1,6 +1,6 @@
 import { UserDataFunctions, AudienceType, type RayfinContext } from '@microsoft/fabric-user-data-functions';
 import type { AgentJurySchema } from '../../data/schema.js';
-import { isActiveAdmin, withAppSql } from './app-sql.js';
+import { withAppSql } from './app-sql.js';
 
 const udf = new UserDataFunctions();
 
@@ -17,12 +17,12 @@ function describe(error: unknown): string {
 
 // Spike "proof by insert": the AdminRequest insert policy (claims.email = requesterEmail) runs with the
 // caller's identity through getDataClient(), so a successful insert proves who is calling.
+// Diagnostic split: this one uses only the caller's data client; sqlPing uses only the Sql audience.
 udf.func(
   'adminProbe',
-  async (claimedEmail: string, ctx: RayfinContext<AgentJurySchema, AudienceType.Sql>): Promise<AdminProbeResult> => {
-    const data = ctx.getDataClient();
+  async (claimedEmail: string, ctx: RayfinContext<AgentJurySchema>): Promise<AdminProbeResult> => {
     try {
-      return await probe(data, claimedEmail, ctx);
+      return await probe(ctx.getDataClient(), claimedEmail);
     } catch (error) {
       return { status: 403, stage: 'error', detail: describe(error) };
     }
@@ -33,10 +33,37 @@ udf.func(
 // Diagnostic: confirms the Functions host runs code that has no context or audience.
 udf.func('ping', (): string => 'pong', []);
 
+export interface SqlPingResult {
+  ok: boolean;
+  activeAdmins?: number;
+  detail?: string;
+}
+
+// Diagnostic: the AudienceType.Sql binding alone, reading Jurors as the app identity.
+udf.func(
+  'sqlPing',
+  async (ctx: RayfinContext<AgentJurySchema, AudienceType.Sql>): Promise<SqlPingResult> => {
+    try {
+      const activeAdmins = await withAppSql(
+        { server: ctx.Secrets.APP_SQL_SERVER, database: ctx.Secrets.APP_SQL_DATABASE, token: ctx.Tokens.Sql },
+        async (pool) => {
+          const result = await pool.request().query<{ total: number }>(
+            `SELECT COUNT(*) AS total FROM dbo.[Jurors] WHERE role = N'admin' AND active = 1`,
+          );
+          return result.recordset[0]?.total ?? 0;
+        },
+      );
+      return { ok: true, activeAdmins };
+    } catch (error) {
+      return { ok: false, detail: describe(error) };
+    }
+  },
+  [],
+);
+
 async function probe(
-  data: ReturnType<RayfinContext<AgentJurySchema, AudienceType.Sql>['getDataClient']>,
+  data: ReturnType<RayfinContext<AgentJurySchema>['getDataClient']>,
   claimedEmail: string,
-  ctx: RayfinContext<AgentJurySchema, AudienceType.Sql>,
 ): Promise<AdminProbeResult> {
     let requestId: string;
     try {
@@ -64,10 +91,10 @@ async function probe(
       return { status: 403, stage: 'read-back', requestId, detail: describe(error) };
     }
 
-    const admin = await withAppSql(
-      { server: ctx.Secrets.APP_SQL_SERVER, database: ctx.Secrets.APP_SQL_DATABASE, token: ctx.Tokens.Sql },
-      (pool) => isActiveAdmin(pool, verifiedEmail),
-    );
+    // Diagnostic variant of the admin check: Jurors are readable by any signed-in user.
+    const jurors = await data.Juror.select(['email', 'role', 'active']).first(1000).execute();
+    const target = verifiedEmail.trim().toLowerCase();
+    const admin = jurors.some((juror) => juror.active && juror.role === 'admin' && juror.email.trim().toLowerCase() === target);
     return admin
       ? { status: 200, stage: 'allowed', requestId }
       : { status: 403, stage: 'admin-check', requestId, detail: 'The caller is not an active admin.' };
