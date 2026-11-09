@@ -91,35 +91,74 @@ if (sections.has("removed")) {
     await expectRejection("X.2", "spikeSqlJuror no longer responds", () => client.functions.spikeSqlJuror.invoke());
 }
 
-// Proof by insert: getDataClient() inside the Function must carry the caller's identity.
+// Admin requests (fallback design): the client inserts the request; adminExecute runs only that row.
 if (sections.has("probe")) {
-    await expectSuccess("P.0", "ping (no context, no audience) runs", () => client.functions.ping.invoke());
-    const sqlPing = await expectSuccess("P.0b", "sqlPing (Sql audience only) runs", () => client.functions.sqlPing.invoke());
-    if (sqlPing) {
-        record("P.0c", "sqlPing reads Jurors as the app identity", sqlPing.ok, sqlPing.ok ? `active admins: ${sqlPing.activeAdmins}` : sqlPing.detail);
+    const dataPing = await expectSuccess("F.0", "dataPing (getDataClient inside a Function) runs", () => client.functions.dataPing.invoke());
+    if (dataPing) {
+        record("F.0b", "getDataClient inside a Function can read data", dataPing.ok, dataPing.detail ?? "");
     }
-    const own = await expectSuccess("P.1", "adminProbe runs for the caller's own email", () =>
-        client.functions.adminProbe.invoke({ claimedEmail: me.email ?? "" }),
+
+    const newRequest = (fields = {}) =>
+        client.data.AdminRequest.create({ requesterEmail: me.email, action: "probe", payload: "{}", createdAt: new Date(), ...fields });
+    const execute = (requestId) => client.functions.adminExecute.invoke({ requestId });
+
+    const own = await expectSuccess("F.1", "the caller can insert an AdminRequest with their own email", () => newRequest());
+    await expectRejection("F.2", "(c) an AdminRequest claiming another user's email is rejected at the insert", () =>
+        newRequest({ requesterEmail: OTHER_ADMIN_EMAIL }),
     );
     if (own) {
-        record("P.2", "the insert with the caller's own email passes (getDataClient carries the identity)", own.stage !== "insert", own.stage === "insert" ? own.detail : "");
-        record("P.3", "the author can read the request back", own.stage !== "read-back", own.stage === "read-back" ? own.detail : "");
-        record(
-            expectAdmin ? "P.4a" : "P.4b",
-            expectAdmin ? "(a) an active admin is allowed" : "(b) a user who is not an admin is rejected",
-            expectAdmin ? own.status === 200 && own.stage === "allowed" : own.status === 403 && own.stage === "admin-check",
-            `status ${own.status}, stage ${own.stage}`,
+        const first = await expectSuccess("F.3", "adminExecute runs for the caller's request", () => execute(own.id));
+        if (first) {
+            record(
+                expectAdmin ? "F.4a" : "F.4b",
+                expectAdmin ? "(a) an active admin is allowed" : "(b) a user who is not an admin is rejected",
+                expectAdmin ? first.status === 200 && first.outcome === "done" : first.status === 403 && /not an active admin/.test(first.detail),
+                `status ${first.status}: ${first.detail}`,
+            );
+        }
+        const second = await expectSuccess("F.5", "adminExecute runs a second time on the same request", () => execute(own.id));
+        if (second) {
+            record("F.6", "a request is single-use", second.status === 409, `status ${second.status}: ${second.detail}`);
+        }
+        const [result] = (await client.data.AdminRequestResult.select(["requestId", "outcome"]).where({ requestId: { eq: own.id } }).execute()) ?? [];
+        record("F.7", "the author can read the result of their own request", !!result, result ? `outcome ${result.outcome}` : "");
+    }
+
+    const expired = await expectSuccess("F.8", "an AdminRequest dated 5 minutes ago can be inserted", () =>
+        newRequest({ createdAt: new Date(Date.now() - 5 * 60_000) }),
+    );
+    if (expired) {
+        const response = await expectSuccess("F.9", "adminExecute runs on the old request", () => execute(expired.id));
+        if (response) record("F.10", "a request older than 2 minutes is rejected", response.status === 403 && /expired/.test(response.detail), `status ${response.status}: ${response.detail}`);
+    }
+    const future = await expectSuccess("F.11", "an AdminRequest dated 10 minutes ahead can be inserted", () =>
+        newRequest({ createdAt: new Date(Date.now() + 10 * 60_000) }),
+    );
+    if (future) {
+        const response = await expectSuccess("F.12", "adminExecute runs on the future-dated request", () => execute(future.id));
+        if (response) record("F.13", "a future-dated request is rejected", response.status === 403 && /expired|invalid date/.test(response.detail), `status ${response.status}: ${response.detail}`);
+    }
+    if (expectAdmin) {
+        const unknown = await expectSuccess("F.14", "an AdminRequest with an unknown action can be inserted", () => newRequest({ action: "dropEverything" }));
+        if (unknown) {
+            const response = await expectSuccess("F.15", "adminExecute runs on the unknown action", () => execute(unknown.id));
+            if (response) record("F.16", "an unknown action is rejected", response.status === 403 && /Unknown action/.test(response.detail), `status ${response.status}: ${response.detail}`);
+        }
+    }
+
+    const missing = await expectSuccess("F.17", "adminExecute runs for an id that does not exist", () => execute("00000000-0000-4000-8000-0000000000ff"));
+    if (missing) record("F.18", "an unknown request id is rejected", missing.status === 404, `status ${missing.status}`);
+    await expectRejection("F.19", "(d) adminExecute without a session is rejected", () =>
+        anonymous.functions.adminExecute.invoke({ requestId: "00000000-0000-4000-8000-0000000000ff" }),
+    );
+    await expectRejection("F.20", "the client cannot write AdminRequestResult", () =>
+        client.data.AdminRequestResult.create({ requestId: "00000000-0000-4000-8000-0000000000ff", requesterEmail: me.email, outcome: "done", detail: "forged", processedAt: new Date() }),
+    );
+    if (own) {
+        await expectRejection("F.21", "the client cannot update an AdminRequest", () =>
+            client.data.AdminRequest.update({ id: own.id }, { action: "forged" }),
         );
     }
-    const forged = await expectSuccess("P.5", "adminProbe runs when claiming another user's email", () =>
-        client.functions.adminProbe.invoke({ claimedEmail: OTHER_ADMIN_EMAIL }),
-    );
-    if (forged) {
-        record("P.6", "(c) claiming another user's email is rejected at the insert", forged.status === 403 && forged.stage === "insert", `status ${forged.status}, stage ${forged.stage}`);
-    }
-    await expectRejection("P.7", "(d) adminProbe without a session is rejected", () =>
-        anonymous.functions.adminProbe.invoke({ claimedEmail: OTHER_ADMIN_EMAIL }),
-    );
 }
 
 // R1: insert policies. Needs an Agent row (from the seed). Creates "[I1a check]" rows.

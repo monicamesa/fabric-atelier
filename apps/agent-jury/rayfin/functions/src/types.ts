@@ -17,16 +17,12 @@
  */
 
 export type AppFunctionsSchema = {
-  adminProbe: {
-    input: { claimedEmail: string };
-    output: { status: 200 | 403; stage: 'insert' | 'read-back' | 'admin-check' | 'allowed' | 'error'; requestId?: undefined | string; detail?: undefined | string };
+  adminExecute: {
+    input: { requestId: string };
+    output: { status: 200 | 403 | 404 | 409; outcome: 'done' | 'rejected'; detail: string };
   };
-  ping: {
+  dataPing: {
     input: Record<string, never>;
-    output: string;
-  };
-  sqlPing: {
-    input: Record<string, never>;
-    output: { ok: boolean; activeAdmins?: undefined | number; detail?: undefined | string };
+    output: { ok: boolean; detail?: undefined | string };
   };
 };

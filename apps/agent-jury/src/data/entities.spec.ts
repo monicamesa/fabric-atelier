@@ -12,7 +12,16 @@ const READ_ONLY = ["Juror.ts", "Agent.ts"];
 
 describe("entity definitions", () => {
     it("cover the I1a entities", () => {
-        expect(entityFiles.sort()).toEqual(["AdminRequest.ts", "Agent.ts", "Case.ts", "CaseDismissal.ts", "Juror.ts", "Testimony.ts"]);
+        expect(entityFiles.sort()).toEqual(["AdminRequest.ts", "AdminRequestResult.ts", "Agent.ts", "Case.ts", "CaseDismissal.ts", "Juror.ts", "Testimony.ts"]);
+    });
+
+    it("AdminRequestResult is written only by the admin Function and readable only by the requester", () => {
+        const source = sources["AdminRequestResult.ts"];
+        const actions = [...source.matchAll(/@authenticated\('([^']+)'/g)].map((match) => match[1]);
+        expect(actions).toEqual(["read"]);
+        expect(source).toMatch(/claims\.email\.eq\(item\.requesterEmail\)/);
+        expect(source).toMatch(/@uuid\(\{ unique: true \}\) requestId/);
+        expect(source).not.toMatch(/@(anonymous|role)\(/);
     });
 
     it("AdminRequest is insert-only and visible only to its author", () => {
