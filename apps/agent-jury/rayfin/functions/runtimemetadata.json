@@ -2,7 +2,7 @@
   "schemaVersion": "2.0",
   "functions": [
     {
-      "functionName": "adminExecute",
+      "functionName": "clerkExecute",
       "delegateParameters": [
         {
           "name": "requestId",
@@ -24,122 +24,6 @@
       "contextAudiences": [
         "Sql"
       ]
-    },
-    {
-      "functionName": "echoSync",
-      "delegateParameters": [
-        {
-          "name": "text",
-          "type": "string",
-          "optional": false,
-          "hasDefault": false,
-          "position": 0,
-          "isFabricParameter": false
-        }
-      ],
-      "contextAudiences": []
-    },
-    {
-      "functionName": "echoAsync",
-      "delegateParameters": [
-        {
-          "name": "text",
-          "type": "string",
-          "optional": false,
-          "hasDefault": false,
-          "position": 0,
-          "isFabricParameter": false
-        }
-      ],
-      "contextAudiences": []
-    },
-    {
-      "functionName": "echoAsyncCtx",
-      "delegateParameters": [
-        {
-          "name": "text",
-          "type": "string",
-          "optional": false,
-          "hasDefault": false,
-          "position": 0,
-          "isFabricParameter": false
-        },
-        {
-          "name": "ctx",
-          "type": "RayfinContext<AgentJurySchema>",
-          "optional": false,
-          "hasDefault": false,
-          "position": 1,
-          "isFabricParameter": false
-        }
-      ],
-      "contextAudiences": []
-    },
-    {
-      "functionName": "echoRequestId",
-      "delegateParameters": [
-        {
-          "name": "requestId",
-          "type": "string",
-          "optional": false,
-          "hasDefault": false,
-          "position": 0,
-          "isFabricParameter": false
-        }
-      ],
-      "contextAudiences": []
-    },
-    {
-      "functionName": "echoUnion",
-      "delegateParameters": [
-        {
-          "name": "text",
-          "type": "string",
-          "optional": false,
-          "hasDefault": false,
-          "position": 0,
-          "isFabricParameter": false
-        }
-      ],
-      "contextAudiences": []
-    },
-    {
-      "functionName": "echoSqlInput",
-      "delegateParameters": [
-        {
-          "name": "text",
-          "type": "string",
-          "optional": false,
-          "hasDefault": false,
-          "position": 0,
-          "isFabricParameter": false
-        },
-        {
-          "name": "ctx",
-          "type": "RayfinContext<AgentJurySchema, AudienceType.Sql>",
-          "optional": false,
-          "hasDefault": false,
-          "position": 1,
-          "isFabricParameter": false
-        }
-      ],
-      "contextAudiences": [
-        "Sql"
-      ]
-    },
-    {
-      "functionName": "dataPing",
-      "delegateParameters": [
-        {
-          "name": "ctx",
-          "type": "RayfinContext<AgentJurySchema>",
-          "optional": false,
-          "hasDefault": false,
-          "position": 0,
-          "isFabricParameter": false
-        }
-      ],
-      "contextAudiences": []
     }
   ]
 }

@@ -13,8 +13,9 @@ function describe(error: unknown): string {
 
 // Admin entry point (fallback design). Takes only the id of an AdminRequest the caller inserted;
 // the action and payload are read from that row, never from the call.
+// Named clerk*, not admin*: the Azure Functions host reserves routes starting with admin or runtime.
 udf.func(
-  'adminExecute',
+  'clerkExecute',
   async (requestId: string, ctx: RayfinContext<AgentJurySchema, AudienceType.Sql>): Promise<AdminExecuteResult> => {
     if (!GUID.test(requestId)) {
       return { code: 404, outcome: 'rejected', detail: 'Unknown request.' };
@@ -26,46 +27,6 @@ udf.func(
       );
     } catch (error) {
       return { code: 500, outcome: 'rejected', detail: describe(error) };
-    }
-  },
-  [],
-);
-
-export interface DataPingResult {
-  ok: boolean;
-  detail?: string;
-}
-
-// Diagnostics: which signatures can the host invoke? (sync/async, with/without an input and context)
-udf.func('echoSync', (text: string): string => `sync:${text.length}`, []);
-udf.func('echoAsync', async (text: string): Promise<string> => `async:${text.length}`, []);
-udf.func(
-  'echoAsyncCtx',
-  async (text: string, ctx: RayfinContext<AgentJurySchema>): Promise<string> => `ctx:${text.length}:${ctx.baseUrl ? 'base' : 'none'}`,
-  [],
-);
-udf.func('echoRequestId', async (requestId: string): Promise<string> => `rid:${requestId.length}`, []);
-export interface EchoUnionResult {
-  code: 200 | 404;
-  detail?: string;
-}
-udf.func('echoUnion', async (text: string): Promise<EchoUnionResult> => ({ code: text ? 200 : 404 }), []);
-udf.func(
-  'echoSqlInput',
-  async (text: string, ctx: RayfinContext<AgentJurySchema, AudienceType.Sql>): Promise<string> =>
-    `sql:${text.length}:${ctx.Tokens.Sql ? 'token' : 'none'}`,
-  [],
-);
-
-// Diagnostic: the smallest possible read through the caller-scoped data client.
-udf.func(
-  'dataPing',
-  async (ctx: RayfinContext<AgentJurySchema>): Promise<DataPingResult> => {
-    try {
-      await ctx.getDataClient().Juror.select(['id']).first(1).execute();
-      return { ok: true };
-    } catch (error) {
-      return { ok: false, detail: describe(error) };
     }
   },
   [],

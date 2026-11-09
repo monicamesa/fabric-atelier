@@ -83,36 +83,26 @@ await expectRejection("R1.0", "reading data without a session is rejected", () =
     anonymous.data.Juror.select(["id"]).first(1).execute(),
 );
 
-// The S-A spike Functions must no longer exist.
+// Spike and diagnostic Functions must no longer exist.
 if (sections.has("removed")) {
     await expectRejection("X.1", "whoAmI no longer responds", () =>
         client.functions.whoAmI.invoke({ expectedSub: "x", expectedEmail: "x" }),
     );
     await expectRejection("X.2", "spikeSqlJuror no longer responds", () => client.functions.spikeSqlJuror.invoke());
+    await expectRejection("X.3", "dataPing no longer responds", () => client.functions.dataPing.invoke());
+    for (const name of ["echoSync", "echoAsync", "echoAsyncCtx", "echoRequestId", "echoUnion", "echoSqlInput"]) {
+        await expectRejection(`X.${name}`, `${name} no longer responds`, () => client.functions[name].invoke({ text: "x", requestId: "x" }));
+    }
+    await expectRejection("X.4", "adminExecute (old name) no longer responds", () =>
+        client.functions.adminExecute.invoke({ requestId: "00000000-0000-4000-8000-0000000000ff" }),
+    );
 }
 
-// Admin requests (fallback design): the client inserts the request; adminExecute runs only that row.
+// Admin requests (fallback design): the client inserts the request; clerkExecute runs only that row.
 if (sections.has("probe")) {
-    for (const name of ["echoSync", "echoAsync", "echoAsyncCtx", "echoUnion", "echoSqlInput"]) {
-        if (client.functions[name]) {
-            const value = await expectSuccess(`E.${name}`, `${name} with a text input runs`, () => client.functions[name].invoke({ text: "hello" }));
-            if (value !== undefined) console.log(`        ${name} returned ${JSON.stringify(value)}`);
-        }
-    }
-    if (client.functions.echoRequestId) {
-        const value = await expectSuccess("E.echoRequestId", "echoRequestId with a requestId input runs", () =>
-            client.functions.echoRequestId.invoke({ requestId: "00000000-0000-4000-8000-0000000000ff" }),
-        );
-        if (value !== undefined) console.log(`        echoRequestId returned ${JSON.stringify(value)}`);
-    }
-    const dataPing = await expectSuccess("F.0", "dataPing (getDataClient inside a Function) runs", () => client.functions.dataPing.invoke());
-    if (dataPing) {
-        record("F.0b", "getDataClient inside a Function can read data", dataPing.ok, dataPing.detail ?? "");
-    }
-
     const newRequest = (fields = {}) =>
         client.data.AdminRequest.create({ requesterEmail: me.email, action: "probe", payload: "{}", createdAt: new Date(), ...fields });
-    const execute = (requestId) => client.functions.adminExecute.invoke({ requestId });
+    const execute = (requestId) => client.functions.clerkExecute.invoke({ requestId });
 
     const own = await expectSuccess("F.1", "the caller can insert an AdminRequest with their own email", () => newRequest());
     await expectRejection("F.2", "(c) an AdminRequest claiming another user's email is rejected at the insert", () =>
@@ -132,8 +122,11 @@ if (sections.has("probe")) {
         if (second) {
             record("F.6", "a request is single-use", second.code === 409, `status ${second.code}: ${second.detail}`);
         }
-        const [result] = (await client.data.AdminRequestResult.select(["requestId", "outcome"]).where({ requestId: { eq: own.id } }).execute()) ?? [];
+        const [result] = (await client.data.AdminRequestResult.select(["requestId", "outcome", "detail"]).where({ requestId: { eq: own.id } }).execute()) ?? [];
         record("F.7", "the author can read the result of their own request", !!result, result ? `outcome ${result.outcome}` : "");
+        if (!expectAdmin) {
+            record("F.7b", "the rejected attempt is recorded in the admin log", result?.outcome === "rejected", result?.detail ?? "");
+        }
     }
 
     const expired = await expectSuccess("F.8", "an AdminRequest dated 5 minutes ago can be inserted", () =>
@@ -160,8 +153,8 @@ if (sections.has("probe")) {
 
     const missing = await expectSuccess("F.17", "adminExecute runs for an id that does not exist", () => execute("00000000-0000-4000-8000-0000000000ff"));
     if (missing) record("F.18", "an unknown request id is rejected", missing.code === 404, `status ${missing.code}`);
-    await expectRejection("F.19", "(d) adminExecute without a session is rejected", () =>
-        anonymous.functions.adminExecute.invoke({ requestId: "00000000-0000-4000-8000-0000000000ff" }),
+    await expectRejection("F.19", "(d) clerkExecute without a session is rejected", () =>
+        anonymous.functions.clerkExecute.invoke({ requestId: "00000000-0000-4000-8000-0000000000ff" }),
     );
     await expectRejection("F.20", "the client cannot write AdminRequestResult", () =>
         client.data.AdminRequestResult.create({ requestId: "00000000-0000-4000-8000-0000000000ff", requesterEmail: me.email, outcome: "done", detail: "forged", processedAt: new Date() }),
