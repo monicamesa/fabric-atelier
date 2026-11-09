@@ -9,9 +9,9 @@ DECLARE @email NVARCHAR(254) = LOWER(LTRIM(RTRIM(N'$(AdminEmail)')));
 IF @email = N'' OR @email NOT LIKE N'%_@_%._%'
     THROW 50001, 'AdminEmail is missing or is not an email address.', 1;
 
-IF EXISTS (SELECT 1 FROM dbo.[Juror] WHERE LOWER(email) = @email)
-    UPDATE dbo.[Juror] SET role = N'admin', active = 1 WHERE LOWER(email) = @email;
+IF EXISTS (SELECT 1 FROM dbo.[Jurors] WHERE LOWER(email) = @email)
+    UPDATE dbo.[Jurors] SET role = N'admin', active = 1 WHERE LOWER(email) = @email;
 ELSE
-    INSERT INTO dbo.[Juror] (id, email, role, team, active) VALUES (NEWID(), @email, N'admin', NULL, 1);
+    INSERT INTO dbo.[Jurors] (id, email, role, team, active) VALUES (NEWID(), @email, N'admin', NULL, 1);
 
-SELECT role, active FROM dbo.[Juror] WHERE LOWER(email) = @email;
+SELECT role, active FROM dbo.[Jurors] WHERE LOWER(email) = @email;

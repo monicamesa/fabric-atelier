@@ -18,7 +18,8 @@ export interface SpikeSqlResult {
   error?: string;
 }
 
-const ENTITY_TABLES = ['Juror', 'Agent', 'Case', 'Testimony', 'CaseDismissal'];
+// Rayfin pluralizes table names: entity Juror is stored in dbo.Jurors.
+const ENTITY_TABLES = ['Jurors', 'Agents', 'Cases', 'Testimonies', 'CaseDismissals'];
 const EXAMPLE_AGENT_ID = '00000000-0000-4000-8000-000000000021';
 const EXAMPLE_PLACEHOLDER_ID = '00000000-0000-4000-8000-000000000031';
 
@@ -70,11 +71,11 @@ export async function runSqlSpike(target: SqlTarget): Promise<SpikeSqlResult> {
       (result.columns[key] ??= []).push(`${row.COLUMN_NAME} ${row.DATA_TYPE}${nullable}${defaultValue}`);
     }
 
-    if (!schemaByTable.Juror || !schemaByTable.Agent) {
-      throw new Error('Juror or Agent table not found in INFORMATION_SCHEMA.');
+    if (!schemaByTable.Jurors || !schemaByTable.Agents) {
+      throw new Error('Jurors or Agents table not found in INFORMATION_SCHEMA.');
     }
-    const jurorTable = `${quoteIdentifier(schemaByTable.Juror)}.${quoteIdentifier('Juror')}`;
-    const agentTable = `${quoteIdentifier(schemaByTable.Agent)}.${quoteIdentifier('Agent')}`;
+    const jurorTable = `${quoteIdentifier(schemaByTable.Jurors)}.${quoteIdentifier('Jurors')}`;
+    const agentTable = `${quoteIdentifier(schemaByTable.Agents)}.${quoteIdentifier('Agents')}`;
 
     await pool
       .request()
