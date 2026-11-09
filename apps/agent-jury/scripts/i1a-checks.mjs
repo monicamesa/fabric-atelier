@@ -1,6 +1,7 @@
-// Runs the I1a post-deploy checks (R1, S-A, S-B) against the deployed app as the `rayfin login` user.
+// Runs the I1a post-deploy checks against the deployed app as the `rayfin login` user.
 // Prints only pass/fail lines: never tokens, emails or identifiers.
-//   node scripts/i1a-checks.mjs
+//   node scripts/i1a-checks.mjs [--only=removed,probe,r1] [--expect-admin]
+// --expect-admin: the signed-in user is an active admin juror; without it, the user must not be one.
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { getAuthenticatedToken } from "@microsoft/rayfin-cli/auth";
@@ -9,6 +10,11 @@ import { signInWithEntraToken } from "@microsoft/rayfin-auth-provider-fabric";
 
 const appRoot = resolve(import.meta.dirname, "..");
 const GUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+const onlyArg = process.argv.find((arg) => arg.startsWith("--only="));
+const sections = new Set((onlyArg ? onlyArg.slice("--only=".length) : "removed,probe,r1").split(","));
+const expectAdmin = process.argv.includes("--expect-admin");
+// A seeded example admin: claiming its email must be rejected at the insert.
+const OTHER_ADMIN_EMAIL = "dario.admin@example.com";
 
 function readEnvFile(path) {
     const values = {};
@@ -72,65 +78,51 @@ const session = client.auth.getSession();
 const me = { id: session.user?.id, email: session.user?.email };
 console.log(`Signed in: ${session.isAuthenticated ? "yes" : "no"}; session has email: ${me.email ? "yes" : "no"}`);
 
-// S-A: identity read from the invocation token.
-const identity = await expectSuccess("S-A.1", "whoAmI runs for a signed-in caller", () =>
-    client.functions.whoAmI.invoke({ expectedSub: me.id, expectedEmail: me.email ?? "" }),
-);
-if (identity) {
-    console.log(`        token claim names: ${identity.claimNames.join(", ")}`);
-    console.log(`        token aud: ${identity.audience}; idtyp: ${identity.identityType}`);
-    record("S-A.2", "the token sub matches the session user", identity.subMatches);
-    record("S-A.3", "the token email claim matches the session email (R3)", identity.emailMatches);
-}
-
 const anonymous = new RayfinClient({ baseUrl, publishableKey, authStorage: false });
-await expectRejection("S-A.4", "a Function invocation without a session is rejected", () =>
-    anonymous.functions.whoAmI.invoke({ expectedSub: "x", expectedEmail: "x" }),
-);
 await expectRejection("R1.0", "reading data without a session is rejected", () =>
     anonymous.data.Juror.select(["id"]).first(1).execute(),
 );
 
-// S-A: T-SQL write and read with the app identity (only when deployed in the second step).
-let spike;
-if (client.functions.spikeSqlJuror) {
-    spike = await expectSuccess("S-A.5", "spikeSqlJuror runs", () =>
-        client.functions.spikeSqlJuror.invoke(),
+// The S-A spike Functions must no longer exist.
+if (sections.has("removed")) {
+    await expectRejection("X.1", "whoAmI no longer responds", () =>
+        client.functions.whoAmI.invoke({ expectedSub: "x", expectedEmail: "x" }),
     );
-    if (spike) {
-        record("S-A.6", "T-SQL with the app identity inserts a Juror and reads it back", !spike.error && spike.readBackMatches, spike.error ?? "");
-        record("S-A.7", "T-SQL with the app identity creates the example Agent", spike.exampleAgentReady);
-        for (const [table, columns] of Object.entries(spike.columns)) {
-            console.log(`        ${table}: ${columns.join(", ")}`);
-        }
+    await expectRejection("X.2", "spikeSqlJuror no longer responds", () => client.functions.spikeSqlJuror.invoke());
+}
+
+// Proof by insert: getDataClient() inside the Function must carry the caller's identity.
+if (sections.has("probe")) {
+    const own = await expectSuccess("P.1", "adminProbe runs for the caller's own email", () =>
+        client.functions.adminProbe.invoke({ claimedEmail: me.email ?? "" }),
+    );
+    if (own) {
+        record("P.2", "the insert with the caller's own email passes (getDataClient carries the identity)", own.stage !== "insert", own.stage === "insert" ? own.detail : "");
+        record("P.3", "the author can read the request back", own.stage !== "read-back", own.stage === "read-back" ? own.detail : "");
+        record(
+            expectAdmin ? "P.4a" : "P.4b",
+            expectAdmin ? "(a) an active admin is allowed" : "(b) a user who is not an admin is rejected",
+            expectAdmin ? own.status === 200 && own.stage === "allowed" : own.status === 403 && own.stage === "admin-check",
+            `status ${own.status}, stage ${own.stage}`,
+        );
     }
+    const forged = await expectSuccess("P.5", "adminProbe runs when claiming another user's email", () =>
+        client.functions.adminProbe.invoke({ claimedEmail: OTHER_ADMIN_EMAIL }),
+    );
+    if (forged) {
+        record("P.6", "(c) claiming another user's email is rejected at the insert", forged.status === 403 && forged.stage === "insert", `status ${forged.status}, stage ${forged.stage}`);
+    }
+    await expectRejection("P.7", "(d) adminProbe without a session is rejected", () =>
+        anonymous.functions.adminProbe.invoke({ claimedEmail: OTHER_ADMIN_EMAIL }),
+    );
 }
 
-// S-B: rows written with T-SQL through the data API.
-if (spike?.jurorId && !spike.error) {
-    const juror = await expectSuccess("S-B.1", "the T-SQL juror is readable through the data API", async () => {
-        // findById returns only the id; select the fields explicitly.
-        const [row] = await client.data.Juror.select(["id", "email", "role", "team", "active"])
-            .where({ id: { eq: spike.jurorId } })
-            .execute();
-        if (!row) throw new Error("not found");
-        return row;
-    });
-    const expected = { id: spike.jurorId, email: spike.jurorEmail, role: "expert", team: "Spike", active: false };
-    const mismatched = juror
-        ? Object.entries(expected)
-              .filter(([field, value]) => String(juror[field]).toLowerCase() !== String(value).toLowerCase())
-              .map(([field]) => `${field} (${typeof juror[field]})`)
-        : ["row missing"];
-    record("S-B.2", "its fields round-trip (id, email, role, team, active)", mismatched.length === 0,
-        mismatched.length ? `${mismatched.join(", ")}; row keys: ${Object.keys(juror ?? {}).join("/")}` : "");
-}
-
-// R1: insert policies. Needs an Agent row, created by the spike (or the seed).
+// R1: insert policies. Needs an Agent row (from the seed). Creates "[I1a check]" rows.
+if (sections.has("r1")) {
 const agents = await expectSuccess("R1.1", "agents are readable", () => client.data.Agent.select(["id"]).first(1).execute());
 const agentId = agents?.[0]?.id;
 if (!agentId) {
-    console.log("SKIP  R1    no Agent row yet; run after spikeSqlJuror or the seed.");
+    console.log("SKIP  R1    no Agent row yet; run after the seed.");
 } else {
     const now = new Date();
     const mine = { authorUserId: me.id, authorEmail: me.email };
@@ -169,10 +161,15 @@ await expectRejection("R1.11", "creating a Juror from the client is rejected", (
 await expectRejection("R1.12", "creating an Agent from the client is rejected", () =>
     client.data.Agent.create({ name: "forged", workspaceId: "x", itemId: "x", active: true }),
 );
-if (spike?.jurorId) {
+const [anyJuror] = (await client.data.Juror.select(["id"]).first(1).execute()) ?? [];
+if (anyJuror) {
     await expectRejection("R1.13", "updating a Juror from the client is rejected", () =>
-        client.data.Juror.update({ id: spike.jurorId }, { role: "admin", active: true }),
+        client.data.Juror.update({ id: anyJuror.id }, { role: "admin", active: true }),
     );
+}
+await expectRejection("R1.14", "updating an AdminRequest from the client is rejected", () =>
+    client.data.AdminRequest.update({ id: "00000000-0000-4000-8000-000000000001" }, { action: "forged" }),
+);
 }
 
 client.auth.destroy?.();

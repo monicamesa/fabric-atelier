@@ -17,12 +17,8 @@
  */
 
 export type AppFunctionsSchema = {
-  whoAmI: {
-    input: { expectedSub: string; expectedEmail: string };
-    output: { claimNames: string[]; audience: string; identityType: string; subMatches: boolean; emailMatches: boolean };
-  };
-  spikeSqlJuror: {
-    input: Record<string, never>;
-    output: { jurorId: string; jurorEmail: string; readBackMatches: boolean; exampleAgentReady: boolean; columns: { [k: string]: string[] }; error?: undefined | string };
+  adminProbe: {
+    input: { claimedEmail: string };
+    output: { status: 200 | 403; stage: 'insert' | 'read-back' | 'admin-check' | 'allowed'; requestId?: undefined | string; detail?: undefined | string };
   };
 };

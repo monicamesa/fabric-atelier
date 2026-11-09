@@ -12,7 +12,15 @@ const READ_ONLY = ["Juror.ts", "Agent.ts"];
 
 describe("entity definitions", () => {
     it("cover the I1a entities", () => {
-        expect(entityFiles.sort()).toEqual(["Agent.ts", "Case.ts", "CaseDismissal.ts", "Juror.ts", "Testimony.ts"]);
+        expect(entityFiles.sort()).toEqual(["AdminRequest.ts", "Agent.ts", "Case.ts", "CaseDismissal.ts", "Juror.ts", "Testimony.ts"]);
+    });
+
+    it("AdminRequest is insert-only and visible only to its author", () => {
+        const source = sources["AdminRequest.ts"];
+        const actions = [...source.matchAll(/@authenticated\('([^']+)'/g)].map((match) => match[1]);
+        expect(actions.sort()).toEqual(["create", "read"]);
+        expect(source.match(/claims\.email\.eq\(item\.requesterEmail\)/g)).toHaveLength(2);
+        expect(source).not.toMatch(/@(anonymous|role)\(/);
     });
 
     it.each(entityFiles)("%s gives every text and email field an explicit max", (name) => {
