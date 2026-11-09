@@ -78,7 +78,7 @@ Solo las que no están ya en la especificación ni en `conventions.md`.
 
 ## Qué queda pendiente (en orden)
 
-1. **Iteración 1**, dividida en dos partes:
+1. **Iteración 1**, dividida en tres partes:
    - **I1a:** datos activados; entidades `Juror`, `Agent`, `Case`, `Testimony` y `CaseDismissal`; seed; base de i18n EN/ES; tests; verificación de R1, S-A y S-B; pantallas 1–3 sin votos (cuando llegue la guía de diseño). Plan en [I1a.md](I1a.md).
      - **Hecho (2026-11-09):** entidades, Functions de los spikes, scripts de seed, base de i18n, reglas de validez y servicios de datos, con sus tests. Desplegado en `FabricApp-AgentJury` con datos y Functions.
      - **R1 y S-B pasan. S-A pasa en la parte T-SQL, pero falla en la identidad:** la Function no recibe el token Rayfin del usuario, sino un token de plataforma sin `email`. Detalle en la sección 6 de [I1a.md](I1a.md).
@@ -91,12 +91,13 @@ Solo las que no están ya en la especificación ni en `conventions.md`.
      - **Datos:** se borraron los datos de prueba con un script privado y se cargó el seed (4 jurors y 2 agentes de ejemplo). La propietaria es admin activa.
      - `externalEntraExchange: true` está activado para los scripts de comprobación (ver `docs/conventions.md`).
      - La guía de diseño "The Docket" ya está en `docs/design/`, con sus tokens en `src/styles/docket-tokens.css`.
-     - Pendiente: pantallas 1–3.
+     - Pendiente: pantallas 1–3, que pasan a I1c.
    - **I1b:** acciones de `clerkExecute` y pantalla "Clerk's office" (Secretaría) para gestionar jurors y agentes. **Implementada y desplegada (2026-11-09)**; detalle y resultados en [I1b.md](I1b.md), secciones 7 y 9.
      - Decisiones D1–D5 aplicadas: `displayName` opcional (si falta, la parte del email antes de la @; emails completos solo en la secretaría), tres roles con descripción, ID del agente abreviado con copia, y base común de componentes en `src/components/docket/`.
      - Errores en lenguaje claro (403, 409, caducada…) con el detalle técnico plegado; autoprotección del admin en la interfaz y en `clerkExecute`; "Latest admin changes" incluye los rechazos.
      - Comprobaciones: tests unitarios y de pantalla, `i1b-checks.mjs` 21/21 e `i1a-checks.mjs` 22/22 tras el despliegue.
-     - **Parado para la revisión visual** (capturas en claro y oscuro, EN y ES) antes de empezar las pantallas 1–3.
+     - **Aprobada (2026-11-09)** con arreglos menores (sección 11 de [I1b.md](I1b.md)): corte de comprobaciones antiguas como secreto opcional `LEGACY_CHECK_CUTOFF_UTC` (solo en este despliegue), acción "Edit details", filtro de agentes, comprobación del foco con teclado, equipo con puntos suspensivos y pestaña corta en móvil.
+   - **I1c:** pantallas 1–3 (Home, Cases, Case detail) con votos y el cálculo de estado R1–R8. **Plan propuesto en [I1c.md](I1c.md), pendiente de revisión** (decisiones D1–D14). No hay código.
    - **Candidatos para más adelante** (fuera de I1b, decisión D3):
      - "Hasn't signed in yet" en la tabla de jurors: exige leer `dbo.Users` de Rayfin con T-SQL desde la Function.
      - "Copy invite link": el enlace de la app en Fabric es un dato privado del despliegue; habría que decidir de dónde se lee.

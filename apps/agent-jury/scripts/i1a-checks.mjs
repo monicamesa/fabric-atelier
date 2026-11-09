@@ -227,4 +227,5 @@ client.auth.destroy?.();
 anonymous.auth.destroy?.();
 const failed = results.filter((result) => !result.passed).length;
 console.log(`\n${results.length - failed} passed, ${failed} failed`);
-process.exitCode = failed === 0 ? 0 : 1;
+// Exit explicitly: an open SDK handle can keep the process alive when its output is piped.
+process.exit(failed === 0 ? 0 : 1);
