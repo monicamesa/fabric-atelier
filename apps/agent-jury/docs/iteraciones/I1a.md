@@ -215,13 +215,44 @@ export class CaseDismissal {
 - **`findById()` solo devuelve `id`.** Para leer campos hay que usar `select([...]).where({ id: { eq } })`.
 - **Token para el script:** la CLI de Azure no puede obtener el scope `Item.Execute.All` (Entra lo rechaza). El script usa `getAuthenticatedToken` de `@microsoft/rayfin-cli/auth`, como el inicio de sesión automático local.
 
-**Datos de prueba que quedan:**
-- Jurors `spike-…@example.com` inactivos.
-- El agente de ejemplo `Sales agent (example)`.
-- Cases "[I1a check]" retirados por su autor, con su testimony.
-- No se pueden borrar desde el cliente (solo inserción).
+**Datos de prueba:** limpiados el 2026-11-09 con un script T-SQL privado (`.private/`, no versionado), ejecutado como propietaria del item. Se borraron los jurors `spike-…@example.com`, el agente de ejemplo creado por el spike y los cases "[I1a check]" con sus testimonies y retiradas. Después se cargó el seed (4 jurors y 2 agentes de ejemplo) y se dio de alta a la propietaria como admin con `admin.sql` (email leído de `.private/values.env`). Las filas de `AdminRequest` y `AdminRequestResult` que crean las comprobaciones posteriores se conservan: forman el registro de admin y no se borra nada (regla 23).
 
-**Limpieza:** las filas de prueba no se pueden borrar desde el cliente (solo inserción). Los jurors de prueba quedan `active = 0` con email `@example.com`. Los cases de prueba los crea el propio usuario y quedarán como cases de prueba; si molestan, se retiran con un `CaseDismissal`.
+### Seguimiento: identidad de admin (2026-11-09)
+
+**Objetivo:** que una Function sepa quién la llama para comprobar que es admin, ya que `ctx.accessToken` no lo dice (S-A).
+
+| Paso | Resultado |
+|---|---|
+| Quitar `whoAmI` y `spikeSqlJuror` | **Hecho.** Ya no responden. Una Function eliminada devuelve "Application authentication for this function is currently unavailable", no "NotFound" |
+| **Opción 1, "prueba por inserción":** la Function inserta un `AdminRequest` con `ctx.getDataClient()`, cuya política exige `claims.email = requesterEmail` | **No concluyente:** la Function `adminProbe` nunca llegó a ejecutarse (ver abajo). Después se comprobó que `getDataClient()` sí funciona dentro de una Function (`dataPing` leyó `Jurors`), pero no se repitió la prueba de identidad porque la opción 2 cumple todos los requisitos |
+| **Opción 2 (adoptada):** el navegador inserta el `AdminRequest` y la Function `clerkExecute(requestId)` lo procesa con T-SQL e identidad de la app | **Pasa.** Resultados abajo |
+
+**Causa de los fallos:** las Functions `adminProbe` y `adminExecute` devolvían siempre `WorkloadException/NotFound … invocation failed`, sin llegar al código. El host de Azure Functions reserva las rutas que empiezan por `admin` y `runtime`. Con el nombre `clerkExecute` funciona sin más cambios. Regla 24 de `AGENTS.md`.
+
+**Pruebas de la opción 2** (`scripts/i1a-checks.mjs --only=removed,probe`, sin y con `--expect-admin`):
+
+| Prueba | Resultado |
+|---|---|
+| (a) Un admin activo ejecuta su petición | Pasa: `200`, `done` |
+| (b) Un usuario que no es admin | Pasa: `403` "The requester is not an active admin." y queda en `AdminRequestResult` como `rejected` |
+| (c) Insertar una petición con el email de otro usuario | Pasa: la inserción se rechaza ("Could not insert row with given values") |
+| (d) Invocar sin sesión | Pasa: "Anonymous access is not allowed for function invocation" |
+| Uso único | Pasa: la segunda ejecución devuelve `409` "already processed" (`requestId` único en `AdminRequestResult`) |
+| Caducidad | Pasa: `403` con `createdAt` de hace 5 minutos y también con fecha 10 minutos en el futuro |
+| Acción desconocida | Pasa: `403` "Unknown action." |
+| Id inexistente | Pasa: `404` |
+| Escrituras desde el cliente | Pasa: no existen `createAdminRequestResult` ni `updateAdminRequest` |
+| Registro de admin | El autor lee el resultado de su propia petición. Para que un admin vea las de todos (incluidos los rechazos), I1b añade una acción de lectura en `clerkExecute`, porque la política de lectura solo deja ver las propias |
+
+**Salvaguardas implementadas** (`rayfin/functions/src/admin-request.ts`):
+- La Function recibe solo `requestId`; acción y payload se leen de la fila.
+- Petición válida durante 2 minutos (con 30 s de margen de reloj hacia el futuro).
+- La comprobación de admin se hace con T-SQL sobre `Jurors`, sin distinguir mayúsculas.
+- El resultado se escribe en la misma transacción que la acción, y `requestId` es único.
+- `AdminRequest` y `AdminRequestResult` solo los lee su autor.
+- Juntos forman el registro de admin.
+
+**Diagnóstico (Functions temporales ya retiradas):** `ping`, `sqlPing`, `dataPing` y seis variantes `echo…` (síncronas y asíncronas, con contexto, con el audience Sql, con `requestId` y con resultados de uniones literales) funcionaron todas. Eso descartó la firma y dejó el nombre como única diferencia.
 
 ## 7. Riesgos y dudas
 

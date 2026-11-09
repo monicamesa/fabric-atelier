@@ -127,10 +127,18 @@ Convenciones de Rayfin a respetar:
 | `Vote` | `testimony_id`, `value` (`for` · `against`), `comment` (max 1000), `voterUserId`, `voterEmail`, `createdAt` | Crear: `claims.sub.eq(item.voterUserId)`. Leer: autenticados. Sin actualizar ni borrar |
 | `Hearing` | `agent_id`, `stage`, `launchedByUserId`, `jobInstanceId`, `evaluationId`, `status`, `caseCount`, `createdAt` | Crear y actualizar: solo desde la Function |
 | `Appeal` | `hearing_id`, `case_id`, `judgeVerdict`, `humanVerdict` (`correct` · `incorrect` · `ambiguous`), `reason`, `comment` (max 1000), `reviewerUserId`, `createdAt` | Crear: `claims.sub.eq(item.reviewerUserId)`. Leer: autenticados. Sin actualizar ni borrar |
+| `AdminRequest` | `requesterEmail`, `action` (max 50), `payload` (JSON, max 4000), `createdAt` | Crear y leer: solo con `claims.email.eq(item.requesterEmail)`. Sin actualizar ni borrar |
+| `AdminRequestResult` | `requestId` (único), `requesterEmail`, `outcome` (`done` · `rejected`), `detail` (max 500), `processedAt` | Leer: solo el autor de la petición. Escritura: solo `clerkExecute` con T-SQL |
 
 **Nota sobre la escritura de admin:** las políticas no permiten comprobar pertenencia a una lista, y `ctx.getDataClient()` escribe con los permisos de quien llama. Por eso:
 - El cliente solo tiene `read` sobre `Juror` y `Agent`; ningún rol tiene `create`, `update` ni `delete`.
-- Toda escritura de admin pasa por una Function que (1) obtiene la identidad de quien llama (`sub` y `email`) del token Rayfin de la invocación, (2) comprueba en `Juror` que es un admin activo y rechaza la llamada si no, y (3) escribe con T-SQL usando el token `AudienceType.Sql` (identidad de la app), nunca con el cliente de datos de quien llama.
+- Toda escritura de admin pasa por la Function `clerkExecute`. Su `ctx.accessToken` es un token de plataforma de Fabric sin el email de quien llama (comprobado en I1a, sección 6), así que la identidad se prueba con una fila:
+  1. El navegador inserta un `AdminRequest` (`requesterEmail`, `action`, `payload` JSON, `createdAt`). La política de inserción exige `claims.email = requesterEmail`.
+  2. El navegador invoca `clerkExecute(requestId)`, solo con el id.
+  3. La Function lee la petición con T-SQL y el token `AudienceType.Sql` (identidad de la app). Rechaza si tiene más de 2 minutos, si la acción no existe o si `requesterEmail` no es un admin activo en `Juror`.
+  4. Ejecuta solo la acción y el payload guardados, y escribe el `AdminRequestResult` (`done` o `rejected`, con el motivo) en la misma transacción. `requestId` es único, así que cada petición se usa una sola vez.
+  5. `AdminRequest` y `AdminRequestResult` solo los lee su autor, y nadie los modifica ni borra. Juntos son el registro de admin.
+- Los nombres de Function no pueden empezar por `admin` ni `runtime` (rutas reservadas por el host de Azure Functions).
 - El primer admin lo crea el script de seed, con el email pasado como variable al ejecutarlo; nunca se guarda en el repositorio.
 
 **Cálculo del estado:** en el MVP, el frontend calcula el estado de cada pregunta (y si está verificada) a partir de propuestas, votos, retiradas y jurors para mostrarlo. El cálculo autoritativo (el que decide qué entra en una evaluación o en el export) se hace en el notebook o la Function correspondiente, con la misma lógica. Esa lógica vive en un único módulo compartido con tests.
@@ -142,8 +150,8 @@ Convenciones de Rayfin a respetar:
    │ GraphQL (Rayfin client)                 → BD de la app: Case, Testimony, Vote, Appeal…
    │ Connector fabric-sqlanalytics (lectura) → Lakehouse "jury_lh": tablas de resultados del SDK
    │ Functions
-   │    ├─ admin: identidad de quien llama (token Rayfin) → comprueba admin en Juror
-   │    │         → escribe Juror/Agent con T-SQL y el token AudienceType.Sql (identidad de la app)
+   │    ├─ clerkExecute(requestId): lee el AdminRequest del navegador → comprueba admin en Juror
+   │    │         → escribe Juror/Agent y AdminRequestResult con T-SQL y el token AudienceType.Sql (identidad de la app)
    │    └─ lanzar evaluación → API Job Scheduler: ejecutar notebook con parámetros
    ▼
 [Notebook "evaluate_agent"]

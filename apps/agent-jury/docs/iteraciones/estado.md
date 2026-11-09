@@ -81,9 +81,18 @@ Solo las que no están ya en la especificación ni en `conventions.md`.
 1. **Iteración 1**, dividida en dos partes:
    - **I1a:** datos activados; entidades `Juror`, `Agent`, `Case`, `Testimony` y `CaseDismissal`; seed; base de i18n EN/ES; tests; verificación de R1, S-A y S-B; pantallas 1–3 sin votos (cuando llegue la guía de diseño). Plan en [I1a.md](I1a.md).
      - **Hecho (2026-11-09):** entidades, Functions de los spikes, scripts de seed, base de i18n, reglas de validez y servicios de datos, con sus tests. Desplegado en `FabricApp-AgentJury` con datos y Functions.
-     - **R1 y S-B pasan; S-A pasa en la parte T-SQL, pero falla en la identidad:** la Function no recibe el token Rayfin del usuario, sino un token de plataforma sin `email`. Detalle en la sección 6 de [I1a.md](I1a.md). **Parado a la espera de decidir cómo identifica la Function de admin a quien llama.**
-     - Pendiente: ejecutar el seed y darte de alta como admin; pantallas 1–3 tras la guía de diseño; quitar los spikes (`whoAmI`, `spikeSqlJuror`) antes de I1b.
-   - **I1b:** Function de admin (T-SQL con identidad de la app) y pantalla de administración de jurors y agentes.
+     - **R1 y S-B pasan. S-A pasa en la parte T-SQL, pero falla en la identidad:** la Function no recibe el token Rayfin del usuario, sino un token de plataforma sin `email`. Detalle en la sección 6 de [I1a.md](I1a.md).
+     - **Identidad de admin resuelta (2026-11-09):**
+       - El navegador inserta un `AdminRequest` y la Function `clerkExecute(requestId)` lo procesa con T-SQL.
+       - Salvaguardas: solo ejecuta la acción guardada, cada petición se usa una vez, caduca a los 2 minutos y el resultado queda en `AdminRequestResult`.
+       - Las pruebas (a)–(d), uso único, caducidad y registro de rechazos pasan (52 comprobaciones en dos ejecuciones).
+       - Las Functions cuyo nombre empieza por `admin` o `runtime` devuelven NotFound, porque esas rutas las reserva el host de Azure Functions (regla 24 de `AGENTS.md`).
+       - Se retiraron los spikes (`whoAmI`, `spikeSqlJuror`) y las Functions de diagnóstico (`dataPing`, `echo…`), y se comprobó que ya no responden.
+     - **Datos:** se borraron los datos de prueba con un script privado y se cargó el seed (4 jurors y 2 agentes de ejemplo). La propietaria es admin activa.
+     - `externalEntraExchange: true` está activado para los scripts de comprobación (ver `docs/conventions.md`).
+     - La guía de diseño "The Docket" ya está en `docs/design/`, con sus tokens en `src/styles/docket-tokens.css`.
+     - Pendiente: pantallas 1–3.
+   - **I1b:** acciones de `clerkExecute` y pantalla del secretario para gestionar jurors y agentes. **Plan propuesto en [I1b.md](I1b.md), pendiente de revisión.**
    - Especificación v0.4: sin dominios, roles globales de juror, cases no verificados (R7) y retiradas con `CaseDismissal` (R8).
    - Criterio de salida de I1: un experto crea preguntas y propuestas en la app desplegada.
 
