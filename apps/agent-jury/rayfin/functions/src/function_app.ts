@@ -40,6 +40,18 @@ udf.func(
   async (text: string, ctx: RayfinContext<AgentJurySchema>): Promise<string> => `ctx:${text.length}:${ctx.baseUrl ? 'base' : 'none'}`,
   [],
 );
+udf.func('echoRequestId', async (requestId: string): Promise<string> => `rid:${requestId.length}`, []);
+export interface EchoUnionResult {
+  code: 200 | 404;
+  detail?: string;
+}
+udf.func('echoUnion', async (text: string): Promise<EchoUnionResult> => ({ code: text ? 200 : 404 }), []);
+udf.func(
+  'echoSqlInput',
+  async (text: string, ctx: RayfinContext<AgentJurySchema, AudienceType.Sql>): Promise<string> =>
+    `sql:${text.length}:${ctx.Tokens.Sql ? 'token' : 'none'}`,
+  [],
+);
 
 // Diagnostic: the smallest possible read through the caller-scoped data client.
 udf.func(

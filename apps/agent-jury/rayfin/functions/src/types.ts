@@ -33,6 +33,18 @@ export type AppFunctionsSchema = {
     input: { text: string };
     output: string;
   };
+  echoRequestId: {
+    input: { requestId: string };
+    output: string;
+  };
+  echoUnion: {
+    input: { text: string };
+    output: { code: 200 | 404; detail?: undefined | string };
+  };
+  echoSqlInput: {
+    input: { text: string };
+    output: string;
+  };
   dataPing: {
     input: Record<string, never>;
     output: { ok: boolean; detail?: undefined | string };

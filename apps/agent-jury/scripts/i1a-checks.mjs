@@ -93,11 +93,17 @@ if (sections.has("removed")) {
 
 // Admin requests (fallback design): the client inserts the request; adminExecute runs only that row.
 if (sections.has("probe")) {
-    for (const name of ["echoSync", "echoAsync", "echoAsyncCtx"]) {
+    for (const name of ["echoSync", "echoAsync", "echoAsyncCtx", "echoUnion", "echoSqlInput"]) {
         if (client.functions[name]) {
             const value = await expectSuccess(`E.${name}`, `${name} with a text input runs`, () => client.functions[name].invoke({ text: "hello" }));
             if (value !== undefined) console.log(`        ${name} returned ${JSON.stringify(value)}`);
         }
+    }
+    if (client.functions.echoRequestId) {
+        const value = await expectSuccess("E.echoRequestId", "echoRequestId with a requestId input runs", () =>
+            client.functions.echoRequestId.invoke({ requestId: "00000000-0000-4000-8000-0000000000ff" }),
+        );
+        if (value !== undefined) console.log(`        echoRequestId returned ${JSON.stringify(value)}`);
     }
     const dataPing = await expectSuccess("F.0", "dataPing (getDataClient inside a Function) runs", () => client.functions.dataPing.invoke());
     if (dataPing) {
