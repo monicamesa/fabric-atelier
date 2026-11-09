@@ -1,0 +1,9 @@
+{
+  "servers": {
+    "rayfin": {
+      "type": "stdio",
+      "command": "npx.cmd",
+      "args": ["-y", "@microsoft/rayfin-mcp", "start"]
+    }
+  }
+}
