@@ -1,9 +1,9 @@
-// Runs the I1a post-deploy checks (R1, S-A, S-B) against the deployed app as the signed-in Azure CLI user.
+// Runs the I1a post-deploy checks (R1, S-A, S-B) against the deployed app as the `rayfin login` user.
 // Prints only pass/fail lines: never tokens, emails or identifiers.
 //   node scripts/i1a-checks.mjs
 import { readFileSync } from "node:fs";
-import { spawnSync } from "node:child_process";
 import { resolve } from "node:path";
+import { getAuthenticatedToken } from "@microsoft/rayfin-cli/auth";
 import { RayfinClient } from "@microsoft/rayfin-client";
 import { signInWithEntraToken } from "@microsoft/rayfin-auth-provider-fabric";
 
@@ -28,17 +28,10 @@ if (!GUID.test(tenantId ?? "") || !baseUrl?.startsWith("https://") || !publishab
     throw new Error("Missing TENANT_ID in .private/values.env or the deployment values in rayfin/.env.");
 }
 
-function getEntraToken() {
-    // Only constant arguments and a validated GUID reach the shell.
-    const result = spawnSync(
-        "az",
-        ["account", "get-access-token", "--resource", "https://analysis.windows.net/powerbi/api", "--tenant", tenantId, "--query", "accessToken", "-o", "tsv"],
-        { encoding: "utf8", shell: process.platform === "win32" },
-    );
-    if (result.status !== 0 || !result.stdout.trim()) {
-        throw new Error("az could not issue a token. Run: az login --tenant <TENANT_ID>");
-    }
-    return result.stdout.trim();
+// Same delegated scope and token source as @microsoft/rayfin-local-dev's automatic sign-in.
+async function getEntraToken() {
+    const result = await getAuthenticatedToken(["https://analysis.windows.net/powerbi/api/Item.Execute.All"], { tenantId });
+    return result.token;
 }
 
 const results = [];
@@ -74,7 +67,7 @@ function describeError(error) {
 }
 
 const client = new RayfinClient({ baseUrl, publishableKey, authStorage: false });
-await signInWithEntraToken(client.auth, { entraToken: getEntraToken() });
+await signInWithEntraToken(client.auth, { entraToken: await getEntraToken() });
 const session = client.auth.getSession();
 const me = { id: session.user?.id, email: session.user?.email };
 console.log(`Signed in: ${session.isAuthenticated ? "yes" : "no"}; session has email: ${me.email ? "yes" : "no"}`);
@@ -85,6 +78,7 @@ const identity = await expectSuccess("S-A.1", "whoAmI runs for a signed-in calle
 );
 if (identity) {
     console.log(`        token claim names: ${identity.claimNames.join(", ")}`);
+    console.log(`        token aud: ${identity.audience}; idtyp: ${identity.identityType}`);
     record("S-A.2", "the token sub matches the session user", identity.subMatches);
     record("S-A.3", "the token email claim matches the session email (R3)", identity.emailMatches);
 }
@@ -100,11 +94,12 @@ await expectRejection("R1.0", "reading data without a session is rejected", () =
 // S-A: T-SQL write and read with the app identity (only when deployed in the second step).
 let spike;
 if (client.functions.spikeSqlJuror) {
-    spike = await expectSuccess("S-A.5", "spikeSqlJuror inserts and reads a Juror and an Agent with T-SQL", () =>
+    spike = await expectSuccess("S-A.5", "spikeSqlJuror runs", () =>
         client.functions.spikeSqlJuror.invoke(),
     );
     if (spike) {
-        record("S-A.6", "the T-SQL read-back matches the inserted juror", spike.readBackMatches, spike.error ?? "");
+        record("S-A.6", "T-SQL with the app identity inserts a Juror and reads it back", !spike.error && spike.readBackMatches, spike.error ?? "");
+        record("S-A.7", "T-SQL with the app identity creates the example Agent", spike.exampleAgentReady);
         for (const [table, columns] of Object.entries(spike.columns)) {
             console.log(`        ${table}: ${columns.join(", ")}`);
         }
@@ -112,10 +107,12 @@ if (client.functions.spikeSqlJuror) {
 }
 
 // S-B: rows written with T-SQL through the data API.
-if (spike?.jurorId) {
-    const juror = await expectSuccess("S-B.1", "the T-SQL juror is readable through the data API", () =>
-        client.data.Juror.findById(spike.jurorId),
-    );
+if (spike?.jurorId && !spike.error) {
+    const juror = await expectSuccess("S-B.1", "the T-SQL juror is readable through the data API", async () => {
+        const row = await client.data.Juror.findById(spike.jurorId);
+        if (!row) throw new Error("not found");
+        return row;
+    });
     record(
         "S-B.2",
         "its fields round-trip (id, email, role, team, active)",

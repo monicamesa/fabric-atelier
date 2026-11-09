@@ -19,7 +19,7 @@
 export type AppFunctionsSchema = {
   whoAmI: {
     input: { expectedSub: string; expectedEmail: string };
-    output: { claimNames: string[]; subMatches: boolean; emailMatches: boolean };
+    output: { claimNames: string[]; audience: string; identityType: string; subMatches: boolean; emailMatches: boolean };
   };
   spikeSqlJuror: {
     input: Record<string, never>;

@@ -26,13 +26,19 @@ function quoteIdentifier(name: string): string {
   return `[${name.replace(/]/g, ']]')}]`;
 }
 
+// Fabric reports serverFqdn as "host,port"; the mssql driver takes them separately.
+export function parseServer(serverFqdn: string): { server: string; port?: number } {
+  const [host, port] = serverFqdn.split(',');
+  return port ? { server: host.trim(), port: Number(port) } : { server: host.trim() };
+}
+
 export async function runSqlSpike(target: SqlTarget): Promise<SpikeSqlResult> {
   const jurorId = randomUUID();
   const jurorEmail = `spike-${Date.now()}@example.com`;
   const result: SpikeSqlResult = { jurorId, jurorEmail, readBackMatches: false, exampleAgentReady: false, columns: {} };
 
   const pool = new sql.ConnectionPool({
-    server: target.server,
+    ...parseServer(target.server),
     database: target.database,
     options: { encrypt: true, trustServerCertificate: false },
     authentication: { type: 'azure-active-directory-access-token', options: { token: target.token } },
