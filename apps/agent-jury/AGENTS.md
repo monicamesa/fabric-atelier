@@ -185,3 +185,7 @@ These rules come from [docs/especificacion-general.md](docs/especificacion-gener
 
 24. Show useful empty and error states. Never replace a failed query with mock or simulated data.
 25. Before launching a hearing, show a cost estimate (about 50 seconds of agent time per case plus the judge's LLM usage) and allow evaluating a subset of cases.
+
+### Privacy
+
+26. Read private values (tenant, workspace, item and capacity IDs, emails, app URLs, the Windows user path) from `.private/values.env` at the repository root. Never write them into tracked files: refer to them by key name, for example `<TENANT_ID>`. The pre-commit hook in `.githooks/` blocks them.

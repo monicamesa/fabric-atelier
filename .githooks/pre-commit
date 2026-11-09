@@ -1,0 +1,72 @@
+#!/bin/sh
+# Blocks commits that add private values or identifiers. Setup: see the root README.
+
+root=$(git rev-parse --show-toplevel)
+values="$root/.private/values.env"
+fail=0
+
+if [ ! -f "$values" ]; then
+  echo "pre-commit: warning: .private/values.env not found; running only the generic checks." >&2
+  values=""
+fi
+
+# Allowed GUIDs: the Rayfin telemetry projectOriginId of each app, plus the template README placeholder.
+allowed=$(sed -n 's/.*"projectOriginId"[^"]*"\([0-9a-fA-F-]*\)".*/\1/p' "$root"/apps/*/rayfin/.project.json 2>/dev/null | tr 'A-F\n' 'a-f ')
+allowed="$allowed 12345678-1234-1234-1234-123456789abc"
+
+# Emit "file:line:text" for every added line in the staged diff.
+hits=$(git diff --cached -U0 --no-color --no-ext-diff --diff-filter=ACMR |
+  awk '
+    /^\+\+\+ / { file = substr($0, 7); next }
+    /^@@/ { match($0, /\+[0-9]+/); n = substr($0, RSTART + 1, RLENGTH - 1); next }
+    /^\+/ { print file ":" n ":" substr($0, 2); n++ }
+  ' |
+  awk -v values="$values" -v allowed="$allowed" '
+    BEGIN {
+      split(allowed, list, " ")
+      for (i in list) allow[list[i]] = 1
+      if (values != "") {
+        while ((getline row < values) > 0) {
+          sub(/\r$/, "", row)
+          if (row ~ /^[ \t]*#/ || index(row, "=") == 0) continue
+          key = substr(row, 1, index(row, "=") - 1)
+          val = substr(row, index(row, "=") + 1)
+          if (val != "") private[key] = tolower(val)
+        }
+      }
+    }
+    function report(reason) { print file ":" ln ": " reason }
+    {
+      i = index($0, ":"); file = substr($0, 1, i - 1); rest = substr($0, i + 1)
+      j = index(rest, ":"); ln = substr(rest, 1, j - 1); t = tolower(substr(rest, j + 1))
+
+      for (k in private) if (index(t, private[k])) report("private value <" k ">")
+
+      s = t
+      while (match(s, /[0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f]-[0-9a-f][0-9a-f][0-9a-f][0-9a-f]-[0-9a-f][0-9a-f][0-9a-f][0-9a-f]-[0-9a-f][0-9a-f][0-9a-f][0-9a-f]-[0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f]/)) {
+        g = substr(s, RSTART, RLENGTH)
+        # Test fixtures such as 00000000-0000-4000-8000-000000000001 are allowed.
+        if (!(g in allow) && g !~ /^00000000-0000-[0-9]000-[0-9a-f]000-0000000000[0-9a-f][0-9a-f]$/) report("GUID not on the allowlist")
+        s = substr(s, RSTART + RLENGTH)
+      }
+
+      s = t
+      while (match(s, /[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z][a-z]+/)) {
+        e = substr(s, RSTART, RLENGTH)
+        if (e !~ /@users\.noreply\.github\.com$/ && e !~ /@example\.(com|org|net)$/) report("email address")
+        s = substr(s, RSTART + RLENGTH)
+      }
+
+      if (t ~ /fabricapps\.net/) report("deployed Fabric Apps URL")
+      if (t ~ /app\.fabric\.microsoft\.com\/groups\/[^<]/) report("Fabric portal workspace link")
+      if (t ~ /[a-z]:[\\\/]+users[\\\/]+[^\\\/<]/) report("Windows user path")
+    }
+  ')
+
+if [ -n "$hits" ]; then
+  echo "pre-commit: blocked. Replace these values with key names from private.example.env:" >&2
+  printf '%s\n' "$hits" | sort -u | sed 's/^/  /' >&2
+  fail=1
+fi
+
+exit $fail

@@ -19,6 +19,24 @@ Each app lives in its own folder under `apps/` and is an independent npm project
 
 See [docs/conventions.md](docs/conventions.md) for the rules shared by all apps.
 
+## One-time setup after cloning
+
+1. Create your private values file from the example and fill it in. It is ignored by Git:
+
+   ```powershell
+   New-Item -ItemType Directory -Force .private | Out-Null
+   Copy-Item private.example.env .private/values.env
+   notepad .private/values.env
+   ```
+
+2. Enable the versioned Git hooks:
+
+   ```powershell
+   git config core.hooksPath .githooks
+   ```
+
+The pre-commit hook blocks any added line that contains a value from `.private/values.env`, a GUID that is not on its allowlist, an email that is not a noreply or `example` address, a deployed Fabric Apps URL, a Fabric portal workspace link or a Windows user path. If `.private/values.env` is missing, it warns and runs only the generic checks.
+
 ## Working on an app
 
 Always run npm and Rayfin commands from the app folder, never from the repository root:
