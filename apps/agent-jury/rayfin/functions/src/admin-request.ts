@@ -9,7 +9,7 @@ export const REQUEST_TTL_SECONDS = 120;
 export const CLOCK_SKEW_SECONDS = 30;
 
 export interface AdminExecuteResult {
-  code: 200 | 403 | 404 | 409;
+  code: 200 | 403 | 404 | 409 | 500;
   outcome: 'done' | 'rejected';
   detail: string;
 }

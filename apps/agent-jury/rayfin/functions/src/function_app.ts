@@ -19,10 +19,14 @@ udf.func(
     if (!GUID.test(requestId)) {
       return { code: 404, outcome: 'rejected', detail: 'Unknown request.' };
     }
-    return withAppSql(
-      { server: ctx.Secrets.APP_SQL_SERVER, database: ctx.Secrets.APP_SQL_DATABASE, token: ctx.Tokens.Sql },
-      (pool) => executeAdminRequest(pool, requestId),
-    );
+    try {
+      return await withAppSql(
+        { server: ctx.Secrets.APP_SQL_SERVER, database: ctx.Secrets.APP_SQL_DATABASE, token: ctx.Tokens.Sql },
+        (pool) => executeAdminRequest(pool, requestId),
+      );
+    } catch (error) {
+      return { code: 500, outcome: 'rejected', detail: describe(error) };
+    }
   },
   [],
 );
