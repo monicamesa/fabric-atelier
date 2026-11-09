@@ -1,52 +1,49 @@
+# Agent Jury
 
-# Fabric Apps - Analytics Template
+> **Who judges the judge?**
 
-> **⚠️ This repository is under active development.** Features and instructions may change.
+Agent Jury is a Fabric App where business experts decide which answers a Fabric Data Agent should give, and check whether the LLM judge that evaluates the agent agrees with them.
 
-This is a starter template for building Fabric Apps - Analytics web apps. Clone this repo locally and follow the steps below to get started.
+- Experts propose test questions (**cases**) with the answer they consider correct (**testimony**) and the metric definition behind it.
+- Other experts vote. A case is **ruled** when it reaches consensus, or **disputed** when areas disagree.
+- The app launches evaluations of the agent against ruled cases (**hearings**) and lets experts confirm or correct the judge's verdicts (**appeals**).
+- Ruled cases can be exported as a CSV compatible with Data Agent Quality Lab.
 
-View our [Microsoft Learn documentation](https://learn.microsoft.com/fabric/apps/data-apps-template) for more information!
+**Status:** In development. See the full specification in [docs/especificacion-general.md](docs/especificacion-general.md) (Spanish).
 
+## Structure
 
-## Prerequisites
+```text
+apps/agent-jury/
+├── docs/          # Specification and design notes
+├── fabric/        # Fabric items outside the app (notebooks evaluate_agent and export_case_law)
+├── rayfin/        # Rayfin configuration (rayfin.yml)
+├── scripts/       # Template validation scripts
+└── src/           # React frontend
+```
 
-1. **Node.js (v22)**: Download and install from https://nodejs.org/dist/v22.22.2/node-v22.22.2-x64.msi
-2. **GitHub Copilot CLI**: Refer to https://github.com/github/copilot-cli
-3. **Fabric account**: A Microsoft Entra account with access to the Fabric workspace and the semantic model. You sign in through the project's own Rayfin CLI (see the steps below); the Azure CLI is not required.
+## Requirements
 
-## Instructions for building a new web app
+- Node.js 24 and Git. See the [common requirements](../../README.md#common-requirements).
+- Fabric capacity F2 or higher, paid (Data Agents and their evaluation do not run on trial capacities).
+- Data Agents enabled in the tenant.
 
-1. **Open Terminal**: Open Terminal in the local folder where you want to clone this repo and create your app.
-1. **Clone this repo**: Run `git clone <REPO_URL> <repo_name>`. Replace `<REPO_URL>` with this repository's URL and `<repo_name>` with the name you want for your project folder.
-1. **Navigate to the repo folder**: Run `cd <repo_name>`. (Optional: Run `code` to open VS Code in that folder and open Terminal inside VS Code.)
-1. **Install dependencies**: Run `npm install`.
-1. **Sign in**: Run `npx rayfin login`, and confirm with `npx rayfin login status`. Copilot queries your semantic model through this sign-in.
-1. **Launch Copilot**: Run `copilot` to start the Copilot CLI. Then type a prompt for what you want to build. Include the dataset ID of the semantic model (from Power BI Service) that you want to use and the URI of the Fabric workspace where the app should be provisioned. (To get the dataset ID, copy the value between `...dataset/` and `/overview...` from the URL.)
-1. **Preview your app**: After Copilot is done, run `npm run dev` and leave the development server running.
-1. **Open Fabric shell**: Navigate to the workspace in Fabric portal and open the artifact. Then append `&devUri=http://localhost:5173` at the end. This allows you to preview your app.
-1. **Deploy or update the app**: When you are ready to publish the latest changes, run `npx rayfin up --workspace-uri "<workspace-uri>"` using your Fabric workspace URL. Users with access to that workspace can then open the updated app.
+## Pinned versions
 
-<details>
-<summary><strong>💡 Tips</strong></summary>
+| Component | Version |
+|---|---|
+| Rayfin CLI (`@microsoft/rayfin-cli`) | 1.36.2 |
+| `fabric-data-agent-sdk` | To be pinned in iteration 3 |
 
-- Use **Shift + Tab** in Copilot to switch to **Plan mode**, where Copilot will present a plan and ask for confirmation before writing any code.
+## Commands
 
-</details>
+Run every command from this folder:
 
-<details>
-<summary><strong>📝 Example prompts</strong></summary>
+```powershell
+npm ci             # install dependencies
+npm run dev        # local dev server
+npm test           # unit tests
+npm run build      # production build
+```
 
-> When using any example below, include the semantic model ID and the URI of the Fabric workspace where the app should be provisioned. Ex. `Semantic model ID: 12345678-1234-1234-1234-123456789abc Fabric workspace: https://fabric.microsoft.com/groups/12345678-1234-1234-1234-123456789abc`
-
-- `Create a sales performance dashboard using the "Contoso Sales" semantic model. Include revenue KPIs, a monthly trend line chart, top 10 stores by profit, and a regional breakdown bar chart.`
-- `Build an executive summary app for the "HR Analytics" model with headcount by department, attrition rate trends over the past 3 years, and a data grid of open positions sorted by days-to-fill.`
-- `I want a customer insights app. Show customer lifetime value distribution, churn risk segmentation, and a filterable table of top accounts.`
-- `Create a supply chain monitoring dashboard from the "Logistics Ops" model. I need inventory levels by warehouse, on-time delivery rate KPIs, and a heatmap of shipping delays by region and month.`
-- `Build a financial reporting app using the "GL Financials" semantic model with a P&L summary, expense breakdown by cost center, and quarter-over-quarter variance charts. Add a date range filter across all visuals.`
-
-</details>
-
-
-## Need help?
-
-If you have any questions or run into any problems, please [file an issue](../../issues) on this repository.
+Deployment (`npx rayfin up`) targets the `FabricApp-AgentJury` workspace. Deployment values are stored in `rayfin/.env` and `rayfin/.deployments.json`, which are not committed.
