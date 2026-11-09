@@ -10,7 +10,7 @@ import { CaseDismissal } from './CaseDismissal.js';
 })
 export class Case {
   @uuid() id!: string;
-  @text({ max: 36 }) agent_id!: string;
+  @uuid() agent_id!: string;
   @one(() => Agent) agent?: Agent;
   @text({ max: 1000 }) text!: string;
   @text({ max: 100 }) category!: string;

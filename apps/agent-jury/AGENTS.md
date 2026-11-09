@@ -165,7 +165,7 @@ These rules come from [docs/especificacion-general.md](docs/especificacion-gener
 
 10. Every entity has a UUID primary key named `id`; no composite keys.
 11. Every text field has an explicit `max`. Without it Rayfin generates `NVARCHAR(MAX)`, which can break GraphQL metadata generation.
-12. Model relations with `@one()` / `@many()` and `{property}_id` foreign keys (text, max 36), the format Rayfin requires. No many-to-many relations.
+12. Model relations with `@one()` / `@many()` and `{property}_id` foreign keys declared as `@uuid()`. CLI 1.36.2 rejects text foreign keys, even though the Learn example uses `@text({ max: 36 })`. No many-to-many relations.
 13. Store user identity in a text `*UserId` field (max 255) filled from `claims.sub`. It is not a foreign key: do not relate to the system `USER` entity.
 14. Name every other field in camelCase (`createdAt`, `judgeVerdict`, `humanVerdict`, `authorUserId`). Only relation foreign keys use `{property}_id` (`case_id`, `testimony_id`, `hearing_id`). Use `@set()` for closed value lists.
 

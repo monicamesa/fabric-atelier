@@ -57,7 +57,7 @@ La carpeta de reglas se llama `src/rules/` y no `src/domain/`, para no confundir
 Reglas comprobadas en la documentación de 1.36.2:
 - `@uuid() id`.
 - `max` en todo `@text`/`@email`.
-- Claves foráneas `{property}_id` como `@text({ max: 36 })` junto a `@one()`.
+- Claves foráneas `{property}_id` como `@uuid()` junto a `@one()`. La CLI 1.36.2 rechazó en el primer despliegue la forma `@text({ max: 36 })` del ejemplo de Learn ("Foreign key type conflict").
 - Importaciones relativas `.js` como valor.
 - Atajo `@authenticated`.
 - Ningún nombre reservado de GraphQL.
@@ -91,7 +91,7 @@ export class Agent {
 })
 export class Case {
   @uuid() id!: string;
-  @text({ max: 36 }) agent_id!: string;
+  @uuid() agent_id!: string;
   @one(() => Agent) agent?: Agent;
   @text({ max: 1000 }) text!: string;
   @text({ max: 100 }) category!: string;
@@ -110,7 +110,7 @@ export class Case {
 })
 export class Testimony {
   @uuid() id!: string;
-  @text({ max: 36 }) case_id!: string;
+  @uuid() case_id!: string;
   @one(() => Case) case?: Case;
   @text({ max: 2000 }) answer!: string;
   @text({ max: 1000 }) definition!: string;
@@ -126,7 +126,7 @@ export class Testimony {
 })
 export class CaseDismissal {
   @uuid() id!: string;
-  @text({ max: 36 }) case_id!: string;
+  @uuid() case_id!: string;
   @one(() => Case) case?: Case;
   @text({ max: 1000 }) reason!: string;
   @text({ max: 255 }) dismissedByUserId!: string;
@@ -170,7 +170,7 @@ export class CaseDismissal {
 | `src/lib/format.spec.ts` | Fechas y números distintos en `en-GB` y `es-ES` |
 | `src/rules/case-validity.spec.ts` | Juror activo por email sin distinguir mayúsculas; inactivo no cuenta; case de no juror → unverified; retirada del autor o de un admin → `dismissed`; retirada de otro usuario o de un admin inactivo → se ignora |
 | `src/data/*.service.spec.ts` | Paginación completa; la autoría (`authorUserId`, `authorEmail`) sale de la sesión; sin sesión, error |
-| `rayfin/data/entities.spec.ts` | Revisa el código fuente: `max` en todos los campos de texto y email, `*_id` con `max: 36`, y solo `read` y `create` en las entidades de solo inserción |
+| `src/data/entities.spec.ts` | Revisa el código fuente: `max` en todos los campos de texto y email, `*_id` como `@uuid()`, y solo `read` y `create` en las entidades de solo inserción |
 
 ## 6. R1, S-A y S-B (tras el primer despliegue)
 

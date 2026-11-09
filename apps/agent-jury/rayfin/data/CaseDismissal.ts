@@ -8,7 +8,7 @@ import { Case } from './Case.js';
 })
 export class CaseDismissal {
   @uuid() id!: string;
-  @text({ max: 36 }) case_id!: string;
+  @uuid() case_id!: string;
   @one(() => Case) case?: Case;
   @text({ max: 1000 }) reason!: string;
   @text({ max: 255 }) dismissedByUserId!: string;

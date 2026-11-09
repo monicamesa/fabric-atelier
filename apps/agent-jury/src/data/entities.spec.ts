@@ -23,10 +23,10 @@ describe("entity definitions", () => {
         }
     });
 
-    it.each(entityFiles)("%s declares foreign keys as text with max 36", (name) => {
+    it.each(entityFiles)("%s declares foreign keys as @uuid(), as the CLI requires", (name) => {
         const foreignKeys = sources[name].match(/@\w+\([^)]*\)\s+\w+_id!/g) ?? [];
         for (const field of foreignKeys) {
-            expect(field, `${name}: ${field}`).toMatch(/^@text\(\{\s*max:\s*36\s*\}\)/);
+            expect(field, `${name}: ${field}`).toMatch(/^@uuid\(\)/);
         }
     });
 

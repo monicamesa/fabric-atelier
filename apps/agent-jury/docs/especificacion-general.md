@@ -114,7 +114,7 @@ Convenciones de Rayfin a respetar:
 - Nombres de campo en camelCase (`createdAt`, `judgeVerdict`, `authorUserId`), salvo las claves foráneas de relaciones.
 - Relaciones con `@one()` / `@many()` y claves foráneas con el formato `{propiedad}_id` que exige Rayfin (`case_id`, `testimony_id`). Sin muchos a muchos.
 - La identidad del usuario se guarda en un campo de texto `*UserId` (max 255) rellenado desde `claims.sub`. No es una clave foránea: no se puede relacionar con la entidad de sistema `USER`.
-- Las claves foráneas son texto con max 36. Los valores cerrados usan `@set()`.
+- Las claves foráneas se declaran con `@uuid()` (la CLI 1.36.2 rechaza claves foráneas de texto, aunque el ejemplo de Learn use `@text({ max: 36 })`). Los valores cerrados usan `@set()`.
 - Los emails de autor (`authorEmail`, `voterEmail`…) se guardan para comparar con `Juror.email` al calcular la validez; la política de inserción también exige `claims.email.eq(item.<role>Email)` si el token de Fabric trae ese claim.
 
 | Entidad | Campos principales | Permisos |
