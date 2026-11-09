@@ -18,9 +18,11 @@ import { AuthProvider } from './hooks/use-auth';
 import { bootstrapAuth, type IAuthService } from './services/rayfin-auth.service';
 import { bootstrapLanguage } from './services/language.service';
 import { AuthGate } from './components/auth-gate.component';
+import { initI18n } from './i18n/i18n';
 
 import "./global.css"
 
+initI18n();
 const rayfinAuthService: IAuthService = bootstrapAuth();
 
 function Root(): ReactElement {

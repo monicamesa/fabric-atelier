@@ -1,0 +1,47 @@
+{
+    "app": {
+        "title": "Agent Jury",
+        "tagline": "¿Quién juzga al juez?"
+    },
+    "language": {
+        "label": "Idioma",
+        "en": "EN",
+        "es": "ES",
+        "enName": "Inglés",
+        "esName": "Español"
+    },
+    "screens": {
+        "agents": {
+            "title": "Agentes a juicio",
+            "help": "Los agentes de datos de Fabric que se evalúan. Elige uno para ver las preguntas que el jurado ha propuesto para él."
+        },
+        "caseBoard": {
+            "title": "Casos",
+            "help": "Preguntas para este agente con las respuestas que el jurado espera. Cada columna indica cuánto ha avanzado el jurado en ponerse de acuerdo."
+        },
+        "caseDetail": {
+            "title": "Caso",
+            "help": "Una pregunta y las respuestas esperadas que se han propuesto, cada una con la definición que usó su autor."
+        }
+    },
+    "caseState": {
+        "under_review": "En revisión",
+        "ruled": "Aprobado",
+        "disputed": "En disputa",
+        "dismissed": "Retirado"
+    },
+    "caseValidity": {
+        "unverified": "No verificado",
+        "unverifiedHelp": "Lo escribió alguien que no forma parte del jurado. Se muestra, pero nunca se usa en una vista."
+    },
+    "common": {
+        "loading": "Cargando…",
+        "retry": "Reintentar",
+        "empty": "Todavía no hay nada."
+    },
+    "errors": {
+        "load": "No se han podido cargar los datos.",
+        "save": "No se ha podido guardar el cambio. No se ha perdido nada; vuelve a intentarlo.",
+        "notSignedIn": "Tienes que iniciar sesión para hacer esto."
+    }
+}

@@ -1,0 +1,47 @@
+{
+    "app": {
+        "title": "Agent Jury",
+        "tagline": "Who judges the judge?"
+    },
+    "language": {
+        "label": "Language",
+        "en": "EN",
+        "es": "ES",
+        "enName": "English",
+        "esName": "Spanish"
+    },
+    "screens": {
+        "agents": {
+            "title": "Agents on trial",
+            "help": "The Fabric data agents being evaluated. Pick one to see the questions the jury has proposed for it."
+        },
+        "caseBoard": {
+            "title": "Cases",
+            "help": "Questions for this agent with the answers the jury expects. Each column shows how far the jury has got in agreeing on an answer."
+        },
+        "caseDetail": {
+            "title": "Case",
+            "help": "One question and the expected answers proposed for it, each with the definition its author used."
+        }
+    },
+    "caseState": {
+        "under_review": "Under review",
+        "ruled": "Ruled",
+        "disputed": "Disputed",
+        "dismissed": "Dismissed"
+    },
+    "caseValidity": {
+        "unverified": "Unverified",
+        "unverifiedHelp": "Written by someone who is not on the jury. It is shown but never used in a hearing."
+    },
+    "common": {
+        "loading": "Loading…",
+        "retry": "Try again",
+        "empty": "Nothing here yet."
+    },
+    "errors": {
+        "load": "The data could not be loaded.",
+        "save": "The change could not be saved. Nothing was lost; try again.",
+        "notSignedIn": "You need to be signed in to do this."
+    }
+}
