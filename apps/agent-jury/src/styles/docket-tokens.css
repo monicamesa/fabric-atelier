@@ -22,6 +22,7 @@
   --overruled: #FFD27A;
   --overruled-text: #14110D;
   --ticker-bg: #14110D;
+  --ticker-text: #F3EEE4;
   --focus: #0F6E5C;
 
   --font-serif: 'Fraunces Variable', Georgia, 'Times New Roman', serif;
@@ -51,5 +52,6 @@
   --overruled: #FFD27A;
   --overruled-text: #14110D;
   --ticker-bg: #0A0806;
+  --ticker-text: #F3EEE4;
   --focus: #7FE0C4;
 }

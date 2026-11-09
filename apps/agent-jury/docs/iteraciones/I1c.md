@@ -1,6 +1,6 @@
 # Plan de la iteración I1c: pantallas 1–3 (Home, Cases, Case detail)
 
-> Estado: **decisiones tomadas (2026-11-09), en construcción**. Sección 8: decisiones; sección 11: resultados.
+> Estado: **construida y desplegada solo en pruebas (2026-11-09), pendiente de revisión**. Sección 8: decisiones; sección 11: resultados.
 > Fuentes: [especificación v0.4](../especificacion-general.md) (secciones 5, 6, 7 y 9), [AGENTS.md](../../AGENTS.md) (reglas 15–19, 23, 25–30), [guía de diseño](../design/design-guide.md) y los mockups [`home.html`](../design/mockups/home.html), [`cases.html`](../design/mockups/cases.html) y [`case-detail.html`](../design/mockups/case-detail.html). Base: la secretaría de I1b y sus componentes en `src/components/docket/`.
 
 ## 1. Objetivo y criterio de salida
@@ -181,3 +181,43 @@ En la propia testimony no hay botón de voto, con la explicación "Your vote doe
 5. Cases.
 6. Home.
 7. Comprobaciones desplegadas, capturas (EN/ES × claro/oscuro, móvil) y parada para revisión.
+
+## 11. Resultados (2026-11-09)
+
+**Construido (pasos 0–7):**
+
+| Paso | Resultado |
+|---|---|
+| 0 | Despliegue de pruebas en su propio workspace (`scripts/deploy-test.mjs`, `scripts/lib/deployment-target.mjs`). Los scripts de comprobación van contra pruebas por defecto y se niegan con producción salvo `--target=production --allow-production`. `run-sql.mjs` se niega a ejecutar sin `--target=test` los ficheros marcados `-- target: test-only` |
+| 1 | `Vote` y los cuatro campos de definición en `Testimony`, desplegados en pruebas |
+| 2 | `src/rules/case-validity.ts` con R1–R8, `analyzeCase` (estado y motivo), `needsMyVote` y `caseEvents`; `CONSENSUS_MIN_VOTES = 2` en `src/rules/consensus.ts` |
+| 3 | `cases.service.ts` (lecturas por lotes de 50 ids, `createVote`), `src/data/docket.ts` (agrupa y calcula los estados una vez por agente) y `use-docket` |
+| 4 | Case detail: tarjetas de respuesta con votos, voto en contra con motivo obligatorio, tabla de diferencias o respuestas lado a lado (D3), acta, "Add your answer" del autor (D10), retirada por el autor o un admin |
+| 5 | Cases: cuatro columnas con su frase, búsqueda sin tildes ni mayúsculas, filtros "Waiting for my vote" y "Proposed by me" en la URL, "+ n more" |
+| 6 | Home: ticker (pausa con hover y foco, estático con movimiento reducido), titular, confianza en el juez como marcador "—" hasta I3, glosario, "Today's docket" con los votos pendientes primero, selector de agente en la URL (D6) y formulario para proponer un case |
+| 7 | Rutas por hash (`#home?agent=`, `#cases?agent=&filter=&q=`, `#case/<id>`), con historial: el botón Atrás funciona |
+
+**Tests:** 30 ficheros, 324 tests (`npm test`); `tsc -b` y `eslint` sin errores. Nuevos: reglas con n = 1, 2 y 3, docket, rutas, formato de días relativos, visor (quién puede actuar), vistas (orden de Home, filtros, búsqueda, filas distintas de la tabla), servicios (`createVote`, campos opcionales, lotes) y la pantalla de detalle (motivo obligatorio, sin voto en la respuesta propia, "Add your answer", solo lectura).
+
+**Comprobaciones desplegadas (`scripts/i1c-checks.mjs`, despliegue de pruebas): 19 de 19.**
+
+| Comprobación | Resultado |
+|---|---|
+| Leer votos sin sesión | Rechazado |
+| Case y testimony con los cuatro campos de definición | Aceptados y leídos tal cual |
+| Campo de definición de más de 300 caracteres; comentario de más de 1000 | Rechazados (el servidor responde "Internal server error", no un mensaje de validación) |
+| Voto a favor y voto en contra con comentario, con la propia identidad | Aceptados; los dos se conservan |
+| Voto con el `sub` o el email de otro | Rechazados al insertar ("Could not insert row") |
+| Voto con un valor distinto de `for`/`against` | Rechazado por la restricción |
+| `updateVote`, `deleteVote`, `updateTestimony` | No existen en el esquema |
+| Limpieza | El autor retira el case de la comprobación |
+
+Las comprobaciones de I1a (46/46) e I1b (23/23) también pasan contra el despliegue de pruebas.
+
+**Volumen (D14):** 17 peticiones de datos en 368,5 s, inicio de sesión incluido (unos 20 s por petición en esta ejecución; la primera conexión T-SQL a la base de datos de pruebas también agotó su tiempo y funcionó al repetirla). El consumo de CU no se puede leer desde los scripts: hay que consultarlo en la app Fabric Capacity Metrics para el workspace de pruebas en la ventana de la ejecución. Queda pendiente anotarlo aquí.
+
+**Datos de ejemplo en pruebas:** `rayfin/seed/docket-examples.sql` (solo pruebas) añade un case en cada estado con los jurados de ejemplo, porque una sola cuenta no puede producir votos de varios jurados. Las capturas usan esos datos.
+
+**Pendiente para cerrar el criterio de salida:** que dos personas reales (un experto y un aprobador) lleven un case a `ruled` desde la app desplegada en pruebas. Con una sola cuenta solo se puede comprobar que el voto propio no cuenta (R2).
+
+**Producción:** sin cambios. I1c solo está desplegada en pruebas.

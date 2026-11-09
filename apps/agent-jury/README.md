@@ -91,6 +91,21 @@ Run every command from `apps/agent-jury` unless noted.
 
 Other commands: `npm test` (unit tests), `npm run lint`, `npm run build`.
 
+### Test deployment
+
+The deployed checks run against a second copy of the app in its own workspace, never against production. Its ids live in `.private/values.env` (keys ending in `_TEST`, see `private.example.env`) and in `rayfin/.env.test` (git-ignored).
+
+```powershell
+node scripts/deploy-test.mjs --set-secrets    # deploy to the test workspace, then switch back to production
+node scripts/run-sql.mjs rayfin/seed/seed.sql --target=test
+node scripts/run-sql.mjs rayfin/seed/docket-examples.sql --target=test   # one example case per state (test only)
+node scripts/i1a-checks.mjs --expect-admin
+node scripts/i1b-checks.mjs
+node scripts/i1c-checks.mjs
+```
+
+The check scripts target the test deployment by default and refuse production unless called with `--target=production --allow-production`. SQL files marked `-- target: test-only` refuse to run without `--target=test`.
+
 ## Security model
 
 - **Records are insert-only.** Cases, testimonies, dismissals, votes and appeals are never updated or deleted; every entry keeps its author and date.

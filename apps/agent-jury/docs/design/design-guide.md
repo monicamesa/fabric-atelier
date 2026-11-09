@@ -41,6 +41,7 @@ Define them as CSS custom properties on `:root` and override them under `[data-t
 | `--review-text` | `#3D5A7A` | `#A9B8D6` | Under review (text) |
 | `--overruled` | `#FFD27A` | `#FFD27A` | "Judge overruled" chip (text always `#14110D`) |
 | `--ticker-bg` | `#14110D` | `#0A0806` | Verdict ticker |
+| `--ticker-text` | `#F3EEE4` | `#F3EEE4` | Verdict ticker text (light on the dark band in both themes) |
 | `--focus` | `#0F6E5C` | `#7FE0C4` | Focus outline |
 
 Contrast: all text pairs above meet WCAG AA (4.5:1) at the sizes used. Don't introduce new colours without checking contrast.

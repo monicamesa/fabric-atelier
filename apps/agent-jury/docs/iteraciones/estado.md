@@ -97,17 +97,16 @@ Solo las que no están ya en la especificación ni en `conventions.md`.
      - Errores en lenguaje claro (403, 409, caducada…) con el detalle técnico plegado; autoprotección del admin en la interfaz y en `clerkExecute`; "Latest admin changes" incluye los rechazos.
      - Comprobaciones: tests unitarios y de pantalla, `i1b-checks.mjs` 21/21 e `i1a-checks.mjs` 22/22 tras el despliegue.
      - **Aprobada (2026-11-09)** con arreglos menores (sección 11 de [I1b.md](I1b.md)): corte de comprobaciones antiguas como secreto opcional `LEGACY_CHECK_CUTOFF_UTC` (solo en este despliegue), acción "Edit details", filtro de agentes, comprobación del foco con teclado, equipo con puntos suspensivos y pestaña corta en móvil.
-   - **I1c:** pantallas 1–3 (Home, Cases, Case detail) con votos y el cálculo de estado R1–R8. **Plan propuesto en [I1c.md](I1c.md), pendiente de revisión** (decisiones D1–D14). No hay código.
+   - **I1c:** pantallas 1–3 (Home, Cases, Case detail) con votos y el cálculo de estado R1–R8. **Construida y desplegada solo en pruebas (2026-11-09), pendiente de revisión.** Decisiones D1–D14 y resultados en [I1c.md](I1c.md), secciones 8 y 11.
+     - Umbral de R3: 2 votos (`CONSENSUS_MIN_VOTES`); el voto de un admin cuenta como el de un experto.
+     - `createdAt` no lo puede generar Rayfin: se ignoran los registros fechados más de 5 minutos en el futuro (riesgo documentado en la especificación).
+     - Comprobaciones en pruebas: `i1c-checks.mjs` 19/19, `i1a-checks.mjs` 46/46, `i1b-checks.mjs` 23/23.
+     - Pendiente: consumo de CU de las comprobaciones (Capacity Metrics), prueba con dos personas reales (experto y aprobador) y, tras la revisión, el despliegue en producción.
+   - **Despliegue de pruebas (D12 de I1c): hecho.** Workspace propio en la misma capacidad, `rayfin/.env.test` y claves `*_TEST` en `.private/values.env`. Comandos en el README de la app ("Test deployment").
    - **Candidatos para más adelante** (fuera de I1b, decisión D3):
      - "Hasn't signed in yet" en la tabla de jurors: exige leer `dbo.Users` de Rayfin con T-SQL desde la Function.
      - "Copy invite link": el enlace de la app en Fabric es un dato privado del despliegue; habría que decidir de dónde se lee.
      - Nombre del workspace en las tarjetas de agentes (D4): con la API de Fabric, en I3.
-   - **Comprobaciones contra un despliegue de pruebas (a largo plazo, sin construir).** Hoy `i1a-checks.mjs` e `i1b-checks.mjs` escriben en la app de producción. Sus peticiones llevan `source: "check"` y la secretaría las oculta por defecto, pero el juror y el agente de ejemplo y las filas del registro se quedan para siempre. Propuesta con Rayfin CLI 1.36.2:
-     1. Un segundo item de Rayfin para pruebas, por ejemplo `npx rayfin up --workspace FabricApp-AgentJury-Test --item-name agent-jury-test --env-file rayfin/.env.test`. Se crea con su propia base de datos y sus propias Functions; el workspace de pruebas puede compartir la capacidad.
-     2. `npx rayfin up list` muestra los despliegues registrados y `npx rayfin up switch <workspace>` cambia el activo (reescribe `rayfin/.env`). La CLI no tiene un `rayfin switch` de primer nivel; es `rayfin up switch`.
-     3. Los scripts de comprobación leen la URL y la clave publicable de un fichero propio (`rayfin/.env.test`) en lugar de `rayfin/.env`, y se niegan a ejecutarse contra producción salvo con un `--allow-production` explícito.
-     4. Los secretos de la Function (`APP_SQL_SERVER`, `APP_SQL_DATABASE`) se configuran aparte en el item de pruebas, y su seed y `admin.sql` apuntan a su propia base de datos (nuevas claves en `.private/values.env`).
-     5. Antes de crearlo hay que comprobar que `--env-file` deja intacto `rayfin/.env` de producción y que `rayfin up switch` no mezcla los IDs de los dos items en `.deployments.json`.
    - Especificación v0.4: sin dominios, roles globales de juror, cases no verificados (R7) y retiradas con `CaseDismissal` (R8).
    - Criterio de salida de I1: un experto crea preguntas y propuestas en la app desplegada.
 

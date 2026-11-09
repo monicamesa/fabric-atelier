@@ -1,0 +1,131 @@
+import { useId, useState, type FormEvent } from "react";
+import { useTranslation } from "react-i18next";
+import { Button } from "@/components/docket/button";
+import { TextAreaField, TextField } from "@/components/docket/field";
+import { Objection } from "@/components/docket/objection";
+import { createCase, createTestimony } from "@/data/cases.service";
+import { canonicalCategory } from "@/data/docket";
+import type { AppRayfinClient } from "@/lib/rayfin-client";
+import { AnswerFields } from "./answer-form";
+import { EMPTY_ANSWER, trimDraft, validateAnswer, type AnswerDraft, type AnswerErrors } from "./answer-draft";
+
+interface ProposeCaseFormProps {
+    client: AppRayfinClient;
+    agentId: string;
+    agentName: string;
+    categories: string[];
+    onSaved: (caseId: string) => void;
+    onCancel: () => void;
+}
+
+type CaseErrors = Partial<Record<"text" | "category", string>> & AnswerErrors;
+
+/**
+ * A case is saved with its first answer. If the case saves and the answer doesn't, the form keeps
+ * what was typed and the retry only adds the answer, so no second case is created.
+ */
+export function ProposeCaseForm({ client, agentId, agentName, categories, onSaved, onCancel }: ProposeCaseFormProps) {
+    const { t } = useTranslation();
+    const listId = useId();
+    const [text, setText] = useState("");
+    const [category, setCategory] = useState("");
+    const [tags, setTags] = useState("");
+    const [answer, setAnswer] = useState<AnswerDraft>(EMPTY_ANSWER);
+    const [errors, setErrors] = useState<CaseErrors>({});
+    const [busy, setBusy] = useState(false);
+    const [savedCaseId, setSavedCaseId] = useState<string>();
+    const [failure, setFailure] = useState<unknown>();
+
+    async function submit(event: FormEvent) {
+        event.preventDefault();
+        const found: CaseErrors = { ...validateAnswer(answer) };
+        if (!text.trim()) found.text = "proposeCase.questionRequired";
+        if (!category.trim()) found.category = "proposeCase.categoryRequired";
+        setErrors(found);
+        if (Object.keys(found).length > 0) return;
+        setBusy(true);
+        setFailure(undefined);
+        let caseId = savedCaseId;
+        try {
+            if (!caseId) {
+                const created = await createCase(client, {
+                    agentId,
+                    text: text.trim(),
+                    category: canonicalCategory(category, categories),
+                    tags: tags.trim() || undefined,
+                });
+                caseId = created.id;
+                setSavedCaseId(caseId);
+            }
+            await createTestimony(client, { caseId, ...trimDraft(answer) });
+            onSaved(caseId);
+        } catch (error) {
+            setFailure(error);
+        } finally {
+            setBusy(false);
+        }
+    }
+
+    return (
+        <form onSubmit={(event) => void submit(event)} noValidate className="flex flex-col gap-4 border border-ink bg-paper-raised p-5">
+            <div className="flex flex-col gap-1">
+                <h2 className="m-0 font-serif text-[28px] font-bold text-ink">{t("proposeCase.title", { agent: agentName })}</h2>
+                <p className="m-0 text-[15px] text-text">{t("proposeCase.help")}</p>
+            </div>
+            <TextAreaField
+                label={t("proposeCase.question")}
+                hint={t("proposeCase.questionHint")}
+                value={text}
+                onChange={(event) => setText(event.target.value)}
+                maxLength={1000}
+                rows={2}
+                required
+                disabled={Boolean(savedCaseId)}
+                error={errors.text && t(errors.text)}
+            />
+            <div className="grid gap-4 min-[700px]:grid-cols-2">
+                <TextField
+                    label={t("proposeCase.category")}
+                    hint={t("proposeCase.categoryHint")}
+                    value={category}
+                    onChange={(event) => setCategory(event.target.value)}
+                    maxLength={100}
+                    list={listId}
+                    required
+                    disabled={Boolean(savedCaseId)}
+                    error={errors.category && t(errors.category)}
+                />
+                <TextField
+                    label={t("proposeCase.tags")}
+                    hint={t("proposeCase.tagsHint")}
+                    value={tags}
+                    onChange={(event) => setTags(event.target.value)}
+                    maxLength={500}
+                    disabled={Boolean(savedCaseId)}
+                />
+                <datalist id={listId}>
+                    {categories.map((item) => (
+                        <option key={item} value={item} />
+                    ))}
+                </datalist>
+            </div>
+            <h3 className="m-0 border-t border-rule pt-4 font-serif text-[20px] font-bold text-ink">{t("proposeCase.firstAnswer")}</h3>
+            <AnswerFields draft={answer} onChange={setAnswer} errors={errors} />
+            {failure !== undefined && (
+                <Objection
+                    compact
+                    message={savedCaseId ? t("proposeCase.answerFailed") : t("errors.save")}
+                    technicalDetails={String(failure)}
+                />
+            )}
+            <div className="flex flex-wrap gap-3">
+                <Button type="submit" variant="primary" compact disabled={busy}>
+                    {busy ? t("proposeCase.saving") : savedCaseId ? t("proposeCase.retryAnswer") : t("proposeCase.submit")}
+                </Button>
+                <Button variant="quiet" onClick={savedCaseId ? () => onSaved(savedCaseId) : onCancel} disabled={busy}>
+                    {savedCaseId ? t("proposeCase.openCase") : t("common.cancel")}
+                </Button>
+            </div>
+        </form>
+    );
+}

@@ -27,7 +27,7 @@ describe("design tokens", () => {
     const dark = cssBlock('[data-theme="dark"]');
 
     it("read every colour token from the guide", () => {
-        expect(Object.keys(tokens)).toHaveLength(19);
+        expect(Object.keys(tokens)).toHaveLength(20);
     });
 
     it.each(Object.keys(guideTokens()))("%s matches the guide in light and dark", (token) => {

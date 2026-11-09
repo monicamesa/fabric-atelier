@@ -1,4 +1,4 @@
-import { useId, type InputHTMLAttributes, type ReactNode } from "react";
+import { useId, type InputHTMLAttributes, type ReactNode, type TextareaHTMLAttributes } from "react";
 import { ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -23,6 +23,46 @@ export function TextField({ label, hint, error, className, ...props }: TextField
                 aria-invalid={error ? true : undefined}
                 className={cn(
                     "min-h-11 rounded-none border bg-paper-raised px-3 text-[15px] text-ink placeholder:text-text-muted",
+                    error ? "border-2 border-action" : "border-ink",
+                )}
+                {...props}
+            />
+            {hint && (
+                <span id={hintId} className="text-[14px] text-text-muted">
+                    {hint}
+                </span>
+            )}
+            {error && (
+                <span id={errorId} className="text-[14px] font-semibold text-action-text">
+                    {error}
+                </span>
+            )}
+        </div>
+    );
+}
+
+interface TextAreaFieldProps extends Omit<TextareaHTMLAttributes<HTMLTextAreaElement>, "id"> {
+    label: string;
+    hint?: string;
+    error?: string;
+}
+
+export function TextAreaField({ label, hint, error, className, rows = 3, ...props }: TextAreaFieldProps) {
+    const id = useId();
+    const hintId = hint ? `${id}-hint` : undefined;
+    const errorId = error ? `${id}-error` : undefined;
+    return (
+        <div className={cn("flex flex-col gap-1.5", className)}>
+            <label htmlFor={id} className="text-[14px] font-semibold text-ink">
+                {label}
+            </label>
+            <textarea
+                id={id}
+                rows={rows}
+                aria-describedby={[hintId, errorId].filter(Boolean).join(" ") || undefined}
+                aria-invalid={error ? true : undefined}
+                className={cn(
+                    "min-h-11 resize-y rounded-none border bg-paper-raised px-3 py-2 text-[15px] text-ink placeholder:text-text-muted",
                     error ? "border-2 border-action" : "border-ink",
                 )}
                 {...props}

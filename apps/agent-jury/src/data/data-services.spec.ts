@@ -1,6 +1,14 @@
 import { describe, expect, it, vi } from "vitest";
 import type { AppRayfinClient } from "@/lib/rayfin-client";
-import { createCase, createCaseDismissal, createTestimony, listCaseDismissals, listCasesByAgent } from "./cases.service";
+import {
+    createCase,
+    createCaseDismissal,
+    createTestimony,
+    createVote,
+    listCaseDismissals,
+    listCasesByAgent,
+    listVotesForTestimonies,
+} from "./cases.service";
 import { listJurors, readAuthorActivity } from "./directory.service";
 import { NotSignedInError } from "./session-author";
 import { readAllPages } from "./pagination";
@@ -132,6 +140,34 @@ describe("create services", () => {
     it("refuses to create anything without a signed-in user", async () => {
         const { client, created } = fakeClient({}, false);
         await expect(createCase(client, { agentId: "a", text: "t", category: "c" })).rejects.toBeInstanceOf(NotSignedInError);
+        await expect(createVote(client, { testimonyId: "t1", value: "for" })).rejects.toBeInstanceOf(NotSignedInError);
         expect(created).toHaveLength(0);
+    });
+
+    it("takes the voter from the session and trims the comment", async () => {
+        const { client, created } = fakeClient({});
+        await createVote(client, { testimonyId: "t1", value: "against", comment: "  Counts billing addresses  " });
+        await createVote(client, { testimonyId: "t1", value: "for", comment: "   " });
+        expect(created[0]).toMatchObject({
+            entity: "Vote",
+            input: { testimony_id: "t1", value: "against", comment: "Counts billing addresses", voterUserId: "sub-ana", voterEmail: "ana.expert@example.com" },
+        });
+        expect((created[1].input as { comment?: string }).comment).toBeUndefined();
+    });
+
+    it("sends the definition details only when they have text", async () => {
+        const { client, created } = fakeClient({});
+        await createTestimony(client, { caseId: "c1", answer: "42", definition: "d", criterion: " An order ", timeWindow: "  " });
+        expect(created[0].input).toMatchObject({ criterion: "An order", timeWindow: undefined, population: undefined, source: undefined });
+    });
+});
+
+describe("batched reads", () => {
+    it("splits long id lists into `in` filters of 50", async () => {
+        const ids = Array.from({ length: 120 }, (_, index) => `t${index}`);
+        const { client, queries } = fakeClient({ Vote: [0, 1, 2].map(() => ({ items: [{ id: "v" }], hasNextPage: false })) });
+        expect(await listVotesForTestimonies(client, ids)).toHaveLength(3);
+        const sizes = queries.map((query) => (query.calls.find(([name]) => name === "where")![1] as { testimony_id: { in: string[] } }).testimony_id.in.length);
+        expect(sizes).toEqual([50, 50, 20]);
     });
 });

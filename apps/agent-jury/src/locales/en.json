@@ -57,12 +57,214 @@
         "loading": "Loading…",
         "retry": "Try again",
         "empty": "Nothing here yet.",
-        "copyId": "Copy the full {{label}}"
+        "copyId": "Copy the full {{label}}",
+        "cancel": "Cancel"
     },
     "nav": {
         "label": "Main",
         "home": "Home",
+        "cases": "Cases",
         "clerk": "Clerk's office"
+    },
+    "loading": {
+        "deliberating": "The jury is deliberating…",
+        "countingVotes": "Counting votes…",
+        "readingRecord": "Reading the court record…"
+    },
+    "ticker": {
+        "label": "Latest verdicts",
+        "title": "Latest verdicts",
+        "proposed": "New case"
+    },
+    "glossary": {
+        "case": {
+            "term": "Case",
+            "meaning": "A business question to test the agent with."
+        },
+        "ruling": {
+            "term": "Ruling",
+            "meaning": "The jury agrees on the right answer. Ruled cases become case law."
+        },
+        "hearing": {
+            "term": "Hearing",
+            "meaning": "A test run: the agent answers, the AI judge scores each answer."
+        },
+        "appeal": {
+            "term": "Appeal",
+            "meaning": "A juror says the judge got it wrong. Appeals lower judge trust."
+        }
+    },
+    "docket": {
+        "agent": "Agent on trial",
+        "propose": "+ Propose a case",
+        "settle": "Settle the dispute",
+        "castVote": "Cast your vote",
+        "readOnly": "You can read the docket. Only active jurors can propose cases, add answers and vote; ask an admin if you should be on the jury."
+    },
+    "cases": {
+        "kicker_one": "{{agent}} · {{count}} case",
+        "kicker_other": "{{agent}} · {{count}} cases",
+        "title": "The full docket",
+        "help": "Every case moves left to right: the jury reviews it, settles any dispute, and rules. Ruled cases become case law, the test the agent has to pass.",
+        "search": "Search questions",
+        "searchPlaceholder": "Search questions",
+        "filter": "Show cases",
+        "filters": {
+            "all": "All",
+            "vote": "Waiting for my vote · {{count}}",
+            "mine": "Proposed by me"
+        },
+        "columns": {
+            "under_review": "Needs votes from the jury",
+            "disputed": "Jurors gave different answers",
+            "ruled": "Case law: ready for hearings",
+            "dismissed": "Not a good test question"
+        },
+        "columnEmpty": "No cases here.",
+        "empty": "No cases for {{agent}} yet. Propose the first question the agent should answer.",
+        "noMatch": "No cases match this search or filter.",
+        "more": "+ {{count}} more",
+        "tip": "Tip: a good case has one right answer that a business expert can check. \"How are sales going?\" is not a case; \"Net sales in October 2026?\" is.",
+        "votesOf": "{{count}} of {{total}} votes",
+        "yourVote": "Your vote needed",
+        "youVoted": "You voted ✓",
+        "jurorsAgree_one": "{{count}} juror agrees",
+        "jurorsAgree_other": "All {{count}} jurors agree",
+        "dismissedHelp": "Dismissed"
+    },
+    "caseDetail": {
+        "back": "← Back to the docket",
+        "safe": "Your cases are safe.",
+        "notFound": "This case doesn't exist, or it was proposed in another app.",
+        "unknownAgent": "Unknown agent",
+        "reason": {
+            "dismissed": "This case was dismissed: it is kept in the record but never used in a hearing.",
+            "noAnswers": "No answer yet. Add the answer the agent should give.",
+            "competingAnswers": "Two answers have votes in favour. Vote for the one the agent should give, or propose a better one.",
+            "approverSplit": "Approvers disagree about the same answer. Read the reasons in the court record.",
+            "ruled": "The jury agreed on the answer. This case is now case law.",
+            "needsVotes_one": "Needs {{count}} more vote in favour.",
+            "needsVotes_other": "Needs {{count}} more votes in favour.",
+            "needsApprover": "Enough votes, but no approver has confirmed the answer yet.",
+            "approverAgainst": "An approver voted against the leading answer."
+        },
+        "threshold_one": "{{count}} vote settles the case.",
+        "threshold_other": "{{count}} votes settle the case.",
+        "dismissedBecause": "Reason: {{reason}}",
+        "proposedBy": "Proposed by",
+        "category": "Category",
+        "votesSoFar": "Votes so far",
+        "votesOf": "{{count}} of {{total}}",
+        "you": "You",
+        "youReadOnly": "can read this case",
+        "youVotedFor": "voted for answer {{letter}}",
+        "youVotedAgainst": "voted against answer {{letter}}",
+        "youHaventVoted": "haven't voted yet",
+        "noAnswersTitle": "No answers yet",
+        "answersTitle_one": "The answer on the table",
+        "answersTitle_other": "The {{count}} answers on the table",
+        "noAnswers": "Nobody has answered this question yet.",
+        "addYourAnswer": "Add your answer",
+        "addFirstAnswer": "Add the first answer",
+        "addAnotherAnswer": "Propose another answer",
+        "answerSaved": "Your answer was added."
+    },
+    "answer": {
+        "label": "Answer {{letter}}",
+        "byTeam": "{{name}}, {{team}}",
+        "votes_one": "{{count}} vote",
+        "votes_other": "{{count}} votes",
+        "ruling": "Ruling",
+        "progress": "{{count}} of {{total}} votes in favour",
+        "against_one": "{{count}} against",
+        "against_other": "{{count}} against"
+    },
+    "vote": {
+        "for": "Vote for answer {{letter}}",
+        "against": "Vote against",
+        "changeToFor": "Change to a vote for {{letter}}",
+        "changeToAgainst": "Change to a vote against",
+        "comment": "Why is this answer wrong?",
+        "commentHint": "Required. Other jurors read it in the court record.",
+        "commentRequired": "Say why, so the jury can settle it.",
+        "submitAgainst": "Vote against answer {{letter}}",
+        "ownAnswer": "Your own answer: your vote on it wouldn't count.",
+        "youVotedFor": "You voted for this answer.",
+        "youVotedAgainst": "You voted against this answer.",
+        "doneFor": "Your vote for answer {{letter}} is in the record.",
+        "doneAgainst": "Your vote against answer {{letter}} is in the record."
+    },
+    "dismiss": {
+        "open": "Dismiss: the question is ambiguous",
+        "title": "Dismiss this case",
+        "help": "Dismissed cases stay in the record but are never used in a hearing. Only the author or an admin can dismiss a case.",
+        "reason": "Why is it not a good test question?",
+        "reasonRequired": "Give a reason.",
+        "submit": "Dismiss the case",
+        "done": "The case was dismissed."
+    },
+    "diff": {
+        "title": "Where the definitions part ways",
+        "help": "Highlighted rows are the real disagreement. Settle these and the case settles itself.",
+        "caption": "Definitions of answer {{left}} and answer {{right}}, rule by rule",
+        "rule": "Rule",
+        "differs": "they differ",
+        "addDetails": "Add the definition to see where they differ.",
+        "rows": {
+            "criterion": "What counts",
+            "timeWindow": "Time window",
+            "population": "Who counts",
+            "source": "Source table"
+        }
+    },
+    "record": {
+        "title": "Court record",
+        "proposed": "{{who}} opened the case",
+        "answer": "{{who}} gave answer {{letter}}",
+        "voteFor": "{{who}} voted for {{letter}}",
+        "voteAgainst": "{{who}} voted against {{letter}}",
+        "dismissed": "{{who}} dismissed the case",
+        "stateBefore": "Case marked ",
+        "notCounted": "not counted: not an active juror",
+        "noReason": "no reason given, not counted",
+        "futureDated": "dated in the future, not counted",
+        "footnote": "The record is never edited. Every vote and answer stays here, so anyone can see how the jury got to its ruling."
+    },
+    "answerForm": {
+        "answer": "Answer",
+        "answerHint": "The value the agent should give, e.g. 2,310 or Mountain-200 Black.",
+        "answerRequired": "Enter the answer.",
+        "definition": "Definition",
+        "definitionHint": "One sentence: how you got this answer.",
+        "definitionRequired": "Explain how you got the answer.",
+        "details": "Definition details (optional)",
+        "detailsHelp": "Fill these in so the jury can see exactly where two answers differ.",
+        "hints": {
+            "criterion": "e.g. at least one order",
+            "timeWindow": "e.g. last 90 days",
+            "population": "e.g. all customers",
+            "source": "e.g. FactSales"
+        },
+        "submit": "Add the answer",
+        "saving": "Saving…"
+    },
+    "proposeCase": {
+        "title": "Propose a case for {{agent}}",
+        "help": "A good case has one right answer that a business expert can check.",
+        "question": "Question",
+        "questionHint": "Ask it the way a business user would ask the agent.",
+        "questionRequired": "Enter the question.",
+        "category": "Category",
+        "categoryHint": "Pick an existing one or type a new one.",
+        "categoryRequired": "Enter a category.",
+        "tags": "Tags",
+        "tagsHint": "Optional, separated by commas.",
+        "firstAnswer": "Your answer",
+        "answerFailed": "The case was saved, but its answer wasn't. Try again: only the answer will be added.",
+        "submit": "Propose the case",
+        "retryAnswer": "Add the answer again",
+        "openCase": "Open the case without an answer",
+        "saving": "Saving…"
     },
     "theme": {
         "toDark": "Switch to dark mode",
@@ -89,9 +291,23 @@
         }
     },
     "home": {
+        "kicker": "Quality control for Fabric data agents",
         "title": "Who judges the judge?",
-        "help": "A jury of business experts agrees on the right answers, so Fabric data agents can be tested against them.",
-        "empty": "The docket opens in the next step: cases, answers and votes will appear here.",
+        "lead": "An AI judge scores every answer your data agents give. Your business experts are the jury: they agree on the right answers and catch the judge when it gets one wrong.",
+        "needYourVote_one": "{{count}} case needs your vote →",
+        "needYourVote_other": "{{count}} cases need your vote →",
+        "trustPending": "Shown after the first hearings: how often the jury agrees with the AI judge.",
+        "docketTitle": "Today's docket",
+        "docketHelp": "Cases for the agent you pick. Cases waiting for your vote come first.",
+        "columns": {
+            "case": "Case",
+            "question": "Question",
+            "status": "Status · next step"
+        },
+        "expected": "Expected answer: {{answer}}",
+        "seeAll_one": "See the case →",
+        "seeAll_other": "See all {{count}} cases →",
+        "noAgents": "No agents on trial yet. An admin registers them in the clerk's office.",
         "openClerk": "Go to the clerk's office"
     },
     "clerk": {

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { formatDate, formatDateTime, formatLogDay, formatNumber } from "./format";
+import { formatDate, formatDateTime, formatLogDay, formatNumber, formatRelativeDay } from "./format";
 
 // Noon UTC keeps the calendar day stable in any test time zone.
 const sample = new Date(Date.UTC(2026, 10, 9, 12, 0, 0));
@@ -35,5 +35,14 @@ describe("format", () => {
         const later = new Date(sample.getTime() + 3 * 86_400_000);
         expect(formatLogDay(sample, "en", later)).toEqual({ today: false, text: "9 Nov" });
         expect(formatLogDay(sample, "es", later)).toEqual({ today: false, text: "9 nov" });
+    });
+
+    it("says today, yesterday or days ago for the last week, then the date", () => {
+        const day = 86_400_000;
+        expect(formatRelativeDay(sample, "en", new Date(sample.getTime() + 60_000))).toBe("Today");
+        expect(formatRelativeDay(sample, "es", new Date(sample.getTime() + day))).toBe("Ayer");
+        expect(formatRelativeDay(sample, "en", new Date(sample.getTime() + 3 * day))).toBe("3 days ago");
+        expect(formatRelativeDay(sample, "es", new Date(sample.getTime() + 3 * day))).toBe("Hace 3 días");
+        expect(formatRelativeDay(sample, "en", new Date(sample.getTime() + 10 * day))).toBe("9 Nov");
     });
 });

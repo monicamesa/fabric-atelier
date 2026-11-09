@@ -10,6 +10,7 @@ import {
     type Me,
 } from "@/rules/case-validity";
 import {
+    getCase,
     listCaseDismissals,
     listCasesByAgent,
     listTestimoniesForCases,
@@ -109,4 +110,16 @@ export async function loadDocketRecords(client: DataClient, agentId: string): Pr
         testimonies.map((testimony) => testimony.id),
     );
     return { cases, testimonies, votes, dismissals };
+}
+
+/** Reads one case with its testimonies, votes and dismissals; `undefined` when the case doesn't exist. */
+export async function loadCaseRecords(client: DataClient, caseId: string): Promise<DocketRecords | undefined> {
+    const record = await getCase(client, caseId);
+    if (!record) return undefined;
+    const [testimonies, dismissals] = await Promise.all([listTestimoniesForCases(client, [caseId]), listCaseDismissals(client, [caseId])]);
+    const votes = await listVotesForTestimonies(
+        client,
+        testimonies.map((testimony) => testimony.id),
+    );
+    return { cases: [record], testimonies, votes, dismissals };
 }

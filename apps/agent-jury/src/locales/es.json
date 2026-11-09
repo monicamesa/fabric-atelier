@@ -57,12 +57,214 @@
         "loading": "Cargando…",
         "retry": "Reintentar",
         "empty": "Todavía no hay nada.",
-        "copyId": "Copiar el {{label}} completo"
+        "copyId": "Copiar el {{label}} completo",
+        "cancel": "Cancelar"
     },
     "nav": {
         "label": "Principal",
         "home": "Inicio",
+        "cases": "Casos",
         "clerk": "Secretaría"
+    },
+    "loading": {
+        "deliberating": "El jurado está deliberando…",
+        "countingVotes": "Contando votos…",
+        "readingRecord": "Leyendo el acta…"
+    },
+    "ticker": {
+        "label": "Últimos fallos",
+        "title": "Últimos fallos",
+        "proposed": "Caso nuevo"
+    },
+    "glossary": {
+        "case": {
+            "term": "Caso",
+            "meaning": "Una pregunta de negocio para poner a prueba al agente."
+        },
+        "ruling": {
+            "term": "Fallo",
+            "meaning": "El jurado se pone de acuerdo en la respuesta correcta. Los casos fallados pasan a ser jurisprudencia."
+        },
+        "hearing": {
+            "term": "Vista",
+            "meaning": "Una prueba: el agente responde y el juez de IA puntúa cada respuesta."
+        },
+        "appeal": {
+            "term": "Recurso",
+            "meaning": "Un jurado dice que el juez se equivocó. Los recursos bajan la confianza en el juez."
+        }
+    },
+    "docket": {
+        "agent": "Agente a juicio",
+        "propose": "+ Proponer un caso",
+        "settle": "Resolver la disputa",
+        "castVote": "Votar",
+        "readOnly": "Puedes leer los casos. Solo los jurados activos pueden proponer casos, añadir respuestas y votar; pide a un admin que te incorpore si deberías estar en el jurado."
+    },
+    "cases": {
+        "kicker_one": "{{agent}} · {{count}} caso",
+        "kicker_other": "{{agent}} · {{count}} casos",
+        "title": "Todos los casos",
+        "help": "Cada caso avanza de izquierda a derecha: el jurado lo revisa, resuelve las disputas y falla. Los casos fallados pasan a ser jurisprudencia, la prueba que el agente tiene que superar.",
+        "search": "Buscar preguntas",
+        "searchPlaceholder": "Buscar preguntas",
+        "filter": "Mostrar casos",
+        "filters": {
+            "all": "Todos",
+            "vote": "Esperan mi voto · {{count}}",
+            "mine": "Propuestos por mí"
+        },
+        "columns": {
+            "under_review": "Necesita votos del jurado",
+            "disputed": "Los jurados dieron respuestas distintas",
+            "ruled": "Jurisprudencia: lista para las vistas",
+            "dismissed": "No es una buena pregunta de prueba"
+        },
+        "columnEmpty": "No hay casos aquí.",
+        "empty": "Todavía no hay casos para {{agent}}. Propón la primera pregunta que el agente debería responder.",
+        "noMatch": "Ningún caso coincide con esta búsqueda o filtro.",
+        "more": "+ {{count}} más",
+        "tip": "Consejo: un buen caso tiene una única respuesta correcta que un experto de negocio puede comprobar. «¿Cómo van las ventas?» no es un caso; «¿Ventas netas en octubre de 2026?» sí lo es.",
+        "votesOf": "{{count}} de {{total}} votos",
+        "yourVote": "Falta tu voto",
+        "youVoted": "Ya has votado ✓",
+        "jurorsAgree_one": "{{count}} jurado está de acuerdo",
+        "jurorsAgree_other": "Los {{count}} jurados están de acuerdo",
+        "dismissedHelp": "Archivado"
+    },
+    "caseDetail": {
+        "back": "← Volver a los casos",
+        "safe": "Tus casos están a salvo.",
+        "notFound": "Este caso no existe o se propuso en otra app.",
+        "unknownAgent": "Agente desconocido",
+        "reason": {
+            "dismissed": "Este caso se archivó: se conserva en el acta, pero nunca se usa en una vista.",
+            "noAnswers": "Todavía no hay respuesta. Añade la respuesta que debería dar el agente.",
+            "competingAnswers": "Dos respuestas tienen votos a favor. Vota la que debería dar el agente o propon una mejor.",
+            "approverSplit": "Los aprobadores no están de acuerdo sobre la misma respuesta. Lee sus motivos en el acta.",
+            "ruled": "El jurado se puso de acuerdo en la respuesta. Este caso ya es jurisprudencia.",
+            "needsVotes_one": "Falta {{count}} voto a favor.",
+            "needsVotes_other": "Faltan {{count}} votos a favor.",
+            "needsApprover": "Hay votos suficientes, pero ningún aprobador ha confirmado la respuesta.",
+            "approverAgainst": "Un aprobador votó en contra de la respuesta con más votos."
+        },
+        "threshold_one": "{{count}} voto resuelve el caso.",
+        "threshold_other": "{{count}} votos resuelven el caso.",
+        "dismissedBecause": "Motivo: {{reason}}",
+        "proposedBy": "Propuesto por",
+        "category": "Categoría",
+        "votesSoFar": "Votos hasta ahora",
+        "votesOf": "{{count}} de {{total}}",
+        "you": "Tú",
+        "youReadOnly": "puedes leer este caso",
+        "youVotedFor": "votaste a favor de la respuesta {{letter}}",
+        "youVotedAgainst": "votaste en contra de la respuesta {{letter}}",
+        "youHaventVoted": "todavía no has votado",
+        "noAnswersTitle": "Todavía no hay respuestas",
+        "answersTitle_one": "La respuesta sobre la mesa",
+        "answersTitle_other": "Las {{count}} respuestas sobre la mesa",
+        "noAnswers": "Nadie ha respondido todavía a esta pregunta.",
+        "addYourAnswer": "Añadir tu respuesta",
+        "addFirstAnswer": "Añadir la primera respuesta",
+        "addAnotherAnswer": "Proponer otra respuesta",
+        "answerSaved": "Se añadió tu respuesta."
+    },
+    "answer": {
+        "label": "Respuesta {{letter}}",
+        "byTeam": "{{name}}, {{team}}",
+        "votes_one": "{{count}} voto",
+        "votes_other": "{{count}} votos",
+        "ruling": "Fallo",
+        "progress": "{{count}} de {{total}} votos a favor",
+        "against_one": "{{count}} en contra",
+        "against_other": "{{count}} en contra"
+    },
+    "vote": {
+        "for": "Votar la respuesta {{letter}}",
+        "against": "Votar en contra",
+        "changeToFor": "Cambiar a un voto a favor de {{letter}}",
+        "changeToAgainst": "Cambiar a un voto en contra",
+        "comment": "¿Por qué es incorrecta esta respuesta?",
+        "commentHint": "Obligatorio. Los demás jurados lo leen en el acta.",
+        "commentRequired": "Explica el motivo para que el jurado pueda resolverlo.",
+        "submitAgainst": "Votar en contra de la respuesta {{letter}}",
+        "ownAnswer": "Es tu propia respuesta: tu voto no contaría.",
+        "youVotedFor": "Votaste a favor de esta respuesta.",
+        "youVotedAgainst": "Votaste en contra de esta respuesta.",
+        "doneFor": "Tu voto a favor de la respuesta {{letter}} está en el acta.",
+        "doneAgainst": "Tu voto en contra de la respuesta {{letter}} está en el acta."
+    },
+    "dismiss": {
+        "open": "Archivar: la pregunta es ambigua",
+        "title": "Archivar este caso",
+        "help": "Los casos archivados se conservan en el acta, pero nunca se usan en una vista. Solo el autor o un admin pueden archivar un caso.",
+        "reason": "¿Por qué no es una buena pregunta de prueba?",
+        "reasonRequired": "Indica un motivo.",
+        "submit": "Archivar el caso",
+        "done": "El caso se archivó."
+    },
+    "diff": {
+        "title": "Dónde se separan las definiciones",
+        "help": "Las filas resaltadas son el desacuerdo real. Resuélvelas y el caso se resuelve solo.",
+        "caption": "Definiciones de la respuesta {{left}} y la respuesta {{right}}, regla por regla",
+        "rule": "Regla",
+        "differs": "son distintas",
+        "addDetails": "Añade la definición para ver en qué se diferencian.",
+        "rows": {
+            "criterion": "Qué cuenta",
+            "timeWindow": "Periodo",
+            "population": "Quién cuenta",
+            "source": "Tabla de origen"
+        }
+    },
+    "record": {
+        "title": "Acta",
+        "proposed": "{{who}} abrió el caso",
+        "answer": "{{who}} dio la respuesta {{letter}}",
+        "voteFor": "{{who}} votó a favor de {{letter}}",
+        "voteAgainst": "{{who}} votó en contra de {{letter}}",
+        "dismissed": "{{who}} archivó el caso",
+        "stateBefore": "Caso marcado como ",
+        "notCounted": "no cuenta: no es un jurado activo",
+        "noReason": "sin motivo, no cuenta",
+        "futureDated": "con fecha futura, no cuenta",
+        "footnote": "El acta nunca se edita. Cada voto y cada respuesta se quedan aquí, así que cualquiera puede ver cómo llegó el jurado a su fallo."
+    },
+    "answerForm": {
+        "answer": "Respuesta",
+        "answerHint": "El valor que debería dar el agente, por ejemplo 2.310 o Mountain-200 Black.",
+        "answerRequired": "Escribe la respuesta.",
+        "definition": "Definición",
+        "definitionHint": "Una frase: cómo has llegado a esta respuesta.",
+        "definitionRequired": "Explica cómo has llegado a la respuesta.",
+        "details": "Detalles de la definición (opcional)",
+        "detailsHelp": "Rellénalos para que el jurado vea exactamente en qué se diferencian dos respuestas.",
+        "hints": {
+            "criterion": "p. ej., al menos un pedido",
+            "timeWindow": "p. ej., últimos 90 días",
+            "population": "p. ej., todos los clientes",
+            "source": "p. ej., FactSales"
+        },
+        "submit": "Añadir la respuesta",
+        "saving": "Guardando…"
+    },
+    "proposeCase": {
+        "title": "Proponer un caso para {{agent}}",
+        "help": "Un buen caso tiene una única respuesta correcta que un experto de negocio puede comprobar.",
+        "question": "Pregunta",
+        "questionHint": "Escríbela como se la preguntaría al agente alguien de negocio.",
+        "questionRequired": "Escribe la pregunta.",
+        "category": "Categoría",
+        "categoryHint": "Elige una existente o escribe una nueva.",
+        "categoryRequired": "Escribe una categoría.",
+        "tags": "Etiquetas",
+        "tagsHint": "Opcional, separadas por comas.",
+        "firstAnswer": "Tu respuesta",
+        "answerFailed": "El caso se guardó, pero su respuesta no. Vuelve a intentarlo: solo se añadirá la respuesta.",
+        "submit": "Proponer el caso",
+        "retryAnswer": "Añadir la respuesta de nuevo",
+        "openCase": "Abrir el caso sin respuesta",
+        "saving": "Guardando…"
     },
     "theme": {
         "toDark": "Cambiar a modo oscuro",
@@ -89,9 +291,23 @@
         }
     },
     "home": {
+        "kicker": "Control de calidad para agentes de datos de Fabric",
         "title": "¿Quién juzga al juez?",
-        "help": "Un jurado de expertos de negocio se pone de acuerdo en las respuestas correctas para poner a prueba a los agentes de datos de Fabric.",
-        "empty": "La lista de casos se abre en el siguiente paso: aquí aparecerán los casos, las respuestas y los votos.",
+        "lead": "Un juez de IA puntúa cada respuesta de tus agentes de datos. Tus expertos de negocio son el jurado: se ponen de acuerdo en las respuestas correctas y pillan al juez cuando se equivoca.",
+        "needYourVote_one": "{{count}} caso necesita tu voto →",
+        "needYourVote_other": "{{count}} casos necesitan tu voto →",
+        "trustPending": "Aparece tras las primeras vistas: con qué frecuencia el jurado está de acuerdo con el juez de IA.",
+        "docketTitle": "Casos de hoy",
+        "docketHelp": "Casos del agente que elijas. Primero, los que esperan tu voto.",
+        "columns": {
+            "case": "Caso",
+            "question": "Pregunta",
+            "status": "Estado · siguiente paso"
+        },
+        "expected": "Respuesta esperada: {{answer}}",
+        "seeAll_one": "Ver el caso →",
+        "seeAll_other": "Ver los {{count}} casos →",
+        "noAgents": "Todavía no hay agentes a juicio. Un admin los registra en la secretaría.",
         "openClerk": "Ir a la secretaría"
     },
     "clerk": {

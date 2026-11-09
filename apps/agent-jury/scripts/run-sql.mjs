@@ -26,6 +26,9 @@ const values = Object.fromEntries(
 );
 
 let script = readFileSync(resolve(file), "utf8");
+if (/^-- target: test-only\s*$/m.test(script) && !isTest) {
+    throw new Error(`${file} is marked test-only; run it with --target=test.`);
+}
 for (let index = 0; index < rest.length; index += 2) {
     const [name, key] = (rest[index] === "--var" ? rest[index + 1] ?? "" : "").split("=");
     const value = values[key];

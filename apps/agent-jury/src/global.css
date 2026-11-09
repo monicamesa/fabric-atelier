@@ -155,6 +155,41 @@
   --color-review: var(--review);
   --color-review-text: var(--review-text);
   --color-focus: var(--focus);
+  --color-ticker-bg: var(--ticker-bg);
+  --color-ticker-text: var(--ticker-text);
+  --color-overruled: var(--overruled);
+  --color-overruled-text: var(--overruled-text);
+}
+
+/* Verdict ticker: 48 s per loop over a duplicated list, paused on hover and focus (design guide, section 7). */
+@keyframes docket-ticker {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+.docket-ticker-track {
+  animation: docket-ticker 48s linear infinite;
+}
+
+.docket-ticker:hover .docket-ticker-track,
+.docket-ticker:focus-within .docket-ticker-track {
+  animation-play-state: paused;
+}
+
+/* Gavel strike: rotate -34deg -> 9deg -> 0 around the handle end. */
+@keyframes docket-gavel {
+  0%, 40% { transform: rotate(-34deg); }
+  55% { transform: rotate(9deg); }
+  70%, 100% { transform: rotate(0deg); }
+}
+
+.docket-gavel-head {
+  transform-box: view-box;
+  transform-origin: 44px 52px;
+}
+
+.docket-gavel-loop .docket-gavel-head {
+  animation: docket-gavel 2.6s ease-in-out infinite;
 }
 
 @utility icon-size-* {
@@ -229,6 +264,11 @@
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+  }
+
+  /* Static ticker: the list wraps instead of scrolling. */
+  .docket-ticker-track {
+    animation: none !important;
   }
 }
 
