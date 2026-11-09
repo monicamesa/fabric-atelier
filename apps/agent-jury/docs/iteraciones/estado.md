@@ -27,6 +27,8 @@
 | `f0a3765` | README de la raíz, `docs/conventions.md`, README de la app, estructura y "Project rules" en `AGENTS.md` |
 | `afe41e0` | Especificación v0.3: nombres en inglés y workspaces |
 | `a504d5e` | Campos de la sección 7 en camelCase y regla de nombres en `AGENTS.md` |
+| `a2063d1` | Fase 1 desplegada en `FabricApp-AgentJury` |
+| `ec0b63d` | Valores privados en `.private/values.env`, hook de pre-commit y limpieza de valores personales |
 
 ### Estructura y documentación
 
@@ -63,6 +65,11 @@ Solo las que no están ya en la especificación ni en `conventions.md`.
 - **Licencia:** se quitaron la licencia y las políticas de Microsoft que traía la plantilla. La licencia del repositorio se decidirá en la raíz.
 - **README de la app:** sustituye al de la plantilla, que sigue disponible en el commit `569c1ef`.
 - **Prefijo `repo:`** para los commits que solo afectan a la raíz (está en el README de la raíz).
+- **Privacidad:**
+  - Los valores privados viven en `.private/values.env` (ignorado por Git), y los ficheros versionados usan su nombre de clave (`<TENANT_ID>`). Plantilla: `private.example.env`.
+  - El hook `.githooks/pre-commit` (activado con `git config core.hooksPath .githooks`) bloquea esos valores, GUID fuera de la lista permitida, emails, URLs de apps desplegadas, enlaces a workspaces del portal y rutas de usuario de Windows.
+  - **El historial no se reescribió a propósito.** Los commits anteriores a `ec0b63d` contienen el email personal (también como autor de todos los commits), la URL de la app y la ruta de usuario de Windows. Son datos que se aceptan como públicos. Nunca se versionaron el tenant, los IDs de workspace, item o capacidad ni el email de la cuenta de Fabric.
+  - El autor de los commits sigue siendo el email personal; no se usa la dirección noreply de GitHub.
 - **Almacenamiento en el navegador:** solo la preferencia de idioma. Ningún dato de usuario en `localStorage`, `sessionStorage` ni IndexedDB (regla 2 de "Project rules" en `AGENTS.md`).
 - **Modelo de datos:**
   - Se añadió `createdAt` a `Case`, `Testimony`, `Vote`, `Hearing` y `Appeal`, porque la sección 10 exige guardar autor y fecha.
