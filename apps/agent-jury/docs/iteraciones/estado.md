@@ -46,7 +46,12 @@ fabric-atelier/
 ```
 
 - La app es la plantilla sin cambios de código. `npm ci`, `npm run build` y `npm test` pasan con Node 24.22.1 (11 ficheros, 138 tests).
-- No se ha desplegado nunca. `rayfin/.env` solo tiene `RAYFIN_WORKSPACE_NAME` y no existe `rayfin/.deployments.json`.
+- **Fase 1 completada (2026-11-09):** la plantilla está desplegada en el workspace `FabricApp-AgentJury` (capacidad `fclabfrc01`, France Central) con `npx.cmd rayfin up` (CLI 1.36.2).
+  - Item Rayfin `agent-jury` (AppBackend). Servicios: `auth` activado, `data` desactivado.
+  - App: https://plain-rill-d2d38072eb-francecentral.webapp.fabricapps.net
+  - Acceso a los ficheros estáticos: `assetAccess: protected` (solo usuarios con permiso de lectura sobre el item de Fabric, con inicio de sesión).
+  - `rayfin up` añadió a `rayfin.yml` la URL de la app y `http://127.0.0.1:5173` en `allowedRedirectUris`, `assetAccess: protected` y `functions.enabled: false`.
+  - `rayfin/.env` y `rayfin/.deployments.json` siguen fuera de Git (`.gitignore`). El enlace al portal y los IDs están en `.deployments.json` y en `npx.cmd rayfin up status`.
 
 ## Decisiones de esta sesión
 
@@ -66,12 +71,7 @@ Solo las que no están ya en la especificación ni en `conventions.md`.
 ## Qué queda pendiente (en orden)
 
 1. **Abrir `apps/agent-jury` como carpeta en VS Code,** para que Copilot cargue `.vscode/mcp.json` y lea `AGENTS.md` desde la raíz del proyecto.
-2. **Fase 1: hola mundo en `FabricApp-AgentJury`** (no completada).
-   1. Crear el workspace `FabricApp-AgentJury` en una capacidad F2 o superior de pago, en una región con Fabric Apps.
-   2. Desde `apps/agent-jury`: `npx.cmd rayfin login` y `npx.cmd rayfin login status`.
-   3. `npx.cmd rayfin up --dry-run --verbose` para revisar el despliegue sin aplicarlo.
-   4. `npx.cmd rayfin up --workspace FabricApp-AgentJury`.
-   5. Abrir la app en Fabric y comprobar que carga. Confirmar que `rayfin/.env` y `rayfin/.deployments.json` siguen fuera de Git.
+2. **Comprobar en el navegador que la app desplegada carga** y pide inicio de sesión (Fase 1 desplegada; falta la comprobación visual).
 3. **Iteración 1** (sección 12 de la especificación).
    1. Activar datos en `rayfin/rayfin.yml` (dialecto `mssql`). Comprobar en qué carpeta espera las entidades esta plantilla (las plantillas planas usan `rayfin/data/`).
    2. Entidades `Domain`, `Juror`, `Agent`, `Case` y `Testimony` según la sección 7, con permisos y `max` en todos los campos de texto.
@@ -87,6 +87,7 @@ Solo las que no están ya en la especificación ni en `conventions.md`.
   - Antes de repetir un comando de npm, comprobar que no queda ningún proceso: `Get-Process node`.
   - Si `node_modules` queda a medias: cerrar el Explorador de archivos en esa carpeta, ejecutar `Remove-Item -Recurse -Force node_modules` y lanzar `npm.cmd ci` una sola vez.
 - **La terminal integrada a veces no devuelve salida,** aunque el comando se ejecuta igualmente. Esto fue lo que provocó el `npm ci` duplicado. Si pasa, abrir una terminal nueva en lugar de repetir el comando.
+  - Le pasó también a `npx.cmd rayfin login`: no abrió el navegador ni inició sesión. En una terminal nueva funcionó a la primera.
 - **Ruta de usuario con tilde (`C:\Users\MónicaMesa`):** nvm-windows no la admite, y npm la muestra como `M├│nicaMesa` en los mensajes. Instalar las herramientas fuera de la carpeta de usuario cuando se pueda elegir.
 - **Instalaciones con winget que piden administrador:** desde la terminal de VS Code fallan con el código 1602 (el registro dice "El usuario ha cancelado la instalación") porque la ventana de UAC no aparece. Lanzarlas desde una PowerShell abierta como administrador.
 - **Avisos de `npm ci` heredados de la plantilla:**
