@@ -80,6 +80,9 @@ Solo las que no están ya en la especificación ni en `conventions.md`.
 
 1. **Iteración 1**, dividida en dos partes:
    - **I1a:** datos activados; entidades `Juror`, `Agent`, `Case`, `Testimony` y `CaseDismissal`; seed; base de i18n EN/ES; tests; verificación de R1, S-A y S-B; pantallas 1–3 sin votos (cuando llegue la guía de diseño). Plan en [I1a.md](I1a.md).
+     - **Hecho (2026-11-09):** entidades, Functions de los spikes, scripts de seed, base de i18n, reglas de validez y servicios de datos, con sus tests. Desplegado en `FabricApp-AgentJury` con datos y Functions.
+     - **R1 y S-B pasan; S-A pasa en la parte T-SQL, pero falla en la identidad:** la Function no recibe el token Rayfin del usuario, sino un token de plataforma sin `email`. Detalle en la sección 6 de [I1a.md](I1a.md). **Parado a la espera de decidir cómo identifica la Function de admin a quien llama.**
+     - Pendiente: ejecutar el seed y darte de alta como admin; pantallas 1–3 tras la guía de diseño; quitar los spikes (`whoAmI`, `spikeSqlJuror`) antes de I1b.
    - **I1b:** Function de admin (T-SQL con identidad de la app) y pantalla de administración de jurors y agentes.
    - Especificación v0.4: sin dominios, roles globales de juror, cases no verificados (R7) y retiradas con `CaseDismissal` (R8).
    - Criterio de salida de I1: un experto crea preguntas y propuestas en la app desplegada.

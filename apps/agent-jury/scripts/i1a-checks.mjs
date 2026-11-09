@@ -109,16 +109,21 @@ if (client.functions.spikeSqlJuror) {
 // S-B: rows written with T-SQL through the data API.
 if (spike?.jurorId && !spike.error) {
     const juror = await expectSuccess("S-B.1", "the T-SQL juror is readable through the data API", async () => {
-        const row = await client.data.Juror.findById(spike.jurorId);
+        // findById returns only the id; select the fields explicitly.
+        const [row] = await client.data.Juror.select(["id", "email", "role", "team", "active"])
+            .where({ id: { eq: spike.jurorId } })
+            .execute();
         if (!row) throw new Error("not found");
         return row;
     });
-    record(
-        "S-B.2",
-        "its fields round-trip (id, email, role, team, active)",
-        !!juror && juror.id.toLowerCase() === spike.jurorId.toLowerCase() && juror.email === spike.jurorEmail
-            && juror.role === "expert" && juror.team === "Spike" && juror.active === false,
-    );
+    const expected = { id: spike.jurorId, email: spike.jurorEmail, role: "expert", team: "Spike", active: false };
+    const mismatched = juror
+        ? Object.entries(expected)
+              .filter(([field, value]) => String(juror[field]).toLowerCase() !== String(value).toLowerCase())
+              .map(([field]) => `${field} (${typeof juror[field]})`)
+        : ["row missing"];
+    record("S-B.2", "its fields round-trip (id, email, role, team, active)", mismatched.length === 0,
+        mismatched.length ? `${mismatched.join(", ")}; row keys: ${Object.keys(juror ?? {}).join("/")}` : "");
 }
 
 // R1: insert policies. Needs an Agent row, created by the spike (or the seed).

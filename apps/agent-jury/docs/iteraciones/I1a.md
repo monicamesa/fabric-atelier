@@ -196,6 +196,31 @@ export class CaseDismissal {
 
 **Si R1, S-A o S-B fallan,** se para y se informa antes de seguir.
 
+### Resultados (2026-11-09, `scripts/i1a-checks.mjs`)
+
+| Comprobación | Resultado |
+|---|---|
+| **R1**: políticas de inserción | **Pasa.** Las inserciones propias de `Case`, `Testimony` y `CaseDismissal` se aceptan. Con otro `authorUserId`, otro `authorEmail` u otro `dismissedByUserId` se rechazan ("Could not insert row with given values"): Rayfin sí aplica las políticas de `create`, incluida `claims.email`. Sin sesión no se lee nada. No existen mutaciones `create`/`update` para `Juror` y `Agent`, ni `update`/`delete` para `Case` |
+| **S-A**: Function con T-SQL e identidad de la app | **Pasa.** Con el token `AudienceType.Sql`, la Function se conecta a la base de datos de la app, inserta y lee un `Juror`, e inserta un `Agent`. Sin sesión, la invocación se rechaza (403) |
+| **S-A**: identidad de quien llama desde `ctx.accessToken` | **Falla.** El token que recibe la Function no es el token Rayfin del usuario: es un token de plataforma de Fabric (`idtyp: fmi`). Sus claims son `aio, appid, aud, exp, iat, idp, idtyp, iss, nbf, rh, sub, tid, uti, ver, xms_*`: no trae `email`, y su `sub` no coincide con el `id` de la sesión. **El paso (1) de la Function de admin no se puede hacer como está diseñado** |
+| **S-B**: filas T-SQL en la API | **Pasa.** El `Juror` insertado por T-SQL se lee por GraphQL con `id`, `email`, `role`, `team` y `active` correctos. Las tablas no tienen columnas de sistema ocultas |
+
+**Hallazgos para el seed y para I1b:**
+- **Tablas en plural:** `dbo.Jurors`, `dbo.Agents`, `dbo.Cases`, `dbo.Testimonies` y `dbo.CaseDismissals`, más `dbo.Users` de Rayfin.
+- **Tipos de columna:**
+  - `id` es `uniqueidentifier` con `default newid()`, y las claves foráneas son `uniqueidentifier`.
+  - `active` es `bit` con `default 1`, y `createdAt` es `datetime2` sin valor por defecto.
+  - Los textos son `nvarchar`, y `@set` se guarda como `nvarchar`.
+- **`serverFqdn` de Fabric** viene como `host,1433`; el driver `mssql` necesita servidor y puerto por separado.
+- **`findById()` solo devuelve `id`.** Para leer campos hay que usar `select([...]).where({ id: { eq } })`.
+- **Token para el script:** la CLI de Azure no puede obtener el scope `Item.Execute.All` (Entra lo rechaza). El script usa `getAuthenticatedToken` de `@microsoft/rayfin-cli/auth`, como el inicio de sesión automático local.
+
+**Datos de prueba que quedan:**
+- Jurors `spike-…@example.com` inactivos.
+- El agente de ejemplo `Sales agent (example)`.
+- Cases "[I1a check]" retirados por su autor, con su testimony.
+- No se pueden borrar desde el cliente (solo inserción).
+
 **Limpieza:** las filas de prueba no se pueden borrar desde el cliente (solo inserción). Los jurors de prueba quedan `active = 0` con email `@example.com`. Los cases de prueba los crea el propio usuario y quedarán como cases de prueba; si molestan, se retiran con un `CaseDismissal`.
 
 ## 7. Riesgos y dudas
