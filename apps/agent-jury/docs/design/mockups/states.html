@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Agent Jury – Loading states (Docket)</title>
+
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,700;9..144,900&amp;family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@500&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#F3EEE4}
+a{color:#0F6E5C}
+a:focus-visible,button:focus-visible{outline:3px solid #0F6E5C;outline-offset:3px}
+@keyframes shimmer{0%{background-position:-400px 0}100%{background-position:400px 0}}
+@keyframes strike{0%,58%,100%{transform:rotate(0deg)}70%{transform:rotate(-34deg)}80%{transform:rotate(9deg)}88%{transform:rotate(0deg)}}
+@keyframes pulse{0%,100%{opacity:.35}50%{opacity:1}}
+@keyframes type{0%{width:0}60%,100%{width:100%}}
+.sk{background:linear-gradient(90deg,#E2D9C8 0%,#EFE8DB 40%,#E2D9C8 80%);background-size:800px 100%;animation:shimmer 1.4s linear infinite}
+.gavel-head{transform-origin:52px 52px;animation:strike 2.4s ease-in-out infinite}
+.pulse{animation:pulse 1.2s ease-in-out infinite}
+@media (prefers-reduced-motion:reduce){.sk,.gavel-head,.pulse{animation:none}}
+</style>
+</helmet>
+<div style="min-height: 100vh; background: #F3EEE4; color: #14110D; font-family: Inter, system-ui, sans-serif; font-size: 16px; padding: 32px 24px; box-sizing: border-box">
+  <div style="max-width: 1360px; margin: 0 auto; display: flex; flex-direction: column; gap: 24px">
+    <div style="display: flex; flex-direction: column; gap: 6px; border-bottom: 6px double #14110D; padding-bottom: 18px">
+      <span style="font-size: 13px; letter-spacing: 0.14em; text-transform: uppercase; color: #A8401F; font-weight: 700">States every screen supports</span>
+      <h1 style="margin: 0; font-family: 'Fraunces', serif; font-weight: 900; font-size: 56px; line-height: 1; letter-spacing: -0.03em">Waiting is part of the trial</h1>
+      <p style="margin: 0; color: #2E2820; max-width: 760px; line-height: 1.5; font-size: 17px">Loading, long-running work and errors. Each one says in plain words what is happening, and none of them ever shows made-up data.</p>
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0">
+
+      <section aria-labelledby="s1" style="padding-right: 24px; display: flex; flex-direction: column; gap: 14px">
+        <h2 id="s1" style="margin: 0; font-family: 'Fraunces', serif; font-size: 24px">1 · Loading a page</h2>
+        <div role="status" style="display: flex; gap: 12px; align-items: center; font-family: 'Fraunces', serif; font-size: 22px; font-weight: 700">
+          <svg width="40" height="40" viewBox="0 0 64 64" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><g class="gavel-head" stroke="#14110D" stroke-width="3.5"><rect x="9" y="15" width="26" height="13" rx="3" transform="rotate(-45 22 21.5)"></rect><line x1="27" y1="27" x2="52" y2="52"></line></g><rect x="6" y="52" width="28" height="6" rx="2" stroke="#C8502B" stroke-width="3.5"></rect></svg>
+          The jury is deliberating…
+        </div>
+        <div style="border-top: 1px solid #14110D">
+          <div style="display: grid; grid-template-columns: 52px minmax(0, 1fr) 90px; gap: 12px; align-items: center; padding: 14px 0; border-bottom: 1px solid #D5CBB8"><div class="sk" style="height: 14px"></div><div style="display: flex; flex-direction: column; gap: 8px"><div class="sk" style="height: 18px"></div><div class="sk" style="height: 18px; width: 60%"></div></div><div class="sk" style="height: 26px"></div></div>
+          <div style="display: grid; grid-template-columns: 52px minmax(0, 1fr) 90px; gap: 12px; align-items: center; padding: 14px 0; border-bottom: 1px solid #D5CBB8"><div class="sk" style="height: 14px"></div><div style="display: flex; flex-direction: column; gap: 8px"><div class="sk" style="height: 18px"></div><div class="sk" style="height: 18px; width: 45%"></div></div><div class="sk" style="height: 26px"></div></div>
+          <div style="display: grid; grid-template-columns: 52px minmax(0, 1fr) 90px; gap: 12px; align-items: center; padding: 14px 0; border-bottom: 1px solid #D5CBB8"><div class="sk" style="height: 14px"></div><div style="display: flex; flex-direction: column; gap: 8px"><div class="sk" style="height: 18px"></div><div class="sk" style="height: 18px; width: 70%"></div></div><div class="sk" style="height: 26px"></div></div>
+        </div>
+        <p style="margin: 0; color: #4A4235; font-size: 14px; line-height: 1.5">The skeleton has the same shape as the docket, so nothing jumps when cases arrive. The line rotates: "Reviewing testimonies…", "Counting votes…".</p>
+      </section>
+
+      <section aria-labelledby="s2" style="padding: 0 24px; border-left: 1px solid #D5CBB8; display: flex; flex-direction: column; gap: 14px">
+        <h2 id="s2" style="margin: 0; font-family: 'Fraunces', serif; font-size: 24px">2 · Running a hearing (minutes)</h2>
+        <div style="background: #14110D; color: #F3EEE4; padding: 22px; display: flex; flex-direction: column; gap: 16px">
+          <span style="display: flex; gap: 10px; align-items: center; font-size: 12px; letter-spacing: 0.14em; font-weight: 700; color: #FF8A62"><span class="pulse" style="width: 10px; height: 10px; border-radius: 999px; background: #FF5A4E"></span>IN SESSION</span>
+          <b style="font-family: 'Fraunces', serif; font-size: 28px; line-height: 1.1">Questioning the Sales Agent</b>
+          <ol style="margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 10px; font-size: 15px">
+            <li style="display: flex; gap: 10px"><span style="color: #7FE0C4; width: 18px">✓</span>18 ruled cases collected</li>
+            <li style="display: flex; gap: 10px"><span style="color: #7FE0C4; width: 18px">✓</span>Hearing started in Fabric</li>
+            <li style="display: flex; gap: 10px; font-weight: 700"><span class="pulse" style="color: #FF8A62; width: 18px">●</span>Asking question 7 of 18</li>
+            <li style="display: flex; gap: 10px; color: #A79E8E"><span style="width: 18px">○</span>The judge rules</li>
+          </ol>
+          <div role="progressbar" aria-valuenow="39" aria-valuemin="0" aria-valuemax="100" aria-label="Hearing progress" style="height: 8px; background: #3A332A"><div style="width: 39%; height: 100%; background: #FF8A62"></div></div>
+          <span style="font-size: 14px; color: #CFC6B5; line-height: 1.5">About 1 minute per question, around 10 minutes left. You can leave: the hearing keeps going and you'll find it in Hearings.</span>
+          <a href="live-hearing.html" style="align-self: flex-start; min-height: 44px; display: flex; align-items: center; color: #FFB59A; font-weight: 700">Watch it live →</a>
+        </div>
+      </section>
+
+      <section aria-labelledby="s3" style="padding-left: 24px; border-left: 1px solid #D5CBB8; display: flex; flex-direction: column; gap: 14px">
+        <h2 id="s3" style="margin: 0; font-family: 'Fraunces', serif; font-size: 24px">3 · When something fails</h2>
+        <div role="alert" style="border: 2px solid #C8502B; background: #FFF4EC; padding: 22px; display: flex; flex-direction: column; gap: 12px">
+          <b style="font-family: 'Fraunces', serif; font-weight: 900; font-size: 40px; line-height: 1; color: #8A3414">Objection!</b>
+          <p style="margin: 0; color: #5C3A2C; line-height: 1.5">We couldn't reach the court records. <b>Your cases are safe</b>: this is a connection problem with Fabric, not with your data.</p>
+          <details style="color: #5C3A2C; font-size: 14px"><summary style="cursor: pointer; min-height: 32px; display: flex; align-items: center; font-weight: 600">Technical details</summary><span style="font-family: 'JetBrains Mono', monospace; font-size: 13px">Data request failed · 503 · retried twice</span></details>
+          <div style="display: flex; gap: 10px; flex-wrap: wrap">
+            <button type="button" style="min-height: 44px; padding: 0 20px; border: 0; background: #14110D; color: #F3EEE4; font: 700 15px Inter, sans-serif; box-shadow: 4px 4px 0 #C8502B">Try again</button>
+            <button type="button" style="min-height: 44px; padding: 0 18px; border: 2px solid #14110D; background: transparent; color: #14110D; font: 700 15px Inter, sans-serif">Copy details</button>
+          </div>
+        </div>
+        <p style="margin: 0; color: #4A4235; font-size: 14px; line-height: 1.5">Never replaced with sample data. Sample data appears only in demo mode, always with a band on top that says so.</p>
+      </section>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":900}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {};
+  }
+}
+</script>
+</body>
+</html>

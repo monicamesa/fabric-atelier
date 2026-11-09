@@ -35,7 +35,7 @@ See [docs/conventions.md](docs/conventions.md) for the rules shared by all apps.
    git config core.hooksPath .githooks
    ```
 
-The pre-commit hook blocks any added line that contains a value from `.private/values.env`, a GUID that is not on its allowlist, an email that is not a noreply or `example` address, a deployed Fabric Apps URL, a Fabric portal workspace link or a Windows user path. If `.private/values.env` is missing, it warns and runs only the generic checks.
+The pre-commit hook blocks any added line that contains a value from `.private/values.env`, a GUID that is not on its allowlist, an email that is not a noreply or `example` address (`example.com`, `example.org`, `example.net` or any `*.example` domain), a deployed Fabric Apps URL, a Fabric portal workspace link or a Windows user path. If `.private/values.env` is missing, it warns and runs only the generic checks.
 
 ## Working on an app
 

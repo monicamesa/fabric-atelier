@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Agent Jury – Intro (Docket)</title>
+
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,700;9..144,900&amp;family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@500&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#F3EEE4}
+a{color:#0F6E5C}
+a:focus-visible,button:focus-visible{outline:3px solid #0F6E5C;outline-offset:3px}
+@keyframes strike{0%,58%,100%{transform:rotate(0deg)}70%{transform:rotate(-34deg)}80%{transform:rotate(9deg)}88%{transform:rotate(0deg)}}
+@keyframes press{from{opacity:0;transform:translateY(24px) scale(.98)}to{opacity:1;transform:none}}
+@keyframes underline{from{background-size:0 16px}to{background-size:100% 16px}}
+.gavel-head{transform-origin:52px 52px;animation:strike 2.8s ease-in-out infinite}
+.press{animation:press .55s cubic-bezier(.2,.8,.2,1) both}
+.hl{background-image:linear-gradient(#FF8A62,#FF8A62);background-repeat:no-repeat;background-position:0 88%;background-size:100% 16px;animation:underline 1s .35s ease-out both}
+@media (prefers-reduced-motion:reduce){.gavel-head,.press,.hl{animation:none}}
+</style>
+</helmet>
+<div style="min-height: 100vh; background: #F3EEE4; color: #14110D; font-family: Inter, system-ui, sans-serif; display: flex; flex-direction: column">
+
+  <div style="display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 16px 28px; border-bottom: 1px solid #14110D">
+    <span style="font-family: 'Fraunces', serif; font-weight: 900; font-size: 22px">Agent Jury</span>
+    <span style="font-family: 'JetBrains Mono', monospace; font-size: 13px; color: #4A4235">Special edition · {{ pageLabel }}</span>
+    <div style="display: flex; gap: 8px; align-items: center">
+      <div role="group" aria-label="Language" style="display: flex; border: 1px solid #14110D"><button type="button" aria-pressed="true" style="min-width: 44px; min-height: 36px; border: 0; background: #14110D; color: #F3EEE4; font: 700 13px Inter, sans-serif">EN</button><button type="button" aria-pressed="false" style="min-width: 44px; min-height: 36px; border: 0; background: transparent; color: #14110D; font: 700 13px Inter, sans-serif">ES</button></div>
+      <a href="home.html" style="min-height: 40px; padding: 0 14px; display: flex; align-items: center; font-weight: 700; color: #14110D">Skip intro</a>
+    </div>
+  </div>
+
+  <main style="flex: 1; display: grid; grid-template-columns: 260px minmax(0, 1fr); gap: 56px; align-items: center; max-width: 1240px; width: 100%; margin: 0 auto; padding: 32px 28px; box-sizing: border-box">
+
+    <div style="display: flex; flex-direction: column; align-items: center; gap: 18px">
+      <svg width="220" height="220" viewBox="0 0 64 64" fill="none" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="A gavel striking its block"><g class="gavel-head" stroke="#14110D" stroke-width="2.2"><rect x="9" y="15" width="26" height="13" rx="3" transform="rotate(-45 22 21.5)"></rect><line x1="27" y1="27" x2="52" y2="52"></line></g><rect x="6" y="52" width="28" height="6" rx="2" stroke="#C8502B" stroke-width="2.2"></rect></svg>
+      <ol aria-label="Intro steps" style="margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 8px; width: 100%; font-size: 14px">
+        <li style="{{ st0 }}">1 · Court is in session</li>
+        <li style="{{ st1 }}">2 · The judge</li>
+        <li style="{{ st2 }}">3 · The jury</li>
+      </ol>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 26px; border-left: 6px double #14110D; padding-left: 48px">
+      <sc-if value="{{ s0 }}" hint-placeholder-val="{{ true }}">
+        <div class="press" style="display: flex; flex-direction: column; gap: 18px">
+          <span style="font-size: 14px; letter-spacing: 0.16em; text-transform: uppercase; color: #A8401F; font-weight: 700">All rise</span>
+          <h1 style="margin: 0; font-family: 'Fraunces', serif; font-weight: 900; font-size: 112px; line-height: 0.9; letter-spacing: -0.045em">Court is in <span class="hl">session</span></h1>
+          <p style="margin: 0; font-family: 'Fraunces', serif; font-size: 26px; line-height: 1.4; max-width: 680px; color: #2E2820">Your Data Agents answer business questions all day. But who checks that the answers are right?</p>
+        </div>
+      </sc-if>
+      <sc-if value="{{ s1 }}" hint-placeholder-val="{{ false }}">
+        <div class="press" style="display: flex; flex-direction: column; gap: 18px">
+          <span style="font-size: 14px; letter-spacing: 0.16em; text-transform: uppercase; color: #A8401F; font-weight: 700">The judge</span>
+          <h1 style="margin: 0; font-family: 'Fraunces', serif; font-weight: 900; font-size: 96px; line-height: 0.92; letter-spacing: -0.04em">The judge is <span class="hl">an AI</span></h1>
+          <p style="margin: 0; font-family: 'Fraunces', serif; font-size: 26px; line-height: 1.4; max-width: 680px; color: #2E2820">Fabric compares each answer from your agent with the expected one, and rules: correct or not. Fast, tireless, and sometimes wrong.</p>
+        </div>
+      </sc-if>
+      <sc-if value="{{ s2 }}" hint-placeholder-val="{{ false }}">
+        <div class="press" style="display: flex; flex-direction: column; gap: 18px">
+          <span style="font-size: 14px; letter-spacing: 0.16em; text-transform: uppercase; color: #A8401F; font-weight: 700">The jury</span>
+          <h1 style="margin: 0; font-family: 'Fraunces', serif; font-weight: 900; font-size: 96px; line-height: 0.92; letter-spacing: -0.04em">You are <span class="hl">the jury</span></h1>
+          <p style="margin: 0; font-family: 'Fraunces', serif; font-size: 26px; line-height: 1.4; max-width: 680px; color: #2E2820">Business experts agree on the right answers, settle disputes about definitions, and appeal when the judge gets it wrong.</p>
+        </div>
+      </sc-if>
+
+      <div style="display: flex; gap: 12px; flex-wrap: wrap; align-items: center">
+        <sc-if value="{{ showBack }}" hint-placeholder-val="{{ false }}">
+          <button type="button" onClick="{{ back }}" style="min-height: 54px; padding: 0 24px; border: 2px solid #14110D; background: transparent; color: #14110D; font: 700 16px Inter, sans-serif">Back</button>
+        </sc-if>
+        <sc-if value="{{ showNext }}" hint-placeholder-val="{{ true }}">
+          <button type="button" onClick="{{ next }}" style="min-height: 54px; padding: 0 30px; border: 0; background: #14110D; color: #F3EEE4; font: 700 16px Inter, sans-serif; box-shadow: 5px 5px 0 #C8502B">{{ nextLabel }} →</button>
+        </sc-if>
+        <sc-if value="{{ showEnter }}" hint-placeholder-val="{{ false }}">
+          <a href="home.html" style="min-height: 54px; padding: 0 30px; background: #14110D; color: #F3EEE4; font-weight: 700; font-size: 16px; display: flex; align-items: center; text-decoration: none; box-shadow: 5px 5px 0 #C8502B">Enter the courtroom →</a>
+        </sc-if>
+      </div>
+    </div>
+  </main>
+
+  <p style="margin: 0; padding: 14px 28px; border-top: 1px solid #14110D; font-size: 14px; color: #4A4235; text-align: center">Shown once. You can replay it any time from How it works.</p>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":900}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { step: 0 };
+  }
+  renderVals() {
+    const step = this.state.step;
+    const st = (i) => i === step
+      ? 'padding:8px 12px;background:#14110D;color:#F3EEE4;font-weight:700'
+      : (i < step ? 'padding:8px 12px;color:#4A4235;text-decoration:line-through' : 'padding:8px 12px;color:#4A4235;border:1px solid #D5CBB8');
+    return {
+      s0: step === 0, s1: step === 1, s2: step === 2,
+      st0: st(0), st1: st(1), st2: st(2),
+      pageLabel: 'Page ' + (step + 1) + ' of 3',
+      showBack: step > 0,
+      showNext: step < 2,
+      showEnter: step === 2,
+      nextLabel: step === 0 ? 'Begin' : 'Next',
+      next: () => this.setState({ step: Math.min(2, step + 1) }),
+      back: () => this.setState({ step: Math.max(0, step - 1) })
+    };
+  }
+}
+</script>
+</body>
+</html>

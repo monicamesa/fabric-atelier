@@ -185,7 +185,11 @@ These rules come from [docs/especificacion-general.md](docs/especificacion-gener
 
 24. Show useful empty and error states. Never replace a failed query with mock or simulated data.
 25. Before launching a hearing, show a cost estimate (about 50 seconds of agent time per case plus the judge's LLM usage) and allow evaluating a subset of cases.
+26. All screens follow [docs/design/design-guide.md](docs/design/design-guide.md) ("The Docket"). Where it conflicts with the template's [app-design](.agents/skills/app-design/SKILL.md) skill, the guide wins.
+27. Use `docs/design/mockups/*.html` as visual reference only. Ignore any `{{ }}` placeholders and the `<x-dc>`, `<sc-if>` and `<helmet>` tags: they come from the mockup tool and must not be copied into the app. The Google Fonts links in the mockups are not used either (see rule 28).
+28. Use only the design tokens in `src/styles/docket-tokens.css` (light on `:root`, dark on `[data-theme="dark"]`), never raw hex values. Fonts come bundled from `@fontsource` (Fraunces, Inter, JetBrains Mono); never load Google Fonts at runtime.
+29. Sample names, emails and numbers in the mockups are illustrative only. Never copy them into the app or into test fixtures as if they were real.
 
 ### Privacy
 
-26. Read private values (tenant, workspace, item and capacity IDs, emails, app URLs, the Windows user path) from `.private/values.env` at the repository root. Never write them into tracked files: refer to them by key name, for example `<TENANT_ID>`. The pre-commit hook in `.githooks/` blocks them.
+30. Read private values (tenant, workspace, item and capacity IDs, emails, app URLs, the Windows user path) from `.private/values.env` at the repository root. Never write them into tracked files: refer to them by key name, for example `<TENANT_ID>`. The pre-commit hook in `.githooks/` blocks them.

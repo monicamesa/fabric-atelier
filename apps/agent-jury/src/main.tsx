@@ -20,7 +20,12 @@ import { bootstrapLanguage } from './services/language.service';
 import { AuthGate } from './components/auth-gate.component';
 import { initI18n } from './i18n/i18n';
 
+// Bundled fonts (design guide, section 3); no runtime requests to Google Fonts.
+import '@fontsource-variable/fraunces/opsz.css';
+import '@fontsource-variable/inter';
+import '@fontsource/jetbrains-mono/500.css';
 import "./global.css"
+import "./styles/docket-tokens.css"
 
 initI18n();
 const rayfinAuthService: IAuthService = bootstrapAuth();

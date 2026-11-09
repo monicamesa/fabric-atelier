@@ -53,7 +53,8 @@ hits=$(git diff --cached -U0 --no-color --no-ext-diff --diff-filter=ACMR |
       s = t
       while (match(s, /[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z][a-z]+/)) {
         e = substr(s, RSTART, RLENGTH)
-        if (e !~ /@users\.noreply\.github\.com$/ && e !~ /@example\.(com|org|net)$/) report("email address")
+        # example.com/org/net and the .example top-level domain are reserved for samples (RFC 2606).
+        if (e !~ /@users\.noreply\.github\.com$/ && e !~ /@example\.(com|org|net)$/ && e !~ /\.example$/) report("email address")
         s = substr(s, RSTART + RLENGTH)
       }
 

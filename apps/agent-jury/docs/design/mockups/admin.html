@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Agent Jury – Administration (Docket)</title>
+
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,700;9..144,900&amp;family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@500&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#F3EEE4}
+a{color:#0F6E5C}
+a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid #0F6E5C;outline-offset:3px}
+.nav a{color:#14110D;text-decoration:none;padding:6px 0;border-bottom:2px solid transparent}
+.nav a:hover{border-bottom-color:#14110D}
+th,td{padding:12px 14px;text-align:left;border-top:1px solid #D5CBB8;vertical-align:middle}
+tbody tr:hover{background:#EBE4D6}
+</style>
+</helmet>
+<div style="min-height: 100vh; background: #F3EEE4; color: #14110D; font-family: Inter, system-ui, sans-serif; font-size: 16px">
+
+  <header style="max-width: 1360px; margin: 0 auto; padding: 14px 24px 0">
+    <div style="display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; border-bottom: 1px solid #14110D; padding-bottom: 10px">
+      <span style="font-family: 'Fraunces', serif; font-weight: 900; font-size: 22px">Agent Jury</span>
+      <nav class="nav" aria-label="Main" style="display: flex; gap: 26px; font-size: 15px; font-weight: 600">
+        <a href="#">Home</a><a href="#">Cases</a><a href="#">Hearings</a><a href="#">Case law</a><a href="#">How it works</a><a href="#" aria-current="page" style="border-bottom-color: #C8502B">Admin</a>
+      </nav>
+      <div style="display: flex; gap: 8px; align-items: center">
+        <div role="group" aria-label="Language" style="display: flex; border: 1px solid #14110D"><button type="button" aria-pressed="true" style="min-width: 44px; min-height: 36px; border: 0; background: #14110D; color: #F3EEE4; font: 700 13px Inter, sans-serif">EN</button><button type="button" aria-pressed="false" style="min-width: 44px; min-height: 36px; border: 0; background: transparent; color: #14110D; font: 700 13px Inter, sans-serif">ES</button></div>
+        <button type="button" aria-label="Switch to dark mode" style="min-width: 40px; min-height: 38px; border: 1px solid #14110D; background: transparent; font-size: 16px">☾</button>
+      </div>
+    </div>
+  </header>
+
+  <main style="max-width: 1360px; margin: 0 auto; padding: 22px 24px 32px; display: flex; flex-direction: column; gap: 22px">
+
+    <div style="display: grid; grid-template-columns: minmax(0, 1fr) 380px; gap: 40px; align-items: end; border-bottom: 6px double #14110D; padding-bottom: 20px">
+      <div style="display: flex; flex-direction: column; gap: 8px">
+        <span style="font-size: 13px; letter-spacing: 0.14em; text-transform: uppercase; color: #A8401F; font-weight: 700">Only visible to admins</span>
+        <h1 style="margin: 0; font-family: 'Fraunces', serif; font-weight: 900; font-size: 64px; line-height: 0.95; letter-spacing: -0.03em">Clerk's office</h1>
+        <p style="margin: 0; max-width: 700px; color: #2E2820; font-size: 17px; line-height: 1.5">Decide who sits on the jury and which agents stand trial. Every change is checked on the server and written to the admin log.</p>
+      </div>
+      <div style="background: #FFFDF8; border: 1px solid #14110D; padding: 14px 16px; display: flex; gap: 12px; align-items: flex-start">
+        <span aria-hidden="true" style="font-size: 20px; line-height: 1">🔒</span>
+        <span style="font-size: 14px; line-height: 1.5; color: #2E2820"><b>How this is protected.</b> The app checks that you are an active admin before saving anything. If it can't confirm it, nothing changes.</span>
+      </div>
+    </div>
+
+    <div role="tablist" aria-label="Admin sections" style="display: flex; gap: 0; border-bottom: 1px solid #14110D">
+      <button type="button" role="tab" aria-selected="true" style="min-height: 46px; padding: 0 20px; border: 0; border-bottom: 3px solid #C8502B; background: transparent; font: 700 16px Inter, sans-serif; color: #14110D">Jurors · 6</button>
+      <button type="button" role="tab" aria-selected="false" style="min-height: 46px; padding: 0 20px; border: 0; background: transparent; font: 600 16px Inter, sans-serif; color: #4A4235">Agents · 2</button>
+      <button type="button" role="tab" aria-selected="false" style="min-height: 46px; padding: 0 20px; border: 0; background: transparent; font: 600 16px Inter, sans-serif; color: #4A4235">Admin log</button>
+    </div>
+
+    <div style="display: grid; grid-template-columns: minmax(0, 1fr) 380px; gap: 40px; align-items: start">
+
+      <section aria-labelledby="jt" style="display: flex; flex-direction: column; gap: 12px">
+        <div style="display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap">
+          <h2 id="jt" style="margin: 0; font-family: 'Fraunces', serif; font-size: 28px">The jury</h2>
+          <div role="group" aria-label="Filter" style="display: flex; border: 1px solid #14110D; padding: 3px; gap: 4px">
+            <button type="button" aria-pressed="true" style="min-height: 34px; padding: 0 14px; border: 0; background: #14110D; color: #F3EEE4; font: 600 14px Inter, sans-serif">Active · 5</button>
+            <button type="button" aria-pressed="false" style="min-height: 34px; padding: 0 14px; border: 0; background: transparent; color: #14110D; font: 600 14px Inter, sans-serif">Inactive · 1</button>
+          </div>
+        </div>
+        <table style="border-collapse: collapse; width: 100%; background: #FFFDF8; border: 1px solid #14110D; font-size: 15px">
+          <thead><tr style="font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase"><th scope="col" style="border-top: 0">Juror</th><th scope="col" style="border-top: 0">Team</th><th scope="col" style="border-top: 0">Role</th><th scope="col" style="border-top: 0">Activity</th><th scope="col" style="border-top: 0"><span style="position: absolute; left: -9999px">Actions</span></th></tr></thead>
+          <tbody>
+            <tr>
+              <td><div style="display: flex; gap: 12px; align-items: center"><span aria-hidden="true" style="width: 36px; height: 36px; border-radius: 999px; background: #C8502B; color: #FFFFFF; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 13px">JR</span><span style="display: flex; flex-direction: column"><b>Jordan R. (you)</b><span style="font-family: 'JetBrains Mono', monospace; font-size: 13px; color: #4A4235">jordan@contoso.example</span></span></div></td>
+              <td>Data team</td>
+              <td><span style="background: #14110D; color: #F3EEE4; font-size: 12px; font-weight: 700; letter-spacing: 0.08em; padding: 4px 8px">ADMIN</span></td>
+              <td style="color: #4A4235">12 votes</td>
+              <td style="text-align: right; color: #4A4235; font-size: 13px">You can't remove yourself</td>
+            </tr>
+            <tr>
+              <td><div style="display: flex; gap: 12px; align-items: center"><span aria-hidden="true" style="width: 36px; height: 36px; border-radius: 999px; background: #0F6E5C; color: #FFFFFF; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 13px">PN</span><span style="display: flex; flex-direction: column"><b>Priya N.</b><span style="font-family: 'JetBrains Mono', monospace; font-size: 13px; color: #4A4235">priya@contoso.example</span></span></div></td>
+              <td>Finance</td>
+              <td><span style="border: 1px solid #14110D; font-size: 12px; font-weight: 700; letter-spacing: 0.08em; padding: 3px 8px">JUROR</span></td>
+              <td style="color: #4A4235">7 answers · 1 appeal</td>
+              <td style="text-align: right"><button type="button" style="min-height: 36px; padding: 0 12px; border: 1px solid #14110D; background: transparent; font: 600 14px Inter, sans-serif">Make admin</button> <button type="button" style="min-height: 36px; padding: 0 12px; border: 0; background: transparent; color: #A8401F; font: 700 14px Inter, sans-serif">Deactivate</button></td>
+            </tr>
+            <tr>
+              <td><div style="display: flex; gap: 12px; align-items: center"><span aria-hidden="true" style="width: 36px; height: 36px; border-radius: 999px; background: #3D5A7A; color: #FFFFFF; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 13px">DL</span><span style="display: flex; flex-direction: column"><b>Diego L.</b><span style="font-family: 'JetBrains Mono', monospace; font-size: 13px; color: #4A4235">diego@contoso.example</span></span></div></td>
+              <td>Sales</td>
+              <td><span style="border: 1px solid #14110D; font-size: 12px; font-weight: 700; letter-spacing: 0.08em; padding: 3px 8px">JUROR</span></td>
+              <td style="color: #4A4235">5 answers</td>
+              <td style="text-align: right"><button type="button" style="min-height: 36px; padding: 0 12px; border: 1px solid #14110D; background: transparent; font: 600 14px Inter, sans-serif">Make admin</button> <button type="button" style="min-height: 36px; padding: 0 12px; border: 0; background: transparent; color: #A8401F; font: 700 14px Inter, sans-serif">Deactivate</button></td>
+            </tr>
+            <tr>
+              <td><div style="display: flex; gap: 12px; align-items: center"><span aria-hidden="true" style="width: 36px; height: 36px; border-radius: 999px; border: 2px dashed #8C8273; color: #4A4235; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 13px">AM</span><span style="display: flex; flex-direction: column"><b>Ana M.</b><span style="font-family: 'JetBrains Mono', monospace; font-size: 13px; color: #4A4235">ana@contoso.example</span></span></div></td>
+              <td>Marketing</td>
+              <td><span style="border: 1px solid #14110D; font-size: 12px; font-weight: 700; letter-spacing: 0.08em; padding: 3px 8px">JUROR</span></td>
+              <td style="color: #A8401F; font-weight: 600">Hasn't signed in yet</td>
+              <td style="text-align: right"><button type="button" style="min-height: 36px; padding: 0 12px; border: 1px solid #14110D; background: transparent; font: 600 14px Inter, sans-serif">Copy invite link</button></td>
+            </tr>
+          </tbody>
+        </table>
+        <p style="margin: 0; font-size: 14px; color: #4A4235; line-height: 1.5">Deactivating keeps everything a juror said in the court record; they just can't vote or propose any more. Nobody is ever deleted.</p>
+      </section>
+
+      <aside style="display: flex; flex-direction: column; gap: 22px">
+        <section aria-labelledby="add" style="background: #FFFDF8; border: 1px solid #14110D; padding: 20px; display: flex; flex-direction: column; gap: 14px">
+          <h2 id="add" style="margin: 0; font-family: 'Fraunces', serif; font-size: 24px">Swear in a juror</h2>
+          <label style="display: flex; flex-direction: column; gap: 6px; font-size: 14px; font-weight: 600">Work email<input type="email" value="lucia@contoso.example" style="min-height: 44px; border: 1px solid #14110D; background: #FFFFFF; padding: 0 12px; font: 15px Inter, sans-serif"><span style="font-weight: 400; color: #4A4235">Must be the email they use to sign in to Fabric.</span></label>
+          <label style="display: flex; flex-direction: column; gap: 6px; font-size: 14px; font-weight: 600">Display name<input type="text" value="Lucía G." style="min-height: 44px; border: 1px solid #14110D; background: #FFFFFF; padding: 0 12px; font: 15px Inter, sans-serif"></label>
+          <label style="display: flex; flex-direction: column; gap: 6px; font-size: 14px; font-weight: 600">Team<input type="text" value="Operations" style="min-height: 44px; border: 1px solid #14110D; background: #FFFFFF; padding: 0 12px; font: 15px Inter, sans-serif"></label>
+          <fieldset style="margin: 0; padding: 0; border: 0; display: flex; flex-direction: column; gap: 8px; font-size: 14px">
+            <legend style="font-weight: 600; margin-bottom: 6px">Role</legend>
+            <label style="display: flex; gap: 10px; align-items: flex-start"><input type="radio" name="role" checked style="margin-top: 3px"><span><b>Juror</b> · proposes answers, votes and appeals</span></label>
+            <label style="display: flex; gap: 10px; align-items: flex-start"><input type="radio" name="role" style="margin-top: 3px"><span><b>Admin</b> · also manages jurors and agents</span></label>
+          </fieldset>
+          <button type="button" style="min-height: 50px; border: 0; background: #14110D; color: #F3EEE4; font: 700 16px Inter, sans-serif; box-shadow: 5px 5px 0 #C8502B">Add to the jury</button>
+        </section>
+
+        <section aria-labelledby="log" style="display: flex; flex-direction: column; gap: 8px">
+          <h2 id="log" style="margin: 0; font-family: 'Fraunces', serif; font-size: 22px; border-bottom: 1px solid #14110D; padding-bottom: 8px">Latest admin changes</h2>
+          <ol style="margin: 0; padding: 0; list-style: none">
+            <li style="display: grid; grid-template-columns: 76px minmax(0, 1fr); gap: 10px; padding: 9px 0; border-bottom: 1px solid #D5CBB8; font-size: 14px"><span style="font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #4A4235">Today</span><span>Jordan R. added <b>Ana M.</b> as juror</span></li>
+            <li style="display: grid; grid-template-columns: 76px minmax(0, 1fr); gap: 10px; padding: 9px 0; border-bottom: 1px solid #D5CBB8; font-size: 14px"><span style="font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #4A4235">Mon</span><span>Jordan R. added agent <b>Finance Agent</b></span></li>
+            <li style="display: grid; grid-template-columns: 76px minmax(0, 1fr); gap: 10px; padding: 9px 0; font-size: 14px"><span style="font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #A8401F">Mon</span><span style="color: #A8401F"><b>Rejected:</b> a non-admin tried to add a juror</span></li>
+          </ol>
+          <a href="#" style="font-size: 14px; font-weight: 700; min-height: 36px; display: flex; align-items: center">Open the full admin log →</a>
+        </section>
+      </aside>
+    </div>
+
+    <section aria-labelledby="ag" style="display: flex; flex-direction: column; gap: 10px; border-top: 6px double #14110D; padding-top: 18px">
+      <div style="display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap">
+        <h2 id="ag" style="margin: 0; font-family: 'Fraunces', serif; font-size: 28px">Agents on trial <span style="font-family: Inter, sans-serif; font-size: 14px; font-weight: 400; color: #4A4235">· preview of the Agents tab</span></h2>
+        <a href="#" style="min-height: 44px; padding: 0 18px; display: flex; align-items: center; border: 2px solid #14110D; color: #14110D; font-weight: 700; text-decoration: none">+ Register an agent</a>
+      </div>
+      <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px">
+        <article style="background: #FFFDF8; border: 1px solid #14110D; padding: 16px; display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 6px 16px; align-items: center">
+          <b style="font-family: 'Fraunces', serif; font-size: 20px">Sales Agent</b><span style="background: #0F6E5C; color: #FFFFFF; font-size: 12px; font-weight: 700; letter-spacing: 0.08em; padding: 4px 8px">ACTIVE</span>
+          <span style="font-family: 'JetBrains Mono', monospace; font-size: 13px; color: #4A4235">Workspace Sales Analytics · Data Agent</span><button type="button" style="min-height: 36px; padding: 0 12px; border: 0; background: transparent; color: #A8401F; font: 700 14px Inter, sans-serif">Retire</button>
+          <span style="font-size: 14px; color: #4A4235">18 cases · last hearing today</span>
+        </article>
+        <article style="background: #FFFDF8; border: 1px solid #14110D; padding: 16px; display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 6px 16px; align-items: center">
+          <b style="font-family: 'Fraunces', serif; font-size: 20px">Finance Agent</b><span style="background: #0F6E5C; color: #FFFFFF; font-size: 12px; font-weight: 700; letter-spacing: 0.08em; padding: 4px 8px">ACTIVE</span>
+          <span style="font-family: 'JetBrains Mono', monospace; font-size: 13px; color: #4A4235">Workspace Sales Analytics · Data Agent</span><button type="button" style="min-height: 36px; padding: 0 12px; border: 0; background: transparent; color: #A8401F; font: 700 14px Inter, sans-serif">Retire</button>
+          <span style="font-size: 14px; color: #4A4235">14 cases · last hearing 2 days ago</span>
+        </article>
+      </div>
+    </section>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1240}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {};
+  }
+}
+</script>
+</body>
+</html>

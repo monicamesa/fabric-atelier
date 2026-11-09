@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Agent Jury – Live hearing (Docket)</title>
+
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,700;9..144,900&amp;family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@500&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#14110D}
+a{color:#7FE0C4}
+a:focus-visible,button:focus-visible{outline:3px solid #7FE0C4;outline-offset:3px}
+@keyframes stamp{0%,40%{opacity:0;transform:rotate(-10deg) scale(2.2)}52%{opacity:1;transform:rotate(-10deg) scale(.94)}60%,100%{opacity:1;transform:rotate(-10deg) scale(1)}}
+@keyframes pulse{0%,100%{opacity:.35}50%{opacity:1}}
+.stamp{animation:stamp 4s ease-out infinite}
+.pulse{animation:pulse 1.2s ease-in-out infinite}
+@media (prefers-reduced-motion:reduce){.stamp,.pulse{animation:none}}
+</style>
+</helmet>
+<div style="min-height: 100vh; background: #14110D; color: #F3EEE4; font-family: Inter, system-ui, sans-serif; font-size: 16px">
+
+  <header style="border-bottom: 1px solid #3A332A">
+    <div style="max-width: 1360px; margin: 0 auto; padding: 14px 24px; display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap">
+      <a href="home.html" style="font-size: 14px; font-weight: 600; color: #F3EEE4">← Leave (the hearing keeps going)</a>
+      <span style="display: flex; gap: 10px; align-items: center; font-size: 13px; font-weight: 700; letter-spacing: 0.14em; color: #FF8A62"><span class="pulse" style="width: 10px; height: 10px; border-radius: 999px; background: #FF5A4E"></span>LIVE FROM THE COURTROOM</span>
+      <span style="font-family: 'JetBrains Mono', monospace; font-size: 13px; color: #BDB3A2">Production agent · started 5 min ago</span>
+    </div>
+  </header>
+
+  <main style="max-width: 1360px; margin: 0 auto; padding: 24px; display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 40px; align-items: start">
+
+    <div style="display: flex; flex-direction: column; gap: 24px">
+      <div style="display: flex; flex-direction: column; gap: 8px; border-bottom: 6px double #3A332A; padding-bottom: 18px">
+        <span style="font-family: 'JetBrains Mono', monospace; font-size: 14px; color: #BDB3A2">Sales Agent on the stand · question 7 of 18 · case #012</span>
+        <h1 style="margin: 0; font-family: 'Fraunces', serif; font-weight: 900; font-size: 56px; line-height: 1; letter-spacing: -0.03em">What was the best-selling product in 2025?</h1>
+      </div>
+
+      <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0; border: 1px solid #3A332A">
+        <div style="padding: 20px; display: flex; flex-direction: column; gap: 8px">
+          <span style="font-size: 12px; font-weight: 700; letter-spacing: 0.14em; color: #BDB3A2">THE JURY EXPECTS</span>
+          <span style="font-family: 'Fraunces', serif; font-size: 26px; line-height: 1.2">Mountain-200 Black, 42</span>
+          <span style="font-size: 14px; color: #A79E8E">Case law · ruled by 3 jurors</span>
+        </div>
+        <div style="padding: 20px; border-left: 1px solid #3A332A; display: flex; flex-direction: column; gap: 8px">
+          <span style="font-size: 12px; font-weight: 700; letter-spacing: 0.14em; color: #BDB3A2">THE AGENT ANSWERED</span>
+          <span style="font-family: 'Fraunces', serif; font-size: 26px; line-height: 1.2">"The best seller was Mountain-200 Black (size 42), with 3,412 units."</span>
+          <span style="font-family: 'JetBrains Mono', monospace; font-size: 13px; color: #A79E8E">Query: DAX · 1.8 s</span>
+        </div>
+      </div>
+
+      <div style="display: flex; gap: 24px; align-items: center; justify-content: space-between; flex-wrap: wrap">
+        <div style="display: flex; gap: 18px; align-items: center">
+          <span style="font-size: 12px; font-weight: 700; letter-spacing: 0.14em; color: #BDB3A2">THE AI JUDGE RULES</span>
+          <div class="stamp" style="border: 4px solid #7FE0C4; color: #7FE0C4; padding: 6px 18px; font-family: 'Fraunces', serif; font-weight: 900; font-size: 32px; letter-spacing: 0.06em">CORRECT</div>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 8px; align-items: flex-end">
+          <span style="font-size: 14px; color: #CFC6B5">Do you agree with the judge?</span>
+          <div style="display: flex; gap: 10px">
+            <button type="button" style="min-height: 50px; padding: 0 20px; border: 2px solid #F3EEE4; background: transparent; color: #F3EEE4; font: 700 15px Inter, sans-serif; display: flex; gap: 10px; align-items: center">Yes, agree <kbd style="font-family: 'JetBrains Mono', monospace; font-size: 12px; border: 1px solid #A79E8E; padding: 2px 6px">A</kbd></button>
+            <button type="button" style="min-height: 50px; padding: 0 20px; border: 0; background: #FF8A62; color: #14110D; font: 700 15px Inter, sans-serif; display: flex; gap: 10px; align-items: center">No, appeal <kbd style="font-family: 'JetBrains Mono', monospace; font-size: 12px; border: 1px solid #14110D; padding: 2px 6px">X</kbd></button>
+          </div>
+        </div>
+      </div>
+
+      <section aria-labelledby="tr" style="display: flex; flex-direction: column; gap: 0">
+        <h2 id="tr" style="margin: 0 0 8px; font-family: 'Fraunces', serif; font-size: 24px">Transcript so far</h2>
+        <ol style="margin: 0; padding: 0; list-style: none; border-top: 1px solid #3A332A">
+          <li style="display: grid; grid-template-columns: 52px minmax(0, 1fr) auto; gap: 14px; align-items: center; padding: 12px 0; border-bottom: 1px solid #3A332A"><span style="font-family: 'JetBrains Mono', monospace; font-size: 13px; color: #A79E8E">#011</span><span>How many customers are based in Spain?</span><span style="display: flex; gap: 10px; align-items: center"><span style="color: #7FE0C4; font-weight: 700">Correct</span><span style="background: #FFD27A; color: #14110D; font-size: 12px; font-weight: 700; letter-spacing: 0.08em; padding: 3px 8px">APPEALED BY PRIYA N.</span></span></li>
+          <li style="display: grid; grid-template-columns: 52px minmax(0, 1fr) auto; gap: 14px; align-items: center; padding: 12px 0; border-bottom: 1px solid #3A332A"><span style="font-family: 'JetBrains Mono', monospace; font-size: 13px; color: #A79E8E">#010</span><span>Average order value in September?</span><span style="color: #FF8A62; font-weight: 700">Incorrect</span></li>
+          <li style="display: grid; grid-template-columns: 52px minmax(0, 1fr) auto; gap: 14px; align-items: center; padding: 12px 0; border-bottom: 1px solid #3A332A"><span style="font-family: 'JetBrains Mono', monospace; font-size: 13px; color: #A79E8E">#009</span><span>Which region grew the most in Q3?</span><span style="color: #7FE0C4; font-weight: 700">Correct</span></li>
+        </ol>
+      </section>
+    </div>
+
+    <aside style="display: flex; flex-direction: column; gap: 22px">
+      <section aria-labelledby="sc" style="border: 1px solid #3A332A; padding: 20px; display: flex; flex-direction: column; gap: 14px">
+        <h2 id="sc" style="margin: 0; font-family: 'Fraunces', serif; font-size: 24px">Scoreboard</h2>
+        <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr))">
+          <div style="display: flex; flex-direction: column"><span style="font-family: 'Fraunces', serif; font-weight: 900; font-size: 56px; line-height: 1; color: #7FE0C4">5</span><span style="font-size: 14px; color: #BDB3A2">correct</span></div>
+          <div style="display: flex; flex-direction: column; border-left: 1px solid #3A332A; padding-left: 16px"><span style="font-family: 'Fraunces', serif; font-weight: 900; font-size: 56px; line-height: 1; color: #FF8A62">1</span><span style="font-size: 14px; color: #BDB3A2">incorrect</span></div>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 8px; border-top: 1px solid #3A332A; padding-top: 14px">
+          <span style="display: flex; justify-content: space-between; font-size: 15px"><span>Jury agrees with the judge</span><b>5 of 6</b></span>
+          <div aria-hidden="true" style="height: 8px; background: #3A332A"><div style="width: 83%; height: 100%; background: #7FE0C4"></div></div>
+          <span style="font-size: 14px; color: #A79E8E; line-height: 1.45">1 appeal: the judge accepted a wrong count for Spain.</span>
+        </div>
+      </section>
+      <section aria-labelledby="room" style="border: 1px solid #3A332A; padding: 20px; display: flex; flex-direction: column; gap: 10px">
+        <h2 id="room" style="margin: 0; font-size: 12px; font-weight: 700; letter-spacing: 0.14em; color: #BDB3A2">IN THE ROOM</h2>
+        <div style="display: flex; gap: 8px">
+          <span aria-label="Priya N." style="width: 38px; height: 38px; border-radius: 999px; background: #0F6E5C; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 13px">PN</span>
+          <span aria-label="Diego L." style="width: 38px; height: 38px; border-radius: 999px; background: #3D5A7A; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 13px">DL</span>
+          <span aria-label="Jordan R. (you)" style="width: 38px; height: 38px; border-radius: 999px; background: #FF8A62; color: #14110D; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 13px">JR</span>
+        </div>
+        <span style="font-size: 14px; color: #A79E8E">Updates every few seconds.</span>
+      </section>
+      <p style="margin: 0; font-size: 14px; color: #A79E8E; line-height: 1.7">Keyboard: <kbd style="font-family: 'JetBrains Mono', monospace; color: #F3EEE4">A</kbd> agree · <kbd style="font-family: 'JetBrains Mono', monospace; color: #F3EEE4">X</kbd> appeal · <kbd style="font-family: 'JetBrains Mono', monospace; color: #F3EEE4">J</kbd>/<kbd style="font-family: 'JetBrains Mono', monospace; color: #F3EEE4">K</kbd> previous / next · <kbd style="font-family: 'JetBrains Mono', monospace; color: #F3EEE4">?</kbd> help</p>
+    </aside>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1100}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {};
+  }
+}
+</script>
+</body>
+</html>

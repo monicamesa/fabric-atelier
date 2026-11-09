@@ -30,6 +30,25 @@
         "disputed": "Disputed",
         "dismissed": "Dismissed"
     },
+    "vocabulary": {
+        "judge": "Judge",
+        "jury": "Jury",
+        "juror": "Juror",
+        "agent": "Agent",
+        "agentOnTheStand": "Agent (on the stand)",
+        "case": "Case",
+        "answer": "Answer",
+        "testimony": "Testimony",
+        "ruling": "Ruling",
+        "ruled": "Ruled",
+        "dispute": "Dispute",
+        "disputed": "Disputed",
+        "appeal": "Appeal",
+        "caseLaw": "Case law",
+        "hearing": "Hearing",
+        "judgeTrust": "Judge trust",
+        "judgeOverruled": "Judge overruled"
+    },
     "caseValidity": {
         "unverified": "Unverified",
         "unverifiedHelp": "Written by someone who is not on the jury. It is shown but never used in a hearing."

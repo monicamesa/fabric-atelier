@@ -26,9 +26,28 @@
     },
     "caseState": {
         "under_review": "En revisión",
-        "ruled": "Aprobado",
+        "ruled": "Fallado",
         "disputed": "En disputa",
-        "dismissed": "Retirado"
+        "dismissed": "Desestimado"
+    },
+    "vocabulary": {
+        "judge": "Juez",
+        "jury": "Jurado",
+        "juror": "Jurado",
+        "agent": "Agente",
+        "agentOnTheStand": "Agente (en el estrado)",
+        "case": "Caso",
+        "answer": "Respuesta",
+        "testimony": "Testimonio",
+        "ruling": "Fallo",
+        "ruled": "Fallado",
+        "dispute": "Disputa",
+        "disputed": "En disputa",
+        "appeal": "Recurso",
+        "caseLaw": "Jurisprudencia",
+        "hearing": "Vista",
+        "judgeTrust": "Confianza en el juez",
+        "judgeOverruled": "Juez corregido"
     },
     "caseValidity": {
         "unverified": "No verificado",

@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Agent Jury – Cases (Docket)</title>
+
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,700;9..144,900&amp;family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@500&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#F3EEE4}
+a{color:#0F6E5C}
+a:focus-visible,button:focus-visible,input:focus-visible{outline:3px solid #0F6E5C;outline-offset:3px}
+.nav a{color:#14110D;text-decoration:none;padding:6px 0;border-bottom:2px solid transparent}
+.nav a:hover{border-bottom-color:#14110D}
+.clip{transition:transform .15s, box-shadow .15s}
+.clip:hover{transform:translate(-2px,-2px);box-shadow:4px 4px 0 #14110D}
+@media (prefers-reduced-motion:reduce){.clip{transition:none}.clip:hover{transform:none}}
+</style>
+</helmet>
+<div style="min-height: 100vh; background: #F3EEE4; color: #14110D; font-family: Inter, system-ui, sans-serif; font-size: 16px">
+
+  <header style="max-width: 1360px; margin: 0 auto; padding: 14px 24px 0">
+    <div style="display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; border-bottom: 1px solid #14110D; padding-bottom: 10px">
+      <span style="font-family: 'Fraunces', serif; font-weight: 900; font-size: 22px">Agent Jury</span>
+      <nav class="nav" aria-label="Main" style="display: flex; gap: 26px; font-size: 15px; font-weight: 600">
+        <a href="#">Home</a><a href="#" aria-current="page" style="border-bottom-color: #C8502B">Cases</a><a href="#">Hearings</a><a href="#">Case law</a><a href="#">How it works</a>
+      </nav>
+      <div style="display: flex; gap: 8px; align-items: center">
+        <div role="group" aria-label="Language" style="display: flex; border: 1px solid #14110D"><button type="button" aria-pressed="true" style="min-width: 44px; min-height: 36px; border: 0; background: #14110D; color: #F3EEE4; font: 700 13px Inter, sans-serif">EN</button><button type="button" aria-pressed="false" style="min-width: 44px; min-height: 36px; border: 0; background: transparent; color: #14110D; font: 700 13px Inter, sans-serif">ES</button></div>
+        <button type="button" aria-label="Switch to dark mode" style="min-width: 40px; min-height: 38px; border: 1px solid #14110D; background: transparent; font-size: 16px">☾</button>
+      </div>
+    </div>
+  </header>
+
+  <main style="max-width: 1360px; margin: 0 auto; padding: 22px 24px 32px; display: flex; flex-direction: column; gap: 18px">
+
+    <div style="display: flex; justify-content: space-between; align-items: flex-end; gap: 24px; flex-wrap: wrap">
+      <div style="display: flex; flex-direction: column; gap: 6px">
+        <span style="font-size: 13px; letter-spacing: 0.14em; text-transform: uppercase; color: #A8401F; font-weight: 700">Sales Agent · 18 cases</span>
+        <h1 style="margin: 0; font-family: 'Fraunces', serif; font-weight: 900; font-size: 64px; line-height: 0.95; letter-spacing: -0.03em">The full docket</h1>
+        <p style="margin: 0; max-width: 680px; color: #2E2820; font-size: 17px; line-height: 1.5">Every case moves left to right: the jury reviews it, settles any dispute, and rules. Ruled cases become case law, the test the agent has to pass.</p>
+      </div>
+      <a href="#" style="min-height: 52px; padding: 0 26px; display: flex; align-items: center; background: #14110D; color: #F3EEE4; font-weight: 700; text-decoration: none; box-shadow: 5px 5px 0 #C8502B">+ Propose a case</a>
+    </div>
+
+    <div style="display: flex; gap: 12px; flex-wrap: wrap; align-items: center; border-top: 6px double #14110D; border-bottom: 1px solid #14110D; padding: 12px 0">
+      <label style="display: flex; align-items: center; gap: 8px; flex: 1 1 320px; border: 1px solid #14110D; background: #FFFDF8; padding: 0 12px; min-height: 42px"><span aria-hidden="true">⌕</span><input type="search" placeholder="Search questions" style="flex: 1; border: 0; background: transparent; font: 15px Inter, sans-serif; color: #14110D; outline: none"></label>
+      <div role="group" aria-label="Show" style="display: flex; border: 1px solid #14110D; padding: 3px; gap: 4px">
+        <button type="button" aria-pressed="true" style="min-height: 34px; padding: 0 14px; border: 0; background: #14110D; color: #F3EEE4; font: 600 14px Inter, sans-serif">All</button>
+        <button type="button" aria-pressed="false" style="min-height: 34px; padding: 0 14px; border: 0; background: transparent; color: #14110D; font: 600 14px Inter, sans-serif">Waiting for my vote · 4</button>
+        <button type="button" aria-pressed="false" style="min-height: 34px; padding: 0 14px; border: 0; background: transparent; color: #14110D; font: 600 14px Inter, sans-serif">Proposed by me</button>
+      </div>
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr))">
+
+      <!-- Under review -->
+      <section aria-labelledby="c1" style="padding: 0 18px 0 0; display: flex; flex-direction: column; gap: 12px">
+        <div style="display: flex; flex-direction: column; gap: 2px; border-bottom: 3px solid #4B6B8F; padding-bottom: 8px">
+          <h2 id="c1" style="margin: 0; font-family: 'Fraunces', serif; font-size: 22px; display: flex; justify-content: space-between">Under review <span style="font-family: 'JetBrains Mono', monospace; font-size: 16px; color: #3D5A7A">6</span></h2>
+          <span style="font-size: 13px; color: #4A4235">Needs votes from the jury</span>
+        </div>
+        <article class="clip" style="background: #FFFDF8; border: 1px solid #14110D; padding: 14px; display: flex; flex-direction: column; gap: 10px; cursor: pointer">
+          <span style="font-family: 'JetBrains Mono', monospace; font-size: 13px; color: #4A4235">#018 · Finance</span>
+          <b style="font-family: 'Fraunces', serif; font-weight: 700; font-size: 19px; line-height: 1.25">Net revenue for fiscal year 2026, by region?</b>
+          <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px"><span style="font-size: 13px; color: #4A4235">1 of 3 votes</span><span style="font-size: 13px; font-weight: 700; color: #A8401F">Your vote needed</span></div>
+          <div aria-hidden="true" style="height: 4px; background: #E2D9C8"><div style="width: 33%; height: 100%; background: #4B6B8F"></div></div>
+        </article>
+        <article class="clip" style="background: #FFFDF8; border: 1px solid #14110D; padding: 14px; display: flex; flex-direction: column; gap: 10px; cursor: pointer">
+          <span style="font-family: 'JetBrains Mono', monospace; font-size: 13px; color: #4A4235">#017 · Sales</span>
+          <b style="font-family: 'Fraunces', serif; font-weight: 700; font-size: 19px; line-height: 1.25">Top 5 customers by net sales last quarter?</b>
+          <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px"><span style="font-size: 13px; color: #4A4235">2 of 3 votes</span><span style="font-size: 13px; color: #4A4235">You voted ✓</span></div>
+          <div aria-hidden="true" style="height: 4px; background: #E2D9C8"><div style="width: 66%; height: 100%; background: #4B6B8F"></div></div>
+        </article>
+        <a href="#" style="font-size: 14px; font-weight: 700; color: #14110D; min-height: 36px; display: flex; align-items: center">+ 4 more</a>
+      </section>
+
+      <!-- Disputed -->
+      <section aria-labelledby="c2" style="padding: 0 18px; border-left: 1px solid #D5CBB8; display: flex; flex-direction: column; gap: 12px">
+        <div style="display: flex; flex-direction: column; gap: 2px; border-bottom: 3px solid #C8502B; padding-bottom: 8px">
+          <h2 id="c2" style="margin: 0; font-family: 'Fraunces', serif; font-size: 22px; display: flex; justify-content: space-between">Disputed <span style="font-family: 'JetBrains Mono', monospace; font-size: 16px; color: #A8401F">2</span></h2>
+          <span style="font-size: 13px; color: #4A4235">Jurors gave different answers</span>
+        </div>
+        <article class="clip" style="background: #FFF4EC; border: 2px solid #C8502B; padding: 14px; display: flex; flex-direction: column; gap: 10px; cursor: pointer">
+          <span style="font-family: 'JetBrains Mono', monospace; font-size: 13px; color: #8A3414">#015 · Sales vs Finance</span>
+          <b style="font-family: 'Fraunces', serif; font-weight: 700; font-size: 19px; line-height: 1.25">How many active customers did we have in October?</b>
+          <span style="font-size: 14px; color: #5C3A2C; line-height: 1.45">"Active" means a purchase in 90 days for Sales, an open contract for Finance.</span>
+          <a href="#" style="align-self: flex-start; min-height: 36px; padding: 0 14px; display: flex; align-items: center; background: #C8502B; color: #FFFFFF; font-size: 14px; font-weight: 700; text-decoration: none">Settle the dispute</a>
+        </article>
+        <article class="clip" style="background: #FFF4EC; border: 2px solid #C8502B; padding: 14px; display: flex; flex-direction: column; gap: 10px; cursor: pointer">
+          <span style="font-family: 'JetBrains Mono', monospace; font-size: 13px; color: #8A3414">#014 · Finance</span>
+          <b style="font-family: 'Fraunces', serif; font-weight: 700; font-size: 19px; line-height: 1.25">Revenue in Q1 of the fiscal year?</b>
+          <span style="font-size: 14px; color: #5C3A2C; line-height: 1.45">Fiscal year starts in July, or in January?</span>
+        </article>
+      </section>
+
+      <!-- Ruled -->
+      <section aria-labelledby="c3" style="padding: 0 18px; border-left: 1px solid #D5CBB8; display: flex; flex-direction: column; gap: 12px">
+        <div style="display: flex; flex-direction: column; gap: 2px; border-bottom: 3px solid #0F6E5C; padding-bottom: 8px">
+          <h2 id="c3" style="margin: 0; font-family: 'Fraunces', serif; font-size: 22px; display: flex; justify-content: space-between">Ruled <span style="font-family: 'JetBrains Mono', monospace; font-size: 16px; color: #0F6E5C">8</span></h2>
+          <span style="font-size: 13px; color: #4A4235">Case law: ready for hearings</span>
+        </div>
+        <article class="clip" style="background: #FFFDF8; border: 1px solid #14110D; padding: 14px; display: flex; flex-direction: column; gap: 10px; cursor: pointer">
+          <span style="font-family: 'JetBrains Mono', monospace; font-size: 13px; color: #4A4235">#012 · Sales</span>
+          <b style="font-family: 'Fraunces', serif; font-weight: 700; font-size: 19px; line-height: 1.25">What was the best-selling product in 2025?</b>
+          <span style="font-size: 14px; color: #2E2820; border-left: 3px solid #0F6E5C; padding-left: 10px">Mountain-200 Black, 42</span>
+          <span style="font-size: 13px; color: #4A4235">All 3 jurors agree</span>
+        </article>
+        <article class="clip" style="background: #FFFDF8; border: 1px solid #14110D; padding: 14px; display: flex; flex-direction: column; gap: 10px; cursor: pointer">
+          <div style="display: flex; justify-content: space-between; align-items: center"><span style="font-family: 'JetBrains Mono', monospace; font-size: 13px; color: #4A4235">#011 · Sales</span><span style="background: #FFD27A; font-size: 11px; font-weight: 700; letter-spacing: 0.08em; padding: 3px 8px">JUDGE OVERRULED</span></div>
+          <b style="font-family: 'Fraunces', serif; font-weight: 700; font-size: 19px; line-height: 1.25">How many customers are based in Spain?</b>
+          <span style="font-size: 14px; color: #2E2820; border-left: 3px solid #0F6E5C; padding-left: 10px">1,284 (by shipping address)</span>
+        </article>
+        <a href="#" style="font-size: 14px; font-weight: 700; color: #14110D; min-height: 36px; display: flex; align-items: center">+ 6 more</a>
+      </section>
+
+      <!-- Dismissed -->
+      <section aria-labelledby="c4" style="padding: 0 0 0 18px; border-left: 1px solid #D5CBB8; display: flex; flex-direction: column; gap: 12px">
+        <div style="display: flex; flex-direction: column; gap: 2px; border-bottom: 3px solid #8C8273; padding-bottom: 8px">
+          <h2 id="c4" style="margin: 0; font-family: 'Fraunces', serif; font-size: 22px; display: flex; justify-content: space-between">Dismissed <span style="font-family: 'JetBrains Mono', monospace; font-size: 16px; color: #4A4235">2</span></h2>
+          <span style="font-size: 13px; color: #4A4235">Not a good test question</span>
+        </div>
+        <article style="border: 1px dashed #8C8273; padding: 14px; display: flex; flex-direction: column; gap: 8px; color: #4A4235">
+          <span style="font-family: 'JetBrains Mono', monospace; font-size: 13px">#007</span>
+          <b style="font-family: 'Fraunces', serif; font-weight: 700; font-size: 18px; line-height: 1.25; text-decoration: line-through; text-decoration-thickness: 1px">How are sales going?</b>
+          <span style="font-size: 13px">Too vague to have one right answer</span>
+        </article>
+      </section>
+    </div>
+
+    <p style="margin: 0; padding-top: 12px; border-top: 1px solid #D5CBB8; font-size: 14px; color: #4A4235">Tip: a good case has one right answer that a business expert can check. "How are sales going?" is not a case; "Net sales in October 2026?" is.</p>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1240}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {};
+  }
+}
+</script>
+</body>
+</html>

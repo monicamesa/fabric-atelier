@@ -1,0 +1,55 @@
+/* Design tokens from docs/design/design-guide.md, section 2 ("The Docket").
+   Components use these tokens only, never raw hex values. */
+
+:root {
+  --paper: #F3EEE4;
+  --paper-raised: #FFFDF8;
+  --paper-hover: #EBE4D6;
+  --ink: #14110D;
+  --ink-inverse: #F3EEE4;
+  --text: #2E2820;
+  --text-muted: #4A4235;
+  --rule: #D5CBB8;
+  --track: #E2D9C8;
+  --ruled: #0F6E5C;
+  --ruled-fill: #0F6E5C;
+  --action: #C8502B;
+  --action-text: #A8401F;
+  --dispute-bg: #FFF4EC;
+  --dispute-text: #8A3414;
+  --review: #4B6B8F;
+  --review-text: #3D5A7A;
+  --overruled: #FFD27A;
+  --overruled-text: #14110D;
+  --ticker-bg: #14110D;
+  --focus: #0F6E5C;
+
+  --font-serif: 'Fraunces Variable', Georgia, 'Times New Roman', serif;
+  --font-sans: 'Inter Variable', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, Consolas, monospace;
+}
+
+/* The guide gives --ruled two dark values: #7FE0C4 for text and #0F6E5C for fills. */
+[data-theme="dark"] {
+  --paper: #14110D;
+  --paper-raised: #1B1712;
+  --paper-hover: #221D16;
+  --ink: #F3EEE4;
+  --ink-inverse: #14110D;
+  --text: #E6DED0;
+  --text-muted: #BDB3A2;
+  --rule: #3A332A;
+  --track: #3A332A;
+  --ruled: #7FE0C4;
+  --ruled-fill: #0F6E5C;
+  --action: #C8502B;
+  --action-text: #FF8A62;
+  --dispute-bg: #2A1A12;
+  --dispute-text: #FFB59A;
+  --review: #A9B8D6;
+  --review-text: #A9B8D6;
+  --overruled: #FFD27A;
+  --overruled-text: #14110D;
+  --ticker-bg: #0A0806;
+  --focus: #7FE0C4;
+}

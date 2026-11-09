@@ -1,0 +1,175 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Agent Jury – Concept A: The Docket</title>
+
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,700;9..144,900&amp;family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@500&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#F3EEE4}
+a{color:#0F6E5C}
+a:focus-visible,button:focus-visible{outline:3px solid #0F6E5C;outline-offset:3px}
+@keyframes marquee{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+@keyframes strike{0%,58%,100%{transform:rotate(0deg)}70%{transform:rotate(-34deg)}80%{transform:rotate(9deg)}88%{transform:rotate(0deg)}}
+@keyframes stamp{0%,30%{opacity:0;transform:rotate(-14deg) scale(2.4)}42%{opacity:1;transform:rotate(-14deg) scale(.92)}50%,100%{opacity:1;transform:rotate(-14deg) scale(1)}}
+@keyframes underline{from{background-size:0 14px}to{background-size:100% 14px}}
+.track{display:flex;width:max-content;animation:marquee 48s linear infinite}
+.ticker:hover .track{animation-play-state:paused}
+.gavel-head{transform-origin:52px 52px;animation:strike 2.8s ease-in-out infinite}
+.stamp{animation:stamp 5s ease-out infinite}
+.hl{background-image:linear-gradient(#FF8A62,#FF8A62);background-repeat:no-repeat;background-position:0 88%;background-size:100% 14px;animation:underline 1.2s .4s ease-out both}
+.row:hover{background:#EBE4D6}
+.nav a{color:#14110D;text-decoration:none;padding:6px 0;border-bottom:2px solid transparent}
+.nav a:hover{border-bottom-color:#14110D}
+@media (prefers-reduced-motion:reduce){.track,.gavel-head,.stamp,.hl{animation:none}}
+</style>
+</helmet>
+<div style="min-height: 100vh; background: #F3EEE4; color: #14110D; font-family: Inter, system-ui, sans-serif; font-size: 16px; display: flex; flex-direction: column">
+
+  <!-- Live verdict ticker: fixed label, pauses on hover -->
+  <div class="ticker" style="display: flex; align-items: stretch; background: #14110D; color: #F3EEE4; border-bottom: 3px solid #C8502B">
+    <span style="flex: none; display: flex; align-items: center; padding: 0 18px; background: #C8502B; color: #FFFFFF; font-size: 12px; font-weight: 700; letter-spacing: 0.12em">LATEST VERDICTS</span>
+    <div aria-label="Latest verdicts, pauses when you hover" style="flex: 1; overflow: hidden">
+      <div class="track" style="font-family: 'JetBrains Mono', monospace; font-size: 14px; padding: 11px 0">
+        <span style="padding: 0 28px; white-space: nowrap"><b style="color: #7FE0C4">RULED</b> · #012 Best-selling product 2025 · all 3 jurors agree</span>
+        <span style="padding: 0 28px; white-space: nowrap"><b style="color: #FF8A62">DISPUTED</b> · #015 "Active customer" · Sales and Finance define it differently</span>
+        <span style="padding: 0 28px; white-space: nowrap"><b style="color: #FFD27A">APPEAL WON</b> · #011 Customers in Spain · the jury overruled the AI judge</span>
+        <span style="padding: 0 28px; white-space: nowrap"><b style="color: #A9B8D6">NEW</b> · #018 Net revenue FY26 · waiting for jury votes</span>
+        <span style="padding: 0 28px; white-space: nowrap"><b style="color: #7FE0C4">RULED</b> · #012 Best-selling product 2025 · all 3 jurors agree</span>
+        <span style="padding: 0 28px; white-space: nowrap"><b style="color: #FF8A62">DISPUTED</b> · #015 "Active customer" · Sales and Finance define it differently</span>
+        <span style="padding: 0 28px; white-space: nowrap"><b style="color: #FFD27A">APPEAL WON</b> · #011 Customers in Spain · the jury overruled the AI judge</span>
+        <span style="padding: 0 28px; white-space: nowrap"><b style="color: #A9B8D6">NEW</b> · #018 Net revenue FY26 · waiting for jury votes</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Masthead -->
+  <header style="max-width: 1360px; width: 100%; margin: 0 auto; padding: 14px 24px 0; box-sizing: border-box">
+    <div style="display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; border-bottom: 1px solid #14110D; padding-bottom: 10px">
+      <span style="font-family: 'Fraunces', serif; font-weight: 900; font-size: 22px">Agent Jury</span>
+      <nav class="nav" aria-label="Main" style="display: flex; gap: 26px; font-size: 15px; font-weight: 600">
+        <a href="#" aria-current="page" style="border-bottom-color: #C8502B">Home</a>
+        <a href="#">Cases</a>
+        <a href="#">Hearings</a>
+        <a href="#">Case law</a>
+        <a href="#">How it works</a>
+      </nav>
+      <div style="display: flex; gap: 8px; align-items: center">
+        <div role="group" aria-label="Language" style="display: flex; border: 1px solid #14110D">
+          <button type="button" aria-pressed="true" style="min-width: 44px; min-height: 36px; border: 0; background: #14110D; color: #F3EEE4; font: 700 13px Inter, sans-serif">EN</button>
+          <button type="button" aria-pressed="false" style="min-width: 44px; min-height: 36px; border: 0; background: transparent; color: #14110D; font: 700 13px Inter, sans-serif">ES</button>
+        </div>
+        <button type="button" aria-label="Switch to dark mode" style="min-width: 40px; min-height: 38px; border: 1px solid #14110D; background: transparent; font-size: 16px">☾</button>
+      </div>
+    </div>
+  </header>
+
+  <main style="flex: 1; max-width: 1360px; width: 100%; margin: 0 auto; padding: 0 24px 28px; box-sizing: border-box">
+
+    <!-- Hero -->
+    <section style="display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 48px; align-items: end; padding: 26px 0 26px">
+      <div>
+        <span style="font-size: 13px; letter-spacing: 0.14em; text-transform: uppercase; color: #A8401F; font-weight: 700">Quality control for Fabric Data Agents</span>
+        <h1 style="margin: 10px 0 0; font-family: 'Fraunces', serif; font-weight: 900; font-size: 132px; line-height: 0.88; letter-spacing: -0.045em">Who judges<br>the <span class="hl">judge?</span></h1>
+        <p style="margin: 20px 0 0; font-family: 'Fraunces', serif; font-size: 23px; line-height: 1.4; max-width: 700px; color: #2E2820">An AI judge scores every answer your Data Agents give. <b>Your business experts are the jury:</b> they agree on the right answers and catch the judge when it gets one wrong.</p>
+        <div style="display: flex; gap: 12px; flex-wrap: wrap; align-items: center; margin-top: 24px">
+          <a href="#" style="min-height: 52px; padding: 0 26px; display: flex; align-items: center; gap: 10px; background: #14110D; color: #F3EEE4; font-weight: 700; font-size: 16px; text-decoration: none; box-shadow: 5px 5px 0 #C8502B">+ Propose a case</a>
+          <a href="#" style="min-height: 52px; padding: 0 24px; display: flex; align-items: center; gap: 10px; border: 2px solid #14110D; color: #14110D; font-weight: 700; font-size: 16px; text-decoration: none">▶ Start a hearing</a>
+          <a href="#" style="min-height: 52px; padding: 0 8px; display: flex; align-items: center; color: #A8401F; font-weight: 700; font-size: 16px">4 cases need your vote →</a>
+        </div>
+      </div>
+      <aside aria-labelledby="trust" style="display: flex; flex-direction: column; gap: 10px; align-items: flex-start; border-left: 1px solid #14110D; padding-left: 28px">
+        <svg width="96" height="96" viewBox="0 0 64 64" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><g class="gavel-head" stroke="#14110D" stroke-width="2.4"><rect x="9" y="15" width="26" height="13" rx="3" transform="rotate(-45 22 21.5)"></rect><line x1="27" y1="27" x2="52" y2="52"></line></g><rect x="6" y="52" width="28" height="6" rx="2" stroke="#C8502B" stroke-width="2.4"></rect></svg>
+        <span id="trust" style="font-size: 13px; letter-spacing: 0.12em; text-transform: uppercase; font-weight: 700">Judge trust</span>
+        <div style="font-family: 'Fraunces', serif; font-weight: 900; font-size: 92px; line-height: 0.9; letter-spacing: -0.04em">83<span style="font-size: 46px">%</span></div>
+        <p style="margin: 0; font-size: 15px; line-height: 1.5; color: #2E2820">Your jury agreed with the AI judge in <b>5 of 6</b> recent rulings. Under 90%, check the appeals before you trust the scores.</p>
+        <a href="#" style="min-height: 40px; display: flex; align-items: center; font-weight: 700; font-size: 15px">See the 2 appeals →</a>
+      </aside>
+    </section>
+
+    <!-- How to read this: plain-language glossary -->
+    <section aria-label="How to read this page" style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); border-top: 6px double #14110D; border-bottom: 1px solid #14110D">
+      <div style="padding: 14px 18px 14px 0; display: flex; flex-direction: column; gap: 4px"><b style="font-family: 'Fraunces', serif; font-size: 18px">Case</b><span style="font-size: 14px; line-height: 1.45; color: #4A4235">A business question to test the agent with.</span></div>
+      <div style="padding: 14px 18px; border-left: 1px solid #D5CBB8; display: flex; flex-direction: column; gap: 4px"><b style="font-family: 'Fraunces', serif; font-size: 18px">Ruling</b><span style="font-size: 14px; line-height: 1.45; color: #4A4235">The jury agrees on the right answer. Ruled cases become case law.</span></div>
+      <div style="padding: 14px 18px; border-left: 1px solid #D5CBB8; display: flex; flex-direction: column; gap: 4px"><b style="font-family: 'Fraunces', serif; font-size: 18px">Hearing</b><span style="font-size: 14px; line-height: 1.45; color: #4A4235">A test run: the agent answers, the AI judge scores each answer.</span></div>
+      <div style="padding: 14px 0 14px 18px; border-left: 1px solid #D5CBB8; display: flex; flex-direction: column; gap: 4px"><b style="font-family: 'Fraunces', serif; font-size: 18px">Appeal</b><span style="font-size: 14px; line-height: 1.45; color: #4A4235">A juror says the judge got it wrong. Appeals lower judge trust.</span></div>
+    </section>
+
+    <!-- Columns -->
+    <section style="display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr); gap: 40px; padding-top: 24px">
+
+      <div>
+        <div style="display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; border-bottom: 1px solid #14110D; padding-bottom: 10px">
+          <div style="display: flex; flex-direction: column; gap: 2px">
+            <h2 style="margin: 0; font-family: 'Fraunces', serif; font-size: 30px">Today's docket</h2>
+            <span style="font-size: 14px; color: #4A4235">Cases for the agent you pick. Open ones first.</span>
+          </div>
+          <div role="group" aria-label="Agent" style="display: flex; gap: 4px; border: 1px solid #14110D; padding: 3px">
+            <button type="button" aria-pressed="true" style="min-height: 36px; padding: 0 14px; border: 0; background: #14110D; color: #F3EEE4; font: 600 14px Inter, sans-serif">Sales Agent · 18</button>
+            <button type="button" aria-pressed="false" style="min-height: 36px; padding: 0 14px; border: 0; background: transparent; color: #14110D; font: 600 14px Inter, sans-serif">Finance Agent · 14</button>
+            <button type="button" style="min-height: 36px; padding: 0 12px; border: 0; background: transparent; color: #4A4235; font: 600 14px Inter, sans-serif">+ Add agent</button>
+          </div>
+        </div>
+        <div aria-hidden="true" style="display: grid; grid-template-columns: 64px minmax(0, 1fr) 210px; gap: 16px; padding: 10px 8px 6px; font-size: 12px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: #4A4235"><span>Case</span><span>Question</span><span style="justify-self: end">Status · next step</span></div>
+        <ol style="margin: 0; padding: 0; list-style: none">
+          <li class="row" style="display: grid; grid-template-columns: 64px minmax(0, 1fr) 210px; gap: 16px; align-items: center; padding: 14px 8px; border-top: 1px solid #D5CBB8">
+            <span style="font-family: 'JetBrains Mono', monospace; font-size: 14px; color: #4A4235">#015</span>
+            <span style="display: flex; flex-direction: column; gap: 4px"><span style="font-family: 'Fraunces', serif; font-size: 21px; line-height: 1.25">How many active customers did we have in October?</span><span style="font-size: 14px; color: #4A4235">Two testimonies disagree on what "active" means</span></span>
+            <span style="justify-self: end; display: flex; flex-direction: column; align-items: flex-end; gap: 8px"><span style="border: 2px solid #C8502B; color: #A8401F; font-weight: 700; font-size: 12px; letter-spacing: 0.1em; padding: 4px 10px">DISPUTED</span><a href="#" style="min-height: 36px; padding: 0 14px; display: flex; align-items: center; background: #C8502B; color: #FFFFFF; font-size: 14px; font-weight: 700; text-decoration: none">Settle the dispute</a></span>
+          </li>
+          <li class="row" style="display: grid; grid-template-columns: 64px minmax(0, 1fr) 210px; gap: 16px; align-items: center; padding: 14px 8px; border-top: 1px solid #D5CBB8">
+            <span style="font-family: 'JetBrains Mono', monospace; font-size: 14px; color: #4A4235">#018</span>
+            <span style="display: flex; flex-direction: column; gap: 4px"><span style="font-family: 'Fraunces', serif; font-size: 21px; line-height: 1.25">Net revenue for fiscal year 2026, by region?</span><span style="font-size: 14px; color: #4A4235">1 of 3 votes so far</span></span>
+            <span style="justify-self: end; display: flex; flex-direction: column; align-items: flex-end; gap: 8px"><span style="border: 2px solid #4B6B8F; color: #3D5A7A; font-weight: 700; font-size: 12px; letter-spacing: 0.1em; padding: 4px 10px">UNDER REVIEW</span><a href="#" style="min-height: 36px; padding: 0 14px; display: flex; align-items: center; border: 2px solid #14110D; color: #14110D; font-size: 14px; font-weight: 700; text-decoration: none">Cast your vote</a></span>
+          </li>
+          <li class="row" style="display: grid; grid-template-columns: 64px minmax(0, 1fr) 210px; gap: 16px; align-items: center; padding: 14px 8px; border-top: 1px solid #D5CBB8">
+            <span style="font-family: 'JetBrains Mono', monospace; font-size: 14px; color: #4A4235">#012</span>
+            <span style="display: flex; flex-direction: column; gap: 4px"><span style="font-family: 'Fraunces', serif; font-size: 21px; line-height: 1.25">What was the best-selling product in 2025?</span><span style="font-size: 14px; color: #4A4235">Expected answer: Mountain-200 Black, 42</span></span>
+            <span style="justify-self: end; display: flex; flex-direction: column; align-items: flex-end; gap: 6px"><span style="background: #0F6E5C; color: #FFFFFF; font-weight: 700; font-size: 12px; letter-spacing: 0.1em; padding: 6px 10px">RULED</span><span style="font-size: 13px; color: #4A4235">All 3 jurors agree</span></span>
+          </li>
+          <li class="row" style="display: grid; grid-template-columns: 64px minmax(0, 1fr) 210px; gap: 16px; align-items: center; padding: 14px 8px; border-top: 1px solid #D5CBB8; border-bottom: 1px solid #D5CBB8">
+            <span style="font-family: 'JetBrains Mono', monospace; font-size: 14px; color: #4A4235">#011</span>
+            <span style="display: flex; flex-direction: column; gap: 4px"><span style="font-family: 'Fraunces', serif; font-size: 21px; line-height: 1.25">How many customers are based in Spain?</span><span style="font-size: 14px; color: #4A4235">The judge said correct; the jury proved it wrong</span></span>
+            <span style="justify-self: end; display: flex; flex-direction: column; align-items: flex-end; gap: 6px"><span style="background: #FFD27A; color: #14110D; font-weight: 700; font-size: 12px; letter-spacing: 0.1em; padding: 6px 10px">JUDGE OVERRULED</span><span style="font-size: 13px; color: #4A4235">Appeal by Priya N.</span></span>
+          </li>
+        </ol>
+        <div style="display: flex; gap: 24px; flex-wrap: wrap; margin-top: 6px"><a href="#" style="display: inline-flex; align-items: center; min-height: 44px; font-weight: 700; color: #14110D">See all 18 cases →</a><a href="#" style="display: inline-flex; align-items: center; min-height: 44px; font-weight: 700; color: #0F6E5C">⤓ Export case law for Fabric (CSV)</a></div>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 24px">
+        <article style="position: relative; background: #14110D; color: #F3EEE4; padding: 24px; overflow: hidden">
+          <span style="font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: #FF8A62; font-weight: 700">Story of the week</span>
+          <h3 style="margin: 10px 0 12px; font-family: 'Fraunces', serif; font-size: 32px; line-height: 1.08; max-width: 360px">The judge said "correct". The jury said no.</h3>
+          <p style="margin: 0 0 16px; color: #DDD5C6; line-height: 1.55; font-size: 15px; max-width: 300px">Case #011: the agent counted customers by billing address; the business counts them by shipping address. Priya N. appealed and won.</p>
+          <a href="#" style="color: #FFB59A; font-weight: 700; font-size: 15px">Read the case →</a>
+          <div class="stamp" aria-hidden="true" style="position: absolute; right: 30px; bottom: 26px; border: 3px solid #FF8A62; color: #FF8A62; padding: 2px 10px; font-family: 'Fraunces', serif; font-weight: 900; font-size: 20px; letter-spacing: 0.06em">OVERRULED</div>
+        </article>
+
+        <div>
+          <h2 style="margin: 0 0 12px; font-family: 'Fraunces', serif; font-size: 24px; border-bottom: 1px solid #14110D; padding-bottom: 8px">Juror of the week</h2>
+          <div style="display: flex; gap: 14px; align-items: center">
+            <span aria-hidden="true" style="width: 56px; height: 56px; border-radius: 999px; background: #0F6E5C; color: #FFFFFF; display: flex; align-items: center; justify-content: center; font-family: 'Fraunces', serif; font-weight: 700; font-size: 20px">PN</span>
+            <div style="display: flex; flex-direction: column; gap: 2px"><b style="font-size: 17px">Priya N.</b><span style="color: #4A4235; font-size: 14px; line-height: 1.45">7 answers proposed · 1 appeal won · settled the "active customer" dispute</span></div>
+          </div>
+        </div>
+
+        <p style="margin: 0; font-size: 13px; color: #4A4235; line-height: 1.5; border-top: 1px solid #D5CBB8; padding-top: 12px">An open-source community app for Microsoft Fabric · Sample data shown · <a href="#">Repo &amp; credits</a></p>
+      </div>
+    </section>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1200}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {};
+  }
+}
+</script>
+</body>
+</html>
