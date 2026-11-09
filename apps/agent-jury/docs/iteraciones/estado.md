@@ -29,6 +29,7 @@
 | `a504d5e` | Campos de la sección 7 en camelCase y regla de nombres en `AGENTS.md` |
 | `a2063d1` | Fase 1 desplegada en `FabricApp-AgentJury` |
 | `ec0b63d` | Valores privados en `.private/values.env`, hook de pre-commit y limpieza de valores personales |
+| `c26b860` | `.vscode/settings.json` de la app fuera de Git (`.vscode/mcp.json` sigue versionado) |
 
 ### Estructura y documentación
 
@@ -48,7 +49,7 @@ fabric-atelier/
 ```
 
 - La app es la plantilla sin cambios de código. `npm ci`, `npm run build` y `npm test` pasan con Node 24.22.1 (11 ficheros, 138 tests).
-- **Fase 1 completada (2026-11-09):** la plantilla está desplegada en el workspace `FabricApp-AgentJury` (capacidad `fclabfrc01`, France Central) con `npx.cmd rayfin up` (CLI 1.36.2).
+- **Fase 1 completada y comprobada (2026-11-09):** la plantilla está desplegada en el workspace `FabricApp-AgentJury` (capacidad `fclabfrc01`, France Central) con `npx.cmd rayfin up` (CLI 1.36.2), y la app se abre en el portal de Fabric.
   - Item Rayfin `agent-jury` (AppBackend). Servicios: `auth` activado, `data` desactivado.
   - App: `<APP_URL_AGENT_JURY>` (valor en `.private/values.env`).
   - Acceso a los ficheros estáticos: `assetAccess: protected` (solo usuarios con permiso de lectura sobre el item de Fabric, con inicio de sesión).
@@ -78,13 +79,10 @@ Solo las que no están ya en la especificación ni en `conventions.md`.
 ## Qué queda pendiente (en orden)
 
 1. **Abrir `apps/agent-jury` como carpeta en VS Code,** para que Copilot cargue `.vscode/mcp.json` y lea `AGENTS.md` desde la raíz del proyecto.
-2. **Comprobar en el navegador que la app desplegada carga** y pide inicio de sesión (Fase 1 desplegada; falta la comprobación visual).
-3. **Iteración 1** (sección 12 de la especificación).
-   1. Activar datos en `rayfin/rayfin.yml` (dialecto `mssql`). Comprobar en qué carpeta espera las entidades esta plantilla (las plantillas planas usan `rayfin/data/`).
-   2. Entidades `Domain`, `Juror`, `Agent`, `Case` y `Testimony` según la sección 7, con permisos y `max` en todos los campos de texto.
-   3. Base de i18n EN/ES: selector en la cabecera, `locales/en.json` y `locales/es.json`, y el test de claves iguales.
-   4. Pantallas 1–3 sin votos.
-   5. `npx.cmd rayfin up db apply` y despliegue. Criterio de salida: un experto crea preguntas y propuestas en la app desplegada.
+2. **Iteración 1**, dividida en dos partes:
+   - **I1a:** datos activados; entidades `Domain`, `Juror`, `Agent`, `Case` y `Testimony` con sus políticas; seed de `Domain`, `Juror` y `Agent` cargado directamente en la base de datos; selector EN/ES; pantallas 1–3 sin votos. Plan en [I1a.md](I1a.md), **pendiente de revisión**.
+   - **I1b:** Functions de administración de `Domain`, `Juror` y `Agent`, que comprueban que quien llama es un juror `admin`. Antes de planificarla hay que resolver el riesgo R2 de [I1a.md](I1a.md): `ctx.getDataClient()` escribe con los permisos de quien llama.
+   - Criterio de salida de I1: un experto crea preguntas y propuestas en la app desplegada.
 
 ## Problemas conocidos del entorno
 
