@@ -30,18 +30,20 @@ function connect(): { client?: AppRayfinClient; error?: unknown } {
 /** Loads one agent's docket; keyed by agent so switching agents starts a fresh load. */
 function WithDocket({
     client,
+    requestedAgentId,
     agentId,
     jurors,
     viewer,
     children,
 }: {
     client: AppRayfinClient;
-    agentId: string;
+    requestedAgentId?: string;
+    agentId?: string;
     jurors?: JurorRow[];
     viewer: Viewer;
     children: (docket: DocketState) => ReactNode;
 }) {
-    const docket = useDocket(client, agentId, jurors, viewer.me);
+    const docket = useDocket(client, requestedAgentId, agentId, jurors, viewer.me);
     return <>{children(docket)}</>;
 }
 
@@ -169,11 +171,12 @@ function App() {
         );
     };
 
-    // With the agent in the URL, the docket loads in parallel with the jury and agent lists.
-    const docketAgentId = agent?.id ?? (agentList.data ? undefined : routeAgentId);
-    if (!docketAgentId) return layout(ready ? renderPage() : <Deliberating />);
+    // The docket loads in the same round as the jury and agent lists: by agent when the URL names a
+    // valid one, otherwise every agent's records, scoped once the first active agent is known.
+    if (agentList.data && !agent) return layout(ready ? renderPage() : <Deliberating />);
+    const requestedAgentId = !agentList.data || agent?.id === routeAgentId ? routeAgentId : undefined;
     return (
-        <WithDocket key={docketAgentId} client={client} agentId={docketAgentId} jurors={jury.data} viewer={viewer}>
+        <WithDocket key={requestedAgentId ?? "all-agents"} client={client} requestedAgentId={requestedAgentId} agentId={agent?.id} jurors={jury.data} viewer={viewer}>
             {(docket) =>
                 ready && agent
                     ? layout(renderPage(docket), route.page === "home" ? <Ticker items={tickerItems(docket.data, t)} /> : undefined)

@@ -30,6 +30,14 @@ Rules shared by every app in Fabric Atelier.
 - It is enabled only so that check scripts (for example `apps/agent-jury/scripts/i1a-checks.mjs`) and local automatic sign-in can act as the `rayfin login` user against the deployed app. The app itself does not use it.
 - **Templates ship with it off** (absent or `false`). Turn it on in a development deployment only while running checks or local sign-in, and off again before the app is shared with users.
 
+## Capacity usage
+
+- The production and test app items run on the same F2 capacity. The Data Agent will join them later. Every request to either app consumes CU from that shared capacity, and an overloaded capacity throttles all of them: Fabric first delays each interactive request by 20 seconds, then rejects it.
+- Run the deployed checks (`scripts/i1*-checks.mjs`) only when code that affects security or data changes: entities, policies, roles, Functions, seed or data services. Run them once, against the test item.
+- Take screenshots once per iteration, before the review.
+- Never poll a deployed app in a loop, and never leave scripts or a local dev server pointed at it running unattended. To wait for a long job, check its status by hand.
+- If every request suddenly takes about 20 s, check the Capacity Metrics app for "Interactive delay" before measuring or debugging anything else.
+
 ## Language
 
 - The user interface is bilingual: English and Spanish, with English as the default.

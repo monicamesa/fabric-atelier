@@ -8,7 +8,7 @@ import {
     listCaseDismissals,
     listCasesByAgent,
 } from "./cases.service";
-import { loadDocketRecords } from "./docket";
+import { loadAllDocketRecords, loadDocketRecords, scopeToAgent } from "./docket";
 import { listJurors, readAuthorActivity } from "./directory.service";
 import { NotSignedInError } from "./session-author";
 import { readAllPages } from "./pagination";
@@ -185,5 +185,22 @@ describe("batched reads", () => {
         expect(records.testimonies.map((row) => row.id)).toEqual(["t1"]);
         expect(records.votes.map((row) => row.id)).toEqual(["v1"]);
         expect(records.dismissals).toEqual([]);
+    });
+
+    it("without an agent, loads every agent in one round and scopes to the agent picked later", async () => {
+        const { client, queries } = fakeClient({
+            Case: [{ items: [{ id: "c1", agent_id: "agent-1" }, { id: "c2", agent_id: "agent-2" }], hasNextPage: false }],
+            Testimony: [{ items: [{ id: "t1", case_id: "c1" }, { id: "t2", case_id: "c2" }], hasNextPage: false }],
+            Vote: [{ items: [{ id: "v1", testimony_id: "t1" }, { id: "v2", testimony_id: "t2" }], hasNextPage: false }],
+            CaseDismissal: [{ items: [{ id: "d2", case_id: "c2" }], hasNextPage: false }],
+        });
+        const loading = loadAllDocketRecords(client);
+        expect(queries.map((query) => query.entity).sort()).toEqual(["Case", "CaseDismissal", "Testimony", "Vote"]);
+        expect(queries.find((query) => query.entity === "Case")!.calls.some(([name]) => name === "where")).toBe(false);
+        const scoped = scopeToAgent(await loading, "agent-2");
+        expect(scoped.cases.map((row) => row.id)).toEqual(["c2"]);
+        expect(scoped.testimonies.map((row) => row.id)).toEqual(["t2"]);
+        expect(scoped.votes.map((row) => row.id)).toEqual(["v2"]);
+        expect(scoped.dismissals.map((row) => row.id)).toEqual(["d2"]);
     });
 });

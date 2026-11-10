@@ -129,6 +129,13 @@ export async function listAllCaseDismissals(client: DataClient): Promise<CaseDis
     })) as CaseDismissalRow[];
 }
 
+export async function listAllCases(client: DataClient): Promise<CaseRow[]> {
+    return (await readAllPages((after) => {
+        const query = client.data.Case.select([...CASE_FIELDS]).orderBy({ createdAt: "desc" }).first(BULK_PAGE_SIZE);
+        return (after ? query.after(after) : query).executePaginated();
+    })) as CaseRow[];
+}
+
 export function listCasesByAgent(client: DataClient, agentId: string): Promise<CaseRow[]> {
     return readAllPages((after) => {
         const query = client.data.Case.select([...CASE_FIELDS])

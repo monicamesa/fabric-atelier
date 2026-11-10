@@ -11,6 +11,7 @@ import {
 } from "@/rules/case-validity";
 import {
     getCase,
+    listAllCases,
     listAllCaseDismissals,
     listAllTestimonies,
     listAllVotes,
@@ -128,6 +129,24 @@ export async function loadDocketRecords(client: DataClient, agentId: string): Pr
         listAllCaseDismissals(client),
     ]);
     return scopeToCases(cases, { testimonies, votes, dismissals });
+}
+
+/** Every agent's records in one parallel round, for when the agent isn't known yet (no agent in the URL). */
+export async function loadAllDocketRecords(client: DataClient): Promise<DocketRecords> {
+    const [cases, testimonies, votes, dismissals] = await Promise.all([
+        listAllCases(client),
+        listAllTestimonies(client),
+        listAllVotes(client),
+        listAllCaseDismissals(client),
+    ]);
+    return { cases, testimonies, votes, dismissals };
+}
+
+export function scopeToAgent(records: DocketRecords, agentId: string): DocketRecords {
+    return scopeToCases(
+        records.cases.filter((record) => record.agent_id === agentId),
+        records,
+    );
 }
 
 /** Reads one case with its testimonies, votes and dismissals in one parallel round; `undefined` when the case doesn't exist. */

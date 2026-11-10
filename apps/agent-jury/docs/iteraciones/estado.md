@@ -97,30 +97,19 @@ Solo las que no están ya en la especificación ni en `conventions.md`.
      - Errores en lenguaje claro (403, 409, caducada…) con el detalle técnico plegado; autoprotección del admin en la interfaz y en `clerkExecute`; "Latest admin changes" incluye los rechazos.
      - Comprobaciones: tests unitarios y de pantalla, `i1b-checks.mjs` 21/21 e `i1a-checks.mjs` 22/22 tras el despliegue.
      - **Aprobada (2026-11-09)** con arreglos menores (sección 11 de [I1b.md](I1b.md)): corte de comprobaciones antiguas como secreto opcional `LEGACY_CHECK_CUTOFF_UTC` (solo en este despliegue), acción "Edit details", filtro de agentes, comprobación del foco con teclado, equipo con puntos suspensivos y pestaña corta en móvil.
-   - **I1c:** pantallas 1–3 (Home, Cases, Case detail) con votos y el cálculo de estado R1–R8. **Construida; desplegada en pruebas solo a medias; sin revisar.** Decisiones D1–D14 y resultados en [I1c.md](I1c.md), secciones 8 y 11. Producción no tiene nada de I1c.
-     - **Hecho y en Git:**
-       - Pasos 0–7 del plan: despliegue de pruebas, `Vote` y campos de definición, reglas R1–R8 con `CONSENSUS_MIN_VOTES = 2`, servicios, Case detail, Cases, Home y rutas por hash.
-       - Carga en una sola ronda en paralelo, en lugar de cuatro rondas seguidas.
-       - Favicon propio: era el 404 de la consola (`/favicon.ico`).
-       - `createdAt` no lo puede generar Rayfin: se ignoran los registros fechados más de 5 minutos en el futuro (riesgo documentado en la especificación).
-       - `npm test` (30 ficheros, 325 tests) y `tsc -b` pasan en local.
-     - **Desplegado en pruebas:** el modelo (`Vote` y los campos nuevos de `Testimony`), los datos de ejemplo (`rayfin/seed/docket-examples.sql`) y el frontend del commit `4e04dfa`. **Falta redesplegar** con `node scripts/deploy-test.mjs` para subir la carga en paralelo y el favicon.
-     - **Comprobaciones en pruebas:** `i1c-checks.mjs` 19/19, `i1a-checks.mjs` 46/46 e `i1b-checks.mjs` 23/23, todas con el frontend anterior. Tras el redespliegue hay que repetir `i1c-checks.mjs`.
-     - **Tiempo de carga** (navegador con la app local contra el backend de pruebas):
-       - Home: 81,8 s → 21,6 s en la primera carga y 81,1 s → 20,5 s en la segunda.
-       - Case detail: 82,4 s → 21,5 s en la primera carga.
-       - **Mediciones pendientes:** la segunda carga de Case detail después del cambio, y Home sin agente en la URL (con dos rondas, se esperan unos 40 s).
-     - **Hallazgo: la capacidad está en *throttling*.** Cada petición tarda unos 20 s fijos en pruebas y en producción, incluso una sin autenticar que el servidor rechaza con 401. Con `curl`, la conexión tarda 0,14 s y el primer byte llega a los 20,3 s. Coincide con la fase "interactive delay" de Fabric (20 s por operación interactiva cuando se han consumido los próximos 10 minutos de CU). No es la base de datos fría: la segunda carga tarda lo mismo que la primera. Hay que confirmarlo en Capacity Metrics, junto con el consumo de CU de las comprobaciones (D14).
-     - **Capturas:** hechas solo `home-en-light-phone` y `home-en-light`, y las dos salieron mientras aún cargaban. Faltan Home, Cases y Case detail en EN/ES × claro/oscuro, las tres de móvil y la de solo lectura, con `.private/screenshots-i1c.mjs` contra pruebas. El script ya carga cada página una sola vez y escribe mensajes legibles.
-     - **Siguiente sesión, en orden:**
-       1. Mirar Capacity Metrics. Esperar a que la capacidad salga del *throttling*.
-       2. Redesplegar en pruebas.
-       3. Terminar las dos mediciones.
-       4. Repetir `i1c-checks.mjs`.
-       5. Hacer las capturas.
-       6. Probar con dos personas reales (experto y aprobador).
-       7. Revisión. Después, preguntar antes de desplegar en producción.
-     - Para arrancar la app local contra pruebas: `node .private/use-test-env-local.mjs` y `npx.cmd vite` (`npm run dev` regenera `.env.local` desde producción). `.env.local` vuelve a apuntar a producción.
+   - **I1c:** pantallas 1–3 (Home, Cases, Case detail) con votos y el cálculo de estado R1–R8. **Construida y desplegada en pruebas (2026-11-10), pendiente de revisión y de la prueba con dos personas.** Decisiones D1–D14 y resultados en [I1c.md](I1c.md), secciones 8 y 11. Producción no tiene nada de I1c.
+     - Pasos 0–7 del plan hechos: despliegue de pruebas, `Vote` y campos de definición, reglas R1–R8 con `CONSENSUS_MIN_VOTES = 2`, servicios, Case detail, Cases, Home y rutas por hash.
+     - Carga en una sola ronda en paralelo, también sin agente en la URL. Sin *throttling*: Home 1,5 s / 0,5 s, Home sin agente 1,5 s / 0,4 s y Case detail 1,6 s / 0,5 s (primera / segunda carga). Antes, con *throttling* y cuatro rondas, unos 82 s.
+     - `createdAt` no lo puede generar Rayfin: se ignoran los registros fechados más de 5 minutos en el futuro (riesgo documentado en la especificación).
+     - Pruebas: `npm test` (30 ficheros, 326 tests) y `tsc -b` pasan. `i1c-checks.mjs` 19/19 tras el redespliegue. I1a (46/46) e I1b (23/23) no se repitieron, porque no ha cambiado nada de seguridad.
+     - Capturas hechas (16), en `.private/screenshots/i1c/`.
+     - El *throttling* del 2026-11-09 (20 s por petición) se resolvió pausando y reanudando la capacidad. Las reglas de uso están en `docs/conventions.md` ("Capacity usage").
+     - **Pendiente:**
+       1. Prueba con dos personas reales (experto y aprobador).
+       2. Consumo de CU de las comprobaciones, desde Capacity Metrics.
+       3. Revisión: números de case `#0000` en los datos de ejemplo y contraste del resaltado de la tabla de diferencias.
+       4. Después, preguntar antes de desplegar en producción.
+     - Para arrancar la app local contra pruebas: `node .private/use-test-env-local.mjs` y `npx.cmd vite` (`npm run dev` regenera `.env.local` desde producción). Al terminar, parar Vite y devolver `.env.local` a producción.
    - **Despliegue de pruebas (D12 de I1c): hecho.** Workspace propio en la misma capacidad, `rayfin/.env.test` y claves `*_TEST` en `.private/values.env`. Comandos en el README de la app ("Test deployment").
    - **Candidatos para más adelante** (fuera de I1b, decisión D3):
      - "Hasn't signed in yet" en la tabla de jurors: exige leer `dbo.Users` de Rayfin con T-SQL desde la Function.

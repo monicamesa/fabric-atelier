@@ -1,18 +1,28 @@
 import { useMemo } from "react";
 import type { JurorRow } from "@/data/directory.service";
-import { buildDocket, loadDocketRecords, type Docket } from "@/data/docket";
+import { buildDocket, loadAllDocketRecords, loadDocketRecords, scopeToAgent, type Docket } from "@/data/docket";
 import { useAsync, type AsyncState } from "@/hooks/use-async";
 import type { AppRayfinClient } from "@/lib/rayfin-client";
 import type { Me } from "@/rules/case-validity";
 
 export type DocketState = AsyncState<Docket> & { reload: () => void };
 
-/** Records for one agent, turned into states with the shared rules once the jury list is in. Remount (key by agent) to switch agents. */
-export function useDocket(client: AppRayfinClient, agentId: string, jurors: readonly JurorRow[] | undefined, me: Me | undefined): DocketState {
-    const records = useAsync(() => loadDocketRecords(client, agentId));
+/**
+ * Records for one agent, turned into states once the jury list is in. Without `requestedAgentId`
+ * every agent's records load in the same round as the jury and agent lists, and `agentId` (known
+ * later) picks the agent. Remount (key by requested agent) to switch agents.
+ */
+export function useDocket(
+    client: AppRayfinClient,
+    requestedAgentId: string | undefined,
+    agentId: string | undefined,
+    jurors: readonly JurorRow[] | undefined,
+    me: Me | undefined,
+): DocketState {
+    const records = useAsync(() => (requestedAgentId ? loadDocketRecords(client, requestedAgentId) : loadAllDocketRecords(client)));
     const data = useMemo(
-        () => (records.data && jurors ? buildDocket(records.data, jurors, me, new Date()) : undefined),
-        [records.data, jurors, me],
+        () => (records.data && jurors && agentId ? buildDocket(scopeToAgent(records.data, agentId), jurors, me, new Date()) : undefined),
+        [records.data, jurors, me, agentId],
     );
     return { ...records, data } as DocketState;
 }

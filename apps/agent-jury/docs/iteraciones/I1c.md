@@ -197,9 +197,9 @@ En la propia testimony no hay botón de voto, con la explicación "Your vote doe
 | 6 | Home: ticker (pausa con hover y foco, estático con movimiento reducido), titular, confianza en el juez como marcador "—" hasta I3, glosario, "Today's docket" con los votos pendientes primero, selector de agente en la URL (D6) y formulario para proponer un case |
 | 7 | Rutas por hash (`#home?agent=`, `#cases?agent=&filter=&q=`, `#case/<id>`), con historial: el botón Atrás funciona |
 
-**Tests:** 30 ficheros, 325 tests (`npm test`); `tsc -b` y `eslint` sin errores. Nuevos: reglas con n = 1, 2 y 3, docket, rutas, formato de días relativos, visor (quién puede actuar), vistas (orden de Home, filtros, búsqueda, filas distintas de la tabla), servicios (`createVote`, campos opcionales, lotes) y la pantalla de detalle (motivo obligatorio, sin voto en la respuesta propia, "Add your answer", solo lectura).
+**Tests:** 30 ficheros, 326 tests (`npm test`); `tsc -b` y `eslint` sin errores. Nuevos: reglas con n = 1, 2 y 3, docket, rutas, formato de días relativos, visor (quién puede actuar), vistas (orden de Home, filtros, búsqueda, filas distintas de la tabla), servicios (`createVote`, campos opcionales, lotes) y la pantalla de detalle (motivo obligatorio, sin voto en la respuesta propia, "Add your answer", solo lectura).
 
-**Comprobaciones desplegadas (`scripts/i1c-checks.mjs`, despliegue de pruebas): 19 de 19.**
+**Comprobaciones desplegadas (`scripts/i1c-checks.mjs`, despliegue de pruebas): 19 de 19** (2026-11-09, y de nuevo el 2026-11-10 tras el redespliegue).
 
 | Comprobación | Resultado |
 |---|---|
@@ -212,23 +212,43 @@ En la propia testimony no hay botón de voto, con la explicación "Your vote doe
 | `updateVote`, `deleteVote`, `updateTestimony` | No existen en el esquema |
 | Limpieza | El autor retira el case de la comprobación |
 
-Las comprobaciones de I1a (46/46) e I1b (23/23) también pasan contra el despliegue de pruebas.
+Las comprobaciones de I1a (46/46) e I1b (23/23) también pasan contra el despliegue de pruebas (2026-11-09). No se repitieron el 2026-11-10: desde entonces solo han cambiado lecturas, la carga de datos y textos, nada de entidades, políticas, roles ni Functions.
 
-**Volumen (D14):** 17 peticiones de datos en 368,5 s, inicio de sesión incluido (unos 20 s por petición en esta ejecución; la primera conexión T-SQL a la base de datos de pruebas también agotó su tiempo y funcionó al repetirla). El consumo de CU no se puede leer desde los scripts: hay que consultarlo en la app Fabric Capacity Metrics para el workspace de pruebas en la ventana de la ejecución. Queda pendiente anotarlo aquí.
+**Volumen (D14):**
+- Con la capacidad limitada (2026-11-09), 17 peticiones de datos tardaron 368,5 s, inicio de sesión incluido.
+- Sin limitación (2026-11-10), las mismas 17 peticiones tardaron 1,9 s.
+- El consumo de CU no se puede leer desde los scripts: está en la app Capacity Metrics, en el workspace de pruebas y la ventana de cada ejecución (el 2026-11-10, sobre las 07:27 UTC).
 
-**Tiempo de carga (2026-11-09, despliegue de pruebas, medido con el navegador y la app local contra el backend desplegado; el frontend desplegado en pruebas todavía es el de antes del cambio):**
+**Tiempo de carga** (navegador con la app local contra el backend de pruebas; tiempo hasta que la página tiene todos sus datos):
 
-| Pantalla | Antes: 1.ª carga / 2.ª carga | Después: 1.ª carga / 2.ª carga |
-|---|---|---|
-| Home (agente en la URL) | 81,8 s / 81,1 s | 21,6 s / 20,5 s |
-| Case detail | 82,4 s / 81,3 s | 21,5 s / pendiente |
-| Home sin agente en la URL | — | pendiente (se esperan dos rondas) |
+| Pantalla | Antes, con *throttling* (2026-11-09): 1.ª / 2.ª carga | Después, con *throttling* (2026-11-09) | Después, sin *throttling* (2026-11-10): 1.ª / 2.ª carga |
+|---|---|---|---|
+| Home (agente en la URL) | 81,8 s / 81,1 s | 21,6 s / 20,5 s | 1,5 s / 0,5 s |
+| Home sin agente en la URL | — | — | 1,5 s / 0,4 s |
+| Case detail | 82,4 s / 81,3 s | 21,5 s / — | 1,6 s / 0,5 s |
+
+En todos los casos de "después" las seis peticiones (jurados, agentes, cases, testimonies, votos y retiradas) salen a la vez, en una sola ronda. Sin *throttling*, cada petición tarda entre 0,4 y 0,5 s en la primera carga y unos 0,1 s en la segunda. El frontend desplegado en pruebas es el mismo código. Se midió en local porque el despliegue exige el inicio de sesión de Fabric, que un navegador sin interfaz no puede hacer.
 
 - **Causa:** cada petición al backend tarda 20,1–20,5 s, sea la que sea: lecturas seguidas o en paralelo, el intercambio de token del inicio de sesión, e incluso una petición sin autenticar que el servidor rechaza con 401. Con `curl`, DNS + conexión + TLS suman 0,14 s y el primer byte llega a los 20,3 s. Producción, en la misma capacidad, se comporta igual. Coincide con la primera fase de *throttling* de Fabric ("interactive delay"): cuando la capacidad ha consumido los próximos 10 minutos de CU, cada operación interactiva nueva espera 20 s ([documentación](https://learn.microsoft.com/fabric/enterprise/throttling#throttle-triggers-and-throttle-stages)). Hay que confirmarlo en la app Capacity Metrics (pestaña *Interactive delay*).
 - **¿Base de datos fría?** No en estas cargas: la segunda carga tarda lo mismo que la primera, y el retraso aparece también en peticiones que no llegan a la base de datos (el 401). Aparte, la primera conexión T-SQL de la tarde sí agotó su tiempo (15 s) y funcionó al repetirla, lo que apunta a una base de datos en pausa en ese momento.
-- **Cambio:** antes había cuatro rondas seguidas (jurados y agentes → cases → testimonies y retiradas → votos). Ahora todo va en una ronda en paralelo: `loadDocketRecords` y `loadCaseRecords` leen testimonies, votos y retiradas completos (páginas de 1000) y los acotan al agente o al case en el cliente (`scopeToCases`), y las pantallas empiezan a cargar a la vez que las listas de jurados y agentes. Sin agente en la URL hacen falta dos rondas, porque primero hay que saber cuál es el primer agente activo.
+- **Cambio:** antes había cuatro rondas seguidas: jurados y agentes, luego cases, luego testimonies y retiradas, y por último votos. Ahora todo va en una sola ronda en paralelo:
+  - `loadDocketRecords` y `loadCaseRecords` leen testimonies, votos y retiradas completos (páginas de 1000) y los acotan al agente o al case en el cliente (`scopeToCases`).
+  - Sin agente en la URL, `loadAllDocketRecords` lee también todos los cases, y `scopeToAgent` se queda con los del primer agente activo cuando llega la lista de agentes.
+  - Las pantallas empiezan a cargar a la vez que las listas de jurados y agentes.
+- **Fallo corregido de paso:** el 404 de la consola era `/favicon.ico`. Ahora hay un favicon propio y el título es "Agent Jury".
 - **Límite conocido:** leer las tablas completas está bien para el volumen del MVP. Si los votos pasan de unos pocos miles, conviene una vista o una consulta anidada por agente.
-- No se ha podido medir sin *throttling*. Sea cual sea la latencia por petición, la carga pasa de 4 rondas a 1.
+- **Throttling resuelto (2026-11-10):** la propietaria pausó y reanudó la capacidad, y las peticiones volvieron a tardar menos de medio segundo. Las reglas para no saturarla de nuevo están en `docs/conventions.md` ("Capacity usage").
+
+**Capturas (2026-11-10, una sola pasada contra pruebas, 16 imágenes, sin desbordamiento horizontal):**
+- Home, Cases y Case detail de un case en disputa con su tabla de diferencias, en EN/ES × claro/oscuro.
+- Home EN claro, Cases ES oscuro y Case detail ES claro en móvil.
+- Case detail en modo de solo lectura.
+- No se versionan: están en `.private/screenshots/i1c/`.
+
+**Para la revisión:**
+- Los cases de ejemplo salen como `#0000`. Sus ids empiezan por `00000000-`, el único formato de GUID que deja pasar el hook de pre-commit, y D7 toma los 4 primeros caracteres. Con ids reales no pasa. Opciones: tomar los 4 últimos caracteres o dar a los ejemplos ids que no estén en el repositorio.
+- En escritorio, el resaltado de las filas que difieren (`--dispute-bg` sobre `--paper-raised`) apenas se distingue. En móvil se ve mejor. Las filas que difieren también lo dicen a los lectores de pantalla ("they differ").
+- Los cases de las comprobaciones (`[I1a check]`, `[I1c check]`) aparecen retirados en el despliegue de pruebas, como estaba previsto.
 
 **Datos de ejemplo en pruebas:** `rayfin/seed/docket-examples.sql` (solo pruebas) añade un case en cada estado con los jurados de ejemplo, porque una sola cuenta no puede producir votos de varios jurados. Las capturas usan esos datos.
 

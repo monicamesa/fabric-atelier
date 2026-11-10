@@ -140,7 +140,7 @@
         "reason": {
             "dismissed": "Este caso se archivó: se conserva en el acta, pero nunca se usa en una vista.",
             "noAnswers": "Todavía no hay respuesta. Añade la respuesta que debería dar el agente.",
-            "competingAnswers": "Dos respuestas tienen votos a favor. Vota la que debería dar el agente o propon una mejor.",
+            "competingAnswers": "Dos respuestas tienen votos a favor. Vota la que debería dar el agente o propón una mejor.",
             "approverSplit": "Los aprobadores no están de acuerdo sobre la misma respuesta. Lee sus motivos en el acta.",
             "ruled": "El jurado se puso de acuerdo en la respuesta. Este caso ya es jurisprudencia.",
             "needsVotes_one": "Falta {{count}} voto a favor.",
