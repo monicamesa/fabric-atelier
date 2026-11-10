@@ -149,13 +149,13 @@ These rules come from [docs/especificacion-general.md](docs/especificacion-gener
 ### Scope and workflow
 
 1. Read the specification before planning any change. Work iteration by iteration (section 12); do not build features from later iterations.
-2. Domain data (`Case`, `Testimony`, `Vote`, `Appeal`, `Hearing` and the other entities in section 7) is persisted in the app database through Rayfin entities. This is the only exception to template critical rule 2. In the browser the rule still applies: no user data in `localStorage`, `sessionStorage` or IndexedDB, except the language preference. Never store credentials or tokens.
+2. Domain data (`Case`, `Testimony`, `Vote`, `VerdictReview`, `Hearing` and the other entities in section 7) is persisted in the app database through Rayfin entities. This is the only exception to template critical rule 2. In the browser the rule still applies: no user data in `localStorage`, `sessionStorage` or IndexedDB, except the language preference. Never store credentials or tokens.
 3. Run every npm and `npx rayfin` command from `apps/agent-jury`. Never commit tenant IDs or workspace IDs.
 4. Pin the Rayfin CLI and `fabric-data-agent-sdk` versions and document them in `README.md`.
 
 ### Naming and language
 
-5. Code is in English. Use the code names from section 9.1: `Juror`, `Agent`, `Case`, `Testimony`, `CaseDismissal`, `Vote`, `Hearing`, `Appeal`, `judgeVerdict`, view `caseLaw`. Case states: `under_review`, `ruled`, `disputed`, `dismissed`. There are no domains: juror roles are global and `Juror.team` is display-only.
+5. Code is in English. Use the code names from section 9.1: `Juror`, `Agent`, `Case`, `Testimony`, `CaseDismissal`, `Vote`, `Hearing`, `VerdictReview` ("Appeal" is only the UI term, derived from a review that disagrees with the judge), `judgeVerdict`, view `caseLaw`. Case states: `under_review`, `ruled`, `disputed`, `dismissed`. There are no domains: juror roles are global and `Juror.team` is display-only.
 6. The UI is bilingual with an **EN | ES** selector in the header on every screen. English is the default, and the choice is remembered per user in the browser.
 7. No visible text is written directly in components: all of it comes from `locales/en.json` and `locales/es.json` through an i18n library. A test checks that both files have the same keys.
 8. Dates and numbers follow the selected language (`en-GB`, `es-ES`). User-written content (cases, testimonies, comments) is shown as written, never translated.
@@ -171,7 +171,7 @@ These rules come from [docs/especificacion-general.md](docs/especificacion-gener
 
 ### Business rules and security
 
-15. `Case`, `Testimony`, `CaseDismissal`, `Vote` and `Appeal` are insert-only: no update or delete. Their policies require `claims.sub.eq(item.<role>UserId)` (for example `authorUserId`, `voterUserId`) so nobody inserts on behalf of someone else.
+15. `Case`, `Testimony`, `CaseDismissal`, `Vote` and `VerdictReview` are insert-only: no update or delete. Their policies require `claims.sub.eq(item.<role>UserId)` (for example `authorUserId`, `voterUserId`) so nobody inserts on behalf of someone else.
 16. Votes are immutable; a juror's latest vote counts (R1). An author's vote on their own testimony does not count (R2).
 17. Consensus (R3): at least `N` valid votes in favour from active jurors (default `N = 1`), at least one from an approver, and no current vote against from an approver. A case is disputed (R4) when two or more testimonies have votes in favour, or one testimony has approver votes both for and against. Only cases and testimonies authored by active jurors count; the rest are shown as unverified (R7). A case is dismissed by a `CaseDismissal` from its author or an admin (R8).
 18. A case's state is computed, never written by the client (R6). The logic lives in a single shared module with tests. The frontend uses it for display; the notebook or Function uses it for anything authoritative.
@@ -179,7 +179,7 @@ These rules come from [docs/especificacion-general.md](docs/especificacion-gener
 20. The client has only `read` on `Juror` and `Agent`. They are written only through `clerkExecute`. The Function's `ctx.accessToken` is a Fabric platform token without the caller's email, so identity comes from an `AdminRequest` row: the browser inserts it (`action`, JSON `payload`, `createdAt`; the insert policy requires `claims.email` = `requesterEmail`) and invokes `clerkExecute(requestId)` with the id only. The Function reads the row with T-SQL using the `AudienceType.Sql` token (app identity), never through `ctx.getDataClient()`. It rejects requests older than 2 minutes, unknown actions and requesters who are not active `admin` jurors. It executes only the stored action and payload, and writes the `AdminRequestResult` (`done` or `rejected`, unique `requestId`, so each request runs once) in the same transaction.
 21. No token leaves a Function. The client is not an authorization boundary: enforce every restriction with `@role`, policies and Functions.
 22. The Function that launches a hearing only starts the notebook job and returns `jobInstanceId` (240-second Function limit). Status is checked with later queries.
-23. Nothing is ever deleted: every vote, testimony and appeal keeps its author and date.
+23. Nothing is ever deleted: every vote, testimony and verdict review keeps its author and date.
 24. Function names must not start with `admin` or `runtime` (reserved by the Azure Functions host); those Functions never reach the code and return NotFound. Entities and tables may keep the `Admin` prefix (`AdminRequest`, `AdminRequestResult`).
 
 ### UI
@@ -199,6 +199,14 @@ These rules come from [docs/especificacion-general.md](docs/especificacion-gener
 ## Verified working notes
 
 Facts confirmed in earlier sessions (Rayfin CLI 1.36.2, Windows, PowerShell 5.1). Project status and next steps are in [docs/iteraciones/estado.md](docs/iteraciones/estado.md).
+
+### Token and capacity discipline
+
+- Never poll in loops (deploys, screenshots, checks). Run a long command once, redirect its output to a file in `.private/logs/`, and read only the summary lines (pass/fail counts, errors).
+- Do not re-run deployed checks or screenshots unless the change requires it.
+- Never print full logs or full test output into the chat: show only failures.
+- When waiting is unavoidable, stop and tell the user instead of waiting.
+- Keep answers short: what changed, results, decisions needed.
 
 ### Terminal
 

@@ -128,7 +128,7 @@ Convenciones de Rayfin a respetar:
 | `CaseDismissal` | `case_id`, `reason` (max 1000), `dismissedByUserId`, `dismissedByEmail`, `createdAt` | Crear: `claims.sub.eq(item.dismissedByUserId)`. Leer: autenticados. Sin actualizar ni borrar |
 | `Vote` | `testimony_id`, `value` (`for` · `against`), `comment` (max 1000), `voterUserId`, `voterEmail`, `createdAt` | Crear: `claims.sub.eq(item.voterUserId)`. Leer: autenticados. Sin actualizar ni borrar |
 | `Hearing` | `agent_id`, `stage`, `launchedByUserId`, `jobInstanceId`, `evaluationId`, `status`, `caseCount`, `createdAt` | Crear y actualizar: solo desde la Function |
-| `Appeal` | `hearing_id`, `case_id`, `judgeVerdict`, `humanVerdict` (`correct` · `incorrect` · `ambiguous`), `reason`, `comment` (max 1000), `reviewerUserId`, `createdAt` | Crear: `claims.sub.eq(item.reviewerUserId)`. Leer: autenticados. Sin actualizar ni borrar |
+| `VerdictReview` | `verdict_id`, `humanVerdict` (`correct` · `incorrect` · `ambiguous`), `reason`, `comment` (max 1000), `reviewerUserId`, `reviewerEmail`, `createdAt`. Guarda también los acuerdos; un "recurso" es una revisión cuyo `humanVerdict` difiere del veredicto del juez | Crear: `claims.sub.eq(item.reviewerUserId)`. Leer: autenticados. Sin actualizar ni borrar |
 | `AdminRequest` | `requesterEmail`, `action` (max 50), `payload` (JSON, max 4000), `createdAt` | Crear y leer: solo con `claims.email.eq(item.requesterEmail)`. Sin actualizar ni borrar |
 | `AdminRequestResult` | `requestId` (único), `requesterEmail`, `outcome` (`done` · `rejected`), `detail` (max 500), `processedAt` | Leer: solo el autor de la petición. Escritura: solo `clerkExecute` con T-SQL |
 
@@ -150,7 +150,7 @@ Convenciones de Rayfin a respetar:
 
 ```
 [Fabric App: frontend React]
-   │ GraphQL (Rayfin client)                 → BD de la app: Case, Testimony, Vote, Appeal…
+   │ GraphQL (Rayfin client)                 → BD de la app: Case, Testimony, Vote, VerdictReview…
    │ Connector fabric-sqlanalytics (lectura) → Lakehouse "jury_lh": tablas de resultados del SDK
    │ Functions
    │    ├─ clerkExecute(requestId): lee el AdminRequest del navegador → comprueba admin en Juror
@@ -202,7 +202,7 @@ Requisitos de idioma:
 | Respuesta esperada propuesta | **Testimony** | **Testimonio** | `Testimony` |
 | Voto | **Vote** | **Voto** | `Vote` |
 | Conflicto entre áreas | **Dispute** | **Disputa** | estado `disputed` |
-| Corregir el veredicto del juez | **Appeal** | **Recurso** | `Appeal` |
+| Corregir el veredicto del juez | **Appeal** | **Recurso** | derivado de `VerdictReview` (revisión que difiere del juez) |
 | Respuestas aprobadas y conflictos resueltos | **Case law** | **Jurisprudencia** | vista `caseLaw` |
 | Ejecución de evaluación | **Hearing** | **Vista** | `Hearing` |
 
@@ -272,7 +272,7 @@ Configuración de tenant necesaria: Data Agents habilitados y, según la región
 | **I1c** | Despliegue de pruebas; `Vote`; cálculo de estado con R1–R8 y tests; pantallas 1–3 (Home, Cases, Case detail) | Dos jurados llevan un case a `ruled` y otro a `disputed` en el despliegue de pruebas; las tres pantallas muestran el mismo estado |
 | **I2** | Pantalla 4 (conflictos) y lo que surja de I1c | La vista de conflictos muestra las propuestas enfrentadas lado a lado |
 | **I3** | Lakehouse `jury_lh`, notebook `evaluate_agent`, Function de lanzamiento, connector de lectura, pantalla 5. Verificar S1–S5 | Una evaluación lanzada desde la app produce resultados visibles en la app |
-| **I4** | `Appeal`, pantallas 6 y 7, vuelta a revisión por respuesta esperada incorrecta | Se calcula el % de acuerdo juez-humano por agente y categoría |
+| **I4** | `VerdictReview`, pantallas 6 y 7, vuelta a revisión por respuesta esperada incorrecta | Se calcula el % de acuerdo juez-humano por agente y categoría |
 | **I5** | Notebook `export_case_law` y prueba de importación en Quality Lab | El CSV exportado se carga sin errores en Quality Lab |
 
 ## 13. Criterios de aceptación del MVP

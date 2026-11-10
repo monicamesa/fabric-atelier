@@ -169,7 +169,7 @@ All of these are disabled under `@media (prefers-reduced-motion: reduce)`.
 | Testimony (expected answer) | Answer / testimony | Respuesta / testimonio |
 | Ruling | Ruling / ruled | Fallo / fallado |
 | Dispute | Dispute / disputed | Disputa / en disputa |
-| Appeal | Appeal | Recurso |
+| Appeal (UI term; stored as a `VerdictReview` that disagrees with the judge) | Appeal | Recurso |
 | Case law | Case law | Jurisprudencia |
 | Hearing | Hearing | Vista |
 | Judge trust | Judge trust | Confianza en el juez |

@@ -108,7 +108,7 @@ The check scripts target the test deployment by default and refuse production un
 
 ## Security model
 
-- **Records are insert-only.** Cases, testimonies, dismissals, votes and appeals are never updated or deleted; every entry keeps its author and date.
+- **Records are insert-only.** Cases, testimonies, dismissals, votes and verdict reviews are never updated or deleted; every entry keeps its author and date.
 - **Read and insert rules live in the data model.** Reading requires sign-in (admin requests and their results are visible only to their author), and inserts must carry the caller's own identity (`claims.sub` / `claims.email`), so nobody writes on someone else's behalf.
 - **Jurors and agents are written only through `clerkExecute`.** The browser inserts an `AdminRequest` (its insert policy proves who asks) and calls the Function with the request id only. The Function reads the request with T-SQL as the app identity and enforces the safeguards:
   - it runs only the stored action and payload;
