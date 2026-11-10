@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import type { JurorRow } from "@/data/directory.service";
 import { buildDocket, type DocketRecords } from "@/data/docket";
-import { applyFilter, canDiff, differingRows, homeRows, matchesQuery } from "./docket-views";
+import { applyFilter, canDiff, caseNumber, differingRows, homeRows, matchesQuery } from "./docket-views";
 
 const NOW = new Date("2026-11-09T12:00:00.000Z");
 const at = (minutes: number) => new Date(NOW.getTime() + minutes * 60_000).toISOString();
@@ -62,6 +62,11 @@ const docket = buildDocket(raw, jurors, me, NOW);
 const ids = (items: { record: { id: string } }[]) => items.map((item) => item.record.id);
 
 describe("docket views", () => {
+    it("numbers cases with the last 4 characters of the id (D7 fallback)", () => {
+        expect(caseNumber("00000000-0000-4000-8000-000000000062")).toBe("#0062");
+        expect(caseNumber("case-id-ending-in-abcd5678")).toBe("#5678");
+    });
+
     it("puts my pending votes first on Home, then disputes, open cases and rulings, without dismissed cases", () => {
         expect(docket.cases.map((item) => item.analysis.state)).toEqual(["ruled", "disputed", "under_review", "under_review", "dismissed"]);
         expect(ids(homeRows(docket.cases))).toEqual(["c3", "c2", "c4", "c1"]);

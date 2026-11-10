@@ -73,8 +73,7 @@
     },
     "ticker": {
         "label": "Últimos fallos",
-        "title": "Últimos fallos",
-        "proposed": "Caso nuevo"
+        "title": "Últimos fallos"
     },
     "glossary": {
         "case": {
@@ -130,7 +129,7 @@
         "youVoted": "Ya has votado ✓",
         "jurorsAgree_one": "{{count}} jurado está de acuerdo",
         "jurorsAgree_other": "Los {{count}} jurados están de acuerdo",
-        "dismissedHelp": "Archivado"
+        "dismissedHelp": "Desestimado"
     },
     "caseDetail": {
         "back": "← Volver a los casos",
@@ -138,7 +137,7 @@
         "notFound": "Este caso no existe o se propuso en otra app.",
         "unknownAgent": "Agente desconocido",
         "reason": {
-            "dismissed": "Este caso se archivó: se conserva en el acta, pero nunca se usa en una vista.",
+            "dismissed": "Este caso se desestimó: se conserva en el acta, pero nunca se usa en una vista.",
             "noAnswers": "Todavía no hay respuesta. Añade la respuesta que debería dar el agente.",
             "competingAnswers": "Dos respuestas tienen votos a favor. Vota la que debería dar el agente o propón una mejor.",
             "approverSplit": "Los aprobadores no están de acuerdo sobre la misma respuesta. Lee sus motivos en el acta.",
@@ -195,13 +194,13 @@
         "doneAgainst": "Tu voto en contra de la respuesta {{letter}} está en el acta."
     },
     "dismiss": {
-        "open": "Archivar: la pregunta es ambigua",
-        "title": "Archivar este caso",
-        "help": "Los casos archivados se conservan en el acta, pero nunca se usan en una vista. Solo el autor o un admin pueden archivar un caso.",
+        "open": "Desestimar: la pregunta es ambigua",
+        "title": "Desestimar este caso",
+        "help": "Los casos desestimados se conservan en el acta, pero nunca se usan en una vista. Solo el autor o un admin pueden desestimar un caso.",
         "reason": "¿Por qué no es una buena pregunta de prueba?",
         "reasonRequired": "Indica un motivo.",
-        "submit": "Archivar el caso",
-        "done": "El caso se archivó."
+        "submit": "Desestimar el caso",
+        "done": "El caso se desestimó."
     },
     "diff": {
         "title": "Dónde se separan las definiciones",
@@ -223,7 +222,7 @@
         "answer": "{{who}} dio la respuesta {{letter}}",
         "voteFor": "{{who}} votó a favor de {{letter}}",
         "voteAgainst": "{{who}} votó en contra de {{letter}}",
-        "dismissed": "{{who}} archivó el caso",
+        "dismissed": "{{who}} desestimó el caso",
         "stateBefore": "Caso marcado como ",
         "notCounted": "no cuenta: no es un jurado activo",
         "noReason": "sin motivo, no cuenta",

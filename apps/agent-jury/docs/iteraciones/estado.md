@@ -97,18 +97,25 @@ Solo las que no están ya en la especificación ni en `conventions.md`.
      - Errores en lenguaje claro (403, 409, caducada…) con el detalle técnico plegado; autoprotección del admin en la interfaz y en `clerkExecute`; "Latest admin changes" incluye los rechazos.
      - Comprobaciones: tests unitarios y de pantalla, `i1b-checks.mjs` 21/21 e `i1a-checks.mjs` 22/22 tras el despliegue.
      - **Aprobada (2026-11-09)** con arreglos menores (sección 11 de [I1b.md](I1b.md)): corte de comprobaciones antiguas como secreto opcional `LEGACY_CHECK_CUTOFF_UTC` (solo en este despliegue), acción "Edit details", filtro de agentes, comprobación del foco con teclado, equipo con puntos suspensivos y pestaña corta en móvil.
-   - **I1c:** pantallas 1–3 (Home, Cases, Case detail) con votos y el cálculo de estado R1–R8. **Construida y desplegada en pruebas (2026-11-10), pendiente de revisión y de la prueba con dos personas.** Decisiones D1–D14 y resultados en [I1c.md](I1c.md), secciones 8 y 11. Producción no tiene nada de I1c.
+   - **I1c:** pantallas 1–3 (Home, Cases, Case detail) con votos y el cálculo de estado R1–R8. **Aprobada con correcciones (2026-11-10) y desplegada en producción.** La prueba con dos personas queda aplazada al final del proyecto (ver Pendiente). Decisiones D1–D14, correcciones de la revisión y resultados en [I1c.md](I1c.md), secciones 8 y 11.
      - Pasos 0–7 del plan hechos: despliegue de pruebas, `Vote` y campos de definición, reglas R1–R8 con `CONSENSUS_MIN_VOTES = 2`, servicios, Case detail, Cases, Home y rutas por hash.
      - Carga en una sola ronda en paralelo, también sin agente en la URL. Sin *throttling*: Home 1,5 s / 0,5 s, Home sin agente 1,5 s / 0,4 s y Case detail 1,6 s / 0,5 s (primera / segunda carga). Antes, con *throttling* y cuatro rondas, unos 82 s.
      - `createdAt` no lo puede generar Rayfin: se ignoran los registros fechados más de 5 minutos en el futuro (riesgo documentado en la especificación).
-     - Pruebas: `npm test` (30 ficheros, 326 tests) y `tsc -b` pasan. `i1c-checks.mjs` 19/19 tras el redespliegue. I1a (46/46) e I1b (23/23) no se repitieron, porque no ha cambiado nada de seguridad.
-     - Capturas hechas (16), en `.private/screenshots/i1c/`.
+     - Correcciones de la revisión: número de case con los 4 últimos caracteres, tabla de diferencias con borde coral y marcador "≠", ticker solo con fallos, "Desestimar" en español, ayuda de las filas en 2 líneas en móvil y confianza en el juez como línea compacta en Home móvil.
+     - Pruebas: `npm test` (31 ficheros, 328 tests) y `tsc -b` pasan. Contra el despliegue de pruebas: I1c 19/19, I1a 46/46 e I1b 23/23 (2026-11-10, tras el despliegue en producción).
+     - Capturas hechas (16, una pasada nueva tras las correcciones), en `.private/screenshots/i1c/`.
      - El *throttling* del 2026-11-09 (20 s por petición) se resolvió pausando y reanudando la capacidad. Las reglas de uso están en `docs/conventions.md` ("Capacity usage").
      - **Pendiente:**
-       1. Prueba con dos personas reales (experto y aprobador).
+       1. **Prueba manual con dos personas, aplazada al final del proyecto.**
+          - **Preparación:**
+            - Dos usuarios de prueba en Entra ID, del mismo tenant: uno aprobador y otro experto.
+            - Los dos con licencia de Fabric y rol Viewer en el workspace de pruebas.
+            - Sus emails se guardan en `.private/values.env` y nunca en el repositorio.
+            - Desde la secretaría del despliegue de pruebas, la propietaria los da de alta como jurados activos con su rol.
+          - **Escenario 1, fallado:** un tercero propone un case con su respuesta. El experto y el aprobador votan a favor, y el case pasa a `ruled` con dos votos de quien no es el autor (R2, R3).
+          - **Escenario 2, en disputa:** cada uno propone y apoya una respuesta distinta en el mismo case, con los cuatro campos de definición. El case pasa a `disputed` (R4) y la tabla de diferencias marca las filas que difieren.
+          - **Escenario 3, desestimación:** la retirada de quien no es el autor ni admin se ignora y el case sigue abierto. La del autor lo pasa a `dismissed` (R8). El acta muestra las dos retiradas.
        2. Consumo de CU de las comprobaciones, desde Capacity Metrics.
-       3. Revisión: números de case `#0000` en los datos de ejemplo y contraste del resaltado de la tabla de diferencias.
-       4. Después, preguntar antes de desplegar en producción.
      - Para arrancar la app local contra pruebas: `node .private/use-test-env-local.mjs` y `npx.cmd vite` (`npm run dev` regenera `.env.local` desde producción). Al terminar, parar Vite y devolver `.env.local` a producción.
    - **Despliegue de pruebas (D12 de I1c): hecho.** Workspace propio en la misma capacidad, `rayfin/.env.test` y claves `*_TEST` en `.private/values.env`. Comandos en el README de la app ("Test deployment").
    - **Candidatos para más adelante** (fuera de I1b, decisión D3):

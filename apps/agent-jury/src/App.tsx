@@ -50,7 +50,7 @@ function WithDocket({
 function tickerItems(docket: Docket | undefined, t: (key: string) => string): TickerItem[] {
     return (docket?.ticker ?? []).map(({ caseId, caseText, event }, index) => {
         const text = caseText.length > 70 ? `${caseText.slice(0, 69)}…` : caseText;
-        const label = event.kind === "state" ? t(`caseState.${event.state}`) : t("ticker.proposed");
+        const label = event.kind === "state" ? t(`caseState.${event.state}`) : "";
         return {
             key: `${caseId}-${index}`,
             href: formatRoute({ page: "case", caseId }),

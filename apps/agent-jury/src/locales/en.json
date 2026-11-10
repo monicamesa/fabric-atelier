@@ -73,8 +73,7 @@
     },
     "ticker": {
         "label": "Latest verdicts",
-        "title": "Latest verdicts",
-        "proposed": "New case"
+        "title": "Latest verdicts"
     },
     "glossary": {
         "case": {

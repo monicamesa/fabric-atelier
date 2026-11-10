@@ -3,9 +3,9 @@ import type { DocketCase } from "@/data/docket";
 import type { CasesFilter } from "@/lib/route";
 import type { CaseState } from "@/rules/case-validity";
 
-/** D7: the server can't number cases, so the number is the first 4 characters of the id. */
+/** D7 fallback: the server can't number cases, so the number is the last 4 characters of the id. */
 export function caseNumber(id: string): string {
-    return `#${id.slice(0, 4)}`;
+    return `#${id.slice(-4)}`;
 }
 
 const RANK: Record<CaseState, number> = { disputed: 1, under_review: 2, ruled: 3, dismissed: 4 };

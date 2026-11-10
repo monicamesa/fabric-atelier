@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import { Button } from "@/components/docket/button";
 import { Deliberating } from "@/components/docket/gavel";
 import { Glossary } from "@/components/docket/glossary";
-import { JudgeTrustPlaceholder } from "@/components/docket/judge-trust";
+import { JudgeTrustLine, JudgeTrustPlaceholder } from "@/components/docket/judge-trust";
 import { Objection } from "@/components/docket/objection";
 import { CaseNumber, StatusChip, UnverifiedChip } from "@/components/docket/status-chip";
 import { EmptyState, Skeleton } from "@/components/docket/states";
@@ -57,7 +57,7 @@ export function HomeScreen({ client, agents, agent, docket, viewer, onAgentChang
                         )}
                     </div>
                 </div>
-                <JudgeTrustPlaceholder />
+                <JudgeTrustPlaceholder className="hidden min-[900px]:flex" />
             </section>
 
             {proposing && agent && (
@@ -134,6 +134,9 @@ export function HomeScreen({ client, agents, agent, docket, viewer, onAgentChang
                     </>
                 ) : null}
             </section>
+
+            {/* Until there are hearings, phones get judge trust as one line below the docket. */}
+            <JudgeTrustLine className="min-[900px]:hidden" />
         </div>
     );
 }
@@ -164,7 +167,7 @@ function DocketRow({ item, onOpen }: { item: DocketCase; onOpen: () => void }) {
                 <a href={href} onClick={go} className="font-serif text-[21px] leading-tight text-ink no-underline hover:underline">
                     {record.text}
                 </a>
-                <span className="truncate text-[14px] text-text">{helper}</span>
+                <span className="line-clamp-2 text-[14px] text-text min-[700px]:line-clamp-1">{helper}</span>
             </span>
             <span role="cell" className="col-start-2 flex flex-wrap items-center gap-2 min-[700px]:col-start-3 min-[700px]:flex-col min-[700px]:items-end">
                 <span className="flex flex-wrap items-center gap-2">

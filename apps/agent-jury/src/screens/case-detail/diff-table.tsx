@@ -51,9 +51,18 @@ export function DiffTable({ left, right }: DiffTableProps) {
                     );
                     return (
                         <tr key={key} className={cn("border-b border-rule last:border-b-0", differ && "bg-dispute-bg")}>
-                            <th scope="row" className="px-3.5 py-2.5 font-semibold text-ink">
-                                {t(`diff.rows.${key}`)}
-                                {differ && <span className="sr-only"> ({t("diff.differs")})</span>}
+                            <th
+                                scope="row"
+                                className={cn("py-2.5 pr-3.5 font-semibold text-ink", differ ? "border-l-[3px] border-l-action pl-[11px]" : "pl-3.5")}
+                            >
+                                <span className="flex items-baseline gap-2">
+                                    {differ && (
+                                        <span role="img" aria-label={t("diff.differs")} className="font-bold text-action-text">
+                                            ≠
+                                        </span>
+                                    )}
+                                    {t(`diff.rows.${key}`)}
+                                </span>
                             </th>
                             {cell(left.testimony[key])}
                             {cell(right.testimony[key])}

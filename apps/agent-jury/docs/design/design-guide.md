@@ -35,7 +35,7 @@ Define them as CSS custom properties on `:root` and override them under `[data-t
 | `--ruled` | `#0F6E5C` | `#7FE0C4` (text) / `#0F6E5C` (fill) | Ruled, case law, links |
 | `--action` | `#C8502B` | `#C8502B` | Primary-button shadow, dispute borders, filled dispute button |
 | `--action-text` | `#A8401F` | `#FF8A62` | Coral text (small text must use this, not `--action`) |
-| `--dispute-bg` | `#FFF4EC` | `#2A1A12` | Disputed card / error background |
+| `--dispute-bg` | `#FBE1D0` | `#2A1A12` | Disputed card / error background, differing rows of the diff table |
 | `--dispute-text` | `#8A3414` | `#FFB59A` | Text on `--dispute-bg` |
 | `--review` | `#4B6B8F` | `#A9B8D6` | Under review (border/bar) |
 | `--review-text` | `#3D5A7A` | `#A9B8D6` | Under review (text) |
@@ -91,7 +91,7 @@ Load fonts from npm (`@fontsource-variable/fraunces`, `@fontsource-variable/inte
 
 **Masthead** — wordmark "Agent Jury" (Fraunces 900, 22 px) · nav (Home, Cases, Hearings, Case law, How it works) with a coral 2 px underline on the current page (`aria-current="page"`) · EN/ES segmented buttons (`aria-pressed`) · theme button with an `aria-label`.
 
-**Verdict ticker** (Home only) — fixed coral label "LATEST VERDICTS" + scrolling list, monospace 14 px, plain words ("all 3 jurors agree", not "3–0"). Pauses on hover and focus; static under reduced motion. Data comes from the latest case and verdict events.
+**Verdict ticker** (Home only) — fixed coral label "LATEST VERDICTS" + scrolling list, monospace 14 px, plain words ("all 3 jurors agree", not "3–0"). Pauses on hover and focus; static under reduced motion. Data comes from verdict events only: ruled, disputed and dismissed (appeals later), never new cases.
 
 **Buttons**
 - Primary: `--ink` background, `--ink-inverse` text, 700, min-height 52 px (44 px when compact), `box-shadow: 5px 5px 0 var(--action)`.
@@ -108,7 +108,7 @@ Load fonts from npm (`@fontsource-variable/fraunces`, `@fontsource-variable/inte
 
 **Testimony card** — label "ANSWER A · NAME, TEAM", the value as a big Fraunces number, the definition in one sentence, a vote bar and "Vote for answer A".
 
-**Definition diff table** — "Where the definitions part ways": rows where the answers differ are highlighted with `--dispute-bg`.
+**Definition diff table** — "Where the definitions part ways": rows where the answers differ use `--dispute-bg`, a 3 px `--action` left border and a "≠" marker with an accessible label, so they stand out in both themes.
 
 **Admin table** — `--paper-raised` table with a 1 px `--ink` border, uppercase column headers, avatar + name + email (mono) per row, role chip (ADMIN filled ink, JUROR outlined), row actions on the right ("Make admin", "Deactivate" in `--action-text`). Admins can't deactivate themselves. Nobody is deleted: deactivated jurors keep their record. Every admin change shows in the admin log, including rejected attempts.
 

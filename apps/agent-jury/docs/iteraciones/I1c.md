@@ -245,13 +245,22 @@ En todos los casos de "después" las seis peticiones (jurados, agentes, cases, t
 - Case detail en modo de solo lectura.
 - No se versionan: están en `.private/screenshots/i1c/`.
 
-**Para la revisión:**
-- Los cases de ejemplo salen como `#0000`. Sus ids empiezan por `00000000-`, el único formato de GUID que deja pasar el hook de pre-commit, y D7 toma los 4 primeros caracteres. Con ids reales no pasa. Opciones: tomar los 4 últimos caracteres o dar a los ejemplos ids que no estén en el repositorio.
-- En escritorio, el resaltado de las filas que difieren (`--dispute-bg` sobre `--paper-raised`) apenas se distingue. En móvil se ve mejor. Las filas que difieren también lo dicen a los lectores de pantalla ("they differ").
-- Los cases de las comprobaciones (`[I1a check]`, `[I1c check]`) aparecen retirados en el despliegue de pruebas, como estaba previsto.
+**Revisión (2026-11-10): aprobada con correcciones, todas aplicadas:**
+1. Número de case: los 4 **últimos** caracteres del id (D7, alternativa). Los ejemplos salen como `#0062`.
+2. Tabla de diferencias: las filas que difieren llevan un borde izquierdo coral de 3 px y un marcador "≠" con etiqueta accesible ("they differ" / "difieren"). `--dispute-bg` en claro pasa de `#FFF4EC` a `#FBE1D0`. Se distingue en claro y en oscuro.
+3. Ticker: solo fallos (`ruled`, `disputed`, `dismissed`; los recursos llegarán después). Sin eventos de case nuevo. La etiqueta sigue siendo "Latest verdicts" / "Últimos fallos".
+4. Español: "Archivar" pasa a "Desestimar" en todos los textos (botón, título, ayuda, confirmación, motivo del estado y acta), según el glosario.
+5. Filas del docket en móvil: la línea de ayuda admite hasta 2 líneas antes de los puntos suspensivos.
+6. Home en móvil: mientras no haya vistas, la confianza en el juez es una sola línea compacta debajo del docket. El bloque completo solo aparece en escritorio, junto al titular.
+
+Tests tras las correcciones: 31 ficheros, 328 tests; `tsc -b` y `eslint` sin errores. Nuevo `diff-table.spec.tsx` (solo las filas que difieren llevan el marcador).
+
+Comprobaciones tras redesplegar en pruebas: I1c 19/19 (17 peticiones en 2,1 s). Capturas: una sola pasada nueva, 16 imágenes, sin desbordamiento horizontal, en `.private/screenshots/i1c/`.
+
+Los cases de las comprobaciones (`[I1a check]`, `[I1c check]`) aparecen desestimados en el despliegue de pruebas, como estaba previsto, y por eso llenan el ticker de pruebas.
 
 **Datos de ejemplo en pruebas:** `rayfin/seed/docket-examples.sql` (solo pruebas) añade un case en cada estado con los jurados de ejemplo, porque una sola cuenta no puede producir votos de varios jurados. Las capturas usan esos datos.
 
-**Pendiente para cerrar el criterio de salida:** que dos personas reales (un experto y un aprobador) lleven un case a `ruled` desde la app desplegada en pruebas. Con una sola cuenta solo se puede comprobar que el voto propio no cuenta (R2).
+**Pendiente para cerrar el criterio de salida:** la prueba manual con dos personas (un experto y un aprobador), aplazada al final del proyecto. Preparación y escenarios en `estado.md`. Con una sola cuenta solo se puede comprobar que el voto propio no cuenta (R2).
 
-**Producción:** sin cambios. I1c solo está desplegada en pruebas.
+**Producción (2026-11-10):** I1c desplegada con `rayfin up` (esquema con `Vote` y los campos de `Testimony`, Functions y frontend), y `rayfin.yml` restaurado después. No se cargan los ejemplos en producción. Tras el despliegue, las comprobaciones se ejecutaron una vez contra el despliegue de pruebas: I1a 46/46, I1b 23/23 e I1c 19/19 (esta última tras el redespliegue en pruebas del mismo día; el despliegue en producción no toca pruebas).

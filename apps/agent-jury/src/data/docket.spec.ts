@@ -45,8 +45,9 @@ describe("docket", () => {
         expect(canonicalCategory("Returns", ["Finance", "Sales"])).toBe("Returns");
     });
 
-    it("feeds the ticker with proposals and computed rulings, newest first", () => {
+    it("feeds the ticker with verdicts only, newest first", () => {
         const ticker = buildDocket(raw, jurors, undefined, NOW).ticker;
         expect(ticker[0]).toMatchObject({ caseId: "c1", event: { kind: "state", state: "ruled" } });
+        expect(ticker.every(({ event }) => event.kind === "state" && ["ruled", "disputed", "dismissed"].includes(event.state))).toBe(true);
     });
 });

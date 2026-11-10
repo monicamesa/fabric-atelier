@@ -56,6 +56,9 @@ export interface Docket {
     ticker: TickerEvent[];
 }
 
+/** The ticker shows verdicts only (appeals join in I4); proposals and returns to review stay in the court record. */
+const VERDICT_STATES = new Set<string>(["ruled", "disputed", "dismissed"]);
+
 /** D8: trims and collapses spaces; categories compare without case. */
 export function normalizeCategory(value: string): string {
     return value.trim().replace(/\s+/g, " ");
@@ -95,7 +98,7 @@ export function buildDocket(raw: DocketRecords, jurors: readonly JurorRecord[], 
     const ticker = cases
         .flatMap((docketCase) =>
             caseEvents(docketCase.records)
-                .filter((event) => event.kind === "state" || event.kind === "proposed")
+                .filter((event) => event.kind === "state" && VERDICT_STATES.has(event.state))
                 .map((event) => ({ caseId: docketCase.record.id, caseText: docketCase.record.text, event })),
         )
         .sort((a, b) => b.event.at.localeCompare(a.event.at))
