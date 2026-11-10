@@ -1,6 +1,19 @@
 # Estado del proyecto — traspaso
 
-> Última actualización: 2026-11-09 · Especificación: [v0.3](../especificacion-general.md) · Convenciones: [docs/conventions.md](../../../../docs/conventions.md)
+> Última actualización: 2026-11-10 · Especificación: [v0.4](../especificacion-general.md) · Convenciones: [docs/conventions.md](../../../../docs/conventions.md) · Notas de trabajo verificadas: [AGENTS.md](../../AGENTS.md), sección "Verified working notes"
+
+## Dónde estamos (2026-11-10)
+
+- **I1a, I1b e I1c están terminadas y desplegadas en producción** (`FabricApp-AgentJury`). Última revisión: I1c, aprobada con correcciones (commit "agent-jury: I1c review fixes, production deploy").
+- **Despliegue de pruebas** en su propio workspace, en la misma capacidad. Es el destino por defecto de las comprobaciones. Con la versión de producción: I1a 46/46, I1b 23/23 e I1c 19/19.
+- **Pendiente al final del proyecto:** la prueba manual con dos personas (aprobador y experto). Preparación y tres escenarios en la sección I1c de "Qué queda pendiente".
+- **Siguiente paso: planificar I3** (Lakehouse `jury_lh`, notebook `evaluate_agent`, Function de lanzamiento, connector de lectura y pantalla 5; verificar S1–S5). Lo primero es escribir el plan en `docs/iteraciones/I3.md`, como en I1a–I1c, y que la propietaria lo apruebe antes de construir nada.
+- **Workspace de demo `FabricApp-AgentJury-Demo`: listo.** Contiene:
+  - El Lakehouse `AdventureWorksDemo`, con los datos en el esquema `demo`.
+  - El modelo semántico `SalesModel`, con las trampas de la sección 11 de la especificación (active customer, revenue, year y region).
+  - El Data Agent `Sales Agent`, publicado.
+  - Los IDs no se versionan: si hacen falta, están en `.private/values.env` o se buscan por nombre en Fabric.
+- Para una sesión nueva: leer `AGENTS.md` (reglas y notas verificadas), este fichero, la especificación y `docs/conventions.md`. Los scripts locales de `.private/` no están en Git (ver `AGENTS.md`).
 
 ## Qué está hecho
 

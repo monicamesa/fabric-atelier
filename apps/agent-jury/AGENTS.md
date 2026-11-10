@@ -194,3 +194,36 @@ These rules come from [docs/especificacion-general.md](docs/especificacion-gener
 ### Privacy
 
 31. Read private values (tenant, workspace, item and capacity IDs, emails, app URLs, the Windows user path) from `.private/values.env` at the repository root. Never write them into tracked files: refer to them by key name, for example `<TENANT_ID>`. The pre-commit hook in `.githooks/` blocks them.
+32. The pre-commit hook also blocks GUIDs that are not of the form `00000000-0000-4000-8000-0000000000NN`, and emails that are not on `example.com`. This applies to tests, fixtures and locale hints too. For a non-GUID test id, use a plain string.
+
+## Verified working notes
+
+Facts confirmed in earlier sessions (Rayfin CLI 1.36.2, Windows, PowerShell 5.1). Project status and next steps are in [docs/iteraciones/estado.md](docs/iteraciones/estado.md).
+
+### Terminal
+
+- Use `npm.cmd` and `npx.cmd`: the execution policy blocks `npm.ps1` and `npx.ps1`.
+- The integrated terminal often returns no output even though the command ran. For anything long, run it async, have it write a UTF-8 file under `.private/` (`Out-File -Encoding utf8`) and read that file. `Out-File` only writes when the command ends. `*>` and `Out-File` without `-Encoding` produce UTF-16.
+- Scripts must call `process.exit` at the end, or they hang when piped.
+- Never create a file and then `Move-Item` it over a file that is open in the editor: the result was an empty file. Write the final path directly.
+- `npx prettier` is not installed and prompts for an install. Use `npm.cmd run lint`.
+- Pure helpers must live outside component files, or the `react-refresh` lint rule warns.
+
+### Rayfin
+
+- After every `npx.cmd rayfin up`, run `git restore rayfin/rayfin.yml` (see `docs/conventions.md`).
+- The production deployment is the active one in `rayfin/.env`. `node scripts/deploy-test.mjs` deploys to the test workspace, writes `rayfin/.env.test` and switches back to production. To switch by hand, use `rayfin up switch` and `rayfin up list` (there is no top-level `rayfin switch`).
+- Check scripts (`scripts/i1a-checks.mjs --expect-admin`, `scripts/i1b-checks.mjs`, `scripts/i1c-checks.mjs`) target the test deployment by default. Production needs `--target=production --allow-production`. `scripts/run-sql.mjs` needs `--target=test` for files marked `-- target: test-only`.
+- Rayfin creates plural table names (`dbo.Jurors`, `dbo.Cases`), with `id uniqueidentifier DEFAULT newid()`. The Fabric SQL `serverFqdn` has the form `host,1433`. The test SQL database auto-pauses, so the first connection may time out: retry once.
+- `findById()` returns only `id`. Use `select([...]).where({ id: { eq } })`.
+- Functions: `rayfin up` does not regenerate `types.ts`. Run `npx.cmd rayfin functions init` (without `--force`) or `dev functions apply`. Deleted Functions answer "Application authentication for this function is currently unavailable".
+- `ctx.accessToken` in a Function is a Fabric platform token (`idtyp` fmi): no email, and its `sub` is not the session user. Create policies, including `claims.email`, are enforced by the data API.
+- Secrets: `<value> | npx.cmd rayfin secret set NAME --stdin --describe="..."` after a deployment exists. It writes the name to `rayfin.yml` and `secrets.generated.ts`. A declared but unset secret throws when read, so read optional ones in `try/catch`.
+- Script sign-in uses `getAuthenticatedToken` from `@microsoft/rayfin-cli/auth`: `az` cannot get `Item.Execute.All`.
+- `rayfin/tsconfig.json` needs its own `tsBuildInfoFile`, or the root project reference fails with TS6377.
+- Check scripts mark their `AdminRequest` payloads with `source: "check"`, so `readAdminLog` reports them as automated.
+
+### Local helpers (not in Git)
+
+- `.private/` (git-ignored) holds local-only scripts: `use-test-env-local.mjs` (points `.env.local` at the test deployment; `npm run dev` regenerates it from production), `screenshots-i1c.mjs` (headless Edge through `.private/tools`, signs in with `rayfin login`, needs Vite running) and `measure-load.mjs`. They are not in the repository. Recreate them if missing; never commit them.
+- After working against test locally, stop Vite and point `.env.local` back to production (`npx.cmd rayfin env --framework vite`).
