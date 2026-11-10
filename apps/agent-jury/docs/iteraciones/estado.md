@@ -7,7 +7,7 @@
 - **I1a, I1b e I1c están terminadas y desplegadas en producción** (`FabricApp-AgentJury`). Última revisión: I1c, aprobada con correcciones (commit "agent-jury: I1c review fixes, production deploy").
 - **Despliegue de pruebas** en su propio workspace, en la misma capacidad. Es el destino por defecto de las comprobaciones. Con la versión de producción: I1a 46/46, I1b 23/23 e I1c 19/19.
 - **Pendiente al final del proyecto:** la prueba manual con dos personas (aprobador y experto). Preparación y tres escenarios en la sección I1c de "Qué queda pendiente".
-- **Siguiente paso: planificar I3** (Lakehouse `jury_lh`, notebook `evaluate_agent`, Function de lanzamiento, connector de lectura y pantalla 5; verificar S1–S5). Lo primero es escribir el plan en `docs/iteraciones/I3.md`, como en I1a–I1c, y que la propietaria lo apruebe antes de construir nada.
+- **Siguiente paso: I3a en curso** (plan aprobado el 2026-11-10 en [I3.md](I3.md)). Hechos los spikes S1, S2, S6 y S7; siguen S3 y S5 y el case fallado de ejemplo para la prueba de punta a punta. Antes de cada spike se pide a la propietaria que confirme en Capacity Metrics que no hay *throttling*.
 - **Workspace de demo `FabricApp-AgentJury-Demo`: listo.** Contiene:
   - El Lakehouse `AdventureWorksDemo`, con los datos en el esquema `demo`.
   - El modelo semántico `SalesModel`, con las trampas de la sección 11 de la especificación (active customer, revenue, year y region).
@@ -132,6 +132,7 @@ Solo las que no están ya en la especificación ni en `conventions.md`.
      - Para arrancar la app local contra pruebas: `node .private/use-test-env-local.mjs` y `npx.cmd vite` (`npm run dev` regenera `.env.local` desde producción). Al terminar, parar Vite y devolver `.env.local` a producción.
    - **Despliegue de pruebas (D12 de I1c): hecho.** Workspace propio en la misma capacidad, `rayfin/.env.test` y claves `*_TEST` en `.private/values.env`. Comandos en el README de la app ("Test deployment").
    - **Candidatos para más adelante** (fuera de I1b, decisión D3):
+     - **Post-MVP: estabilidad de las respuestas.** Medir si el agente contesta lo mismo ante la misma pregunta repetida (en I3a el agente publicado respondió distinto que en una prueba manual anterior).
      - "Hasn't signed in yet" en la tabla de jurors: exige leer `dbo.Users` de Rayfin con T-SQL desde la Function.
      - "Copy invite link": el enlace de la app en Fabric es un dato privado del despliegue; habría que decidir de dónde se lee.
      - Nombre del workspace en las tarjetas de agentes (D4): con la API de Fabric, en I3.
