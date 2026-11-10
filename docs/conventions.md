@@ -38,6 +38,10 @@ Rules shared by every app in Fabric Atelier.
 - Never poll a deployed app in a loop, and never leave scripts or a local dev server pointed at it running unattended. To wait for a long job, check its status by hand.
 - If every request suddenly takes about 20 s, check the Capacity Metrics app for "Interactive delay" before measuring or debugging anything else.
 
+## Lessons learned
+
+- Every new gotcha goes into [lessons-learned.md](lessons-learned.md) (symptom, cause, what we did, link) in the same commit as its fix. No private data.
+
 ## Language
 
 - The user interface is bilingual: English and Spanish, with English as the default.

@@ -195,6 +195,7 @@ These rules come from [docs/especificacion-general.md](docs/especificacion-gener
 
 31. Read private values (tenant, workspace, item and capacity IDs, emails, app URLs, the Windows user path) from `.private/values.env` at the repository root. Never write them into tracked files: refer to them by key name, for example `<TENANT_ID>`. The pre-commit hook in `.githooks/` blocks them.
 32. The pre-commit hook also blocks GUIDs that are not of the form `00000000-0000-4000-8000-0000000000NN`, and emails that are not on `example.com`. This applies to tests, fixtures and locale hints too. For a non-GUID test id, use a plain string.
+33. Whenever you hit a new gotcha, add a lesson (symptom, cause, what we did, link) to [../../docs/lessons-learned.md](../../docs/lessons-learned.md) in the same commit as the fix. No private data.
 
 ## Verified working notes
 
