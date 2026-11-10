@@ -151,7 +151,7 @@ function DocketRow({ item, onOpen }: { item: DocketCase; onOpen: () => void }) {
         analysis.state === "ruled" && ruling
             ? t("home.expected", { answer: ruling.answer })
             : analysis.state === "under_review" && analysis.reason !== "noAnswers"
-              ? t("cases.votesOf", { count: leading, total: CONSENSUS_MIN_VOTES })
+              ? t("cases.votesOf", { votes: leading, count: CONSENSUS_MIN_VOTES })
               : t(`caseDetail.reason.${analysis.reason}`, { count: analysis.votesMissing, total: CONSENSUS_MIN_VOTES });
     const href = formatRoute({ page: "case", caseId: record.id });
     const go = (event: MouseEvent) => {

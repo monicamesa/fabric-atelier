@@ -73,7 +73,7 @@ export function TestimonyCard({ letter, testimony, tally, author, team, minVotes
             <p className="m-0 text-[16px] text-text">{testimony.definition}</p>
             <VoteBar value={tally.votesFor} max={minVotes} />
             <p className="m-0 text-[14px] text-text-muted">
-                {t("answer.progress", { count: tally.votesFor, total: minVotes })}
+                {t("answer.progress", { votes: tally.votesFor, count: minVotes })}
                 {tally.votesAgainst > 0 && ` · ${t("answer.against", { count: tally.votesAgainst })}`}
             </p>
             {isOwn && <p className="m-0 text-[14px] text-text-muted">{t("vote.ownAnswer")}</p>}

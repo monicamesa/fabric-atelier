@@ -125,7 +125,8 @@
         "noMatch": "No cases match this search or filter.",
         "more": "+ {{count}} more",
         "tip": "Tip: a good case has one right answer that a business expert can check. \"How are sales going?\" is not a case; \"Net sales in October 2026?\" is.",
-        "votesOf": "{{count}} of {{total}} votes",
+        "votesOf_one": "{{votes}} of {{count}} vote",
+        "votesOf_other": "{{votes}} of {{count}} votes",
         "yourVote": "Your vote needed",
         "youVoted": "You voted ✓",
         "jurorsAgree_one": "{{count}} juror agrees",
@@ -175,7 +176,8 @@
         "votes_one": "{{count}} vote",
         "votes_other": "{{count}} votes",
         "ruling": "Ruling",
-        "progress": "{{count}} of {{total}} votes in favour",
+        "progress_one": "{{votes}} of {{count}} vote in favour",
+        "progress_other": "{{votes}} of {{count}} votes in favour",
         "against_one": "{{count}} against",
         "against_other": "{{count}} against"
     },
@@ -518,7 +520,14 @@
             "startedBy": "Started {{when}} by {{who}}",
             "questions_one": "{{count}} question",
             "questions_other": "{{count}} questions",
-            "scoreline": "{{correct}} correct · {{incorrect}} incorrect · {{unclear}} unclear",
+            "score": {
+                "correct_one": "{{count}} correct",
+                "correct_other": "{{count}} correct",
+                "incorrect_one": "{{count}} incorrect",
+                "incorrect_other": "{{count}} incorrect",
+                "unclear_one": "{{count}} unclear",
+                "unclear_other": "{{count}} unclear"
+            },
             "open": "Open the hearing"
         },
         "launch": {
@@ -595,9 +604,12 @@
         },
         "scoreboard": {
             "title": "Scoreboard",
-            "correct": "correct",
-            "incorrect": "incorrect",
-            "unclear": "unclear"
+            "correct_one": "correct",
+            "correct_other": "correct",
+            "incorrect_one": "incorrect",
+            "incorrect_other": "incorrect",
+            "unclear_one": "unclear",
+            "unclear_other": "unclear"
         },
         "notFound": "That hearing does not exist.",
         "detail": {

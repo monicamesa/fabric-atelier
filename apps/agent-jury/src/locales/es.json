@@ -125,7 +125,8 @@
         "noMatch": "Ningún caso coincide con esta búsqueda o filtro.",
         "more": "+ {{count}} más",
         "tip": "Consejo: un buen caso tiene una única respuesta correcta que un experto de negocio puede comprobar. «¿Cómo van las ventas?» no es un caso; «¿Ventas netas en octubre de 2026?» sí lo es.",
-        "votesOf": "{{count}} de {{total}} votos",
+        "votesOf_one": "{{votes}} de {{count}} voto",
+        "votesOf_other": "{{votes}} de {{count}} votos",
         "yourVote": "Falta tu voto",
         "youVoted": "Ya has votado ✓",
         "jurorsAgree_one": "{{count}} jurado está de acuerdo",
@@ -175,7 +176,8 @@
         "votes_one": "{{count}} voto",
         "votes_other": "{{count}} votos",
         "ruling": "Resolución",
-        "progress": "{{count}} de {{total}} votos a favor",
+        "progress_one": "{{votes}} de {{count}} voto a favor",
+        "progress_other": "{{votes}} de {{count}} votos a favor",
         "against_one": "{{count}} en contra",
         "against_other": "{{count}} en contra"
     },
@@ -518,7 +520,14 @@
             "startedBy": "Iniciada {{when}} por {{who}}",
             "questions_one": "{{count}} pregunta",
             "questions_other": "{{count}} preguntas",
-            "scoreline": "{{correct}} correctas · {{incorrect}} incorrectas · {{unclear}} sin claro",
+            "score": {
+                "correct_one": "{{count}} correcta",
+                "correct_other": "{{count}} correctas",
+                "incorrect_one": "{{count}} incorrecta",
+                "incorrect_other": "{{count}} incorrectas",
+                "unclear_one": "{{count}} sin claro",
+                "unclear_other": "{{count}} sin claro"
+            },
             "open": "Abrir la vista"
         },
         "launch": {
@@ -595,9 +604,12 @@
         },
         "scoreboard": {
             "title": "Marcador",
-            "correct": "correctas",
-            "incorrect": "incorrectas",
-            "unclear": "sin claro"
+            "correct_one": "correcta",
+            "correct_other": "correctas",
+            "incorrect_one": "incorrecta",
+            "incorrect_other": "incorrectas",
+            "unclear_one": "sin claro",
+            "unclear_other": "sin claro"
         },
         "notFound": "Esa vista no existe.",
         "detail": {

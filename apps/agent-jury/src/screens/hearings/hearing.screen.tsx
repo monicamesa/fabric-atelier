@@ -217,7 +217,7 @@ export function HearingScreen({ client, hearingId, agents, jurors, viewer, onBac
                     <dl className="m-0 flex gap-5" aria-label={t("hearings.scoreboard.title")}>
                         {(["correct", "incorrect", "unclear"] as const).map((key) => (
                             <div key={key} className="flex flex-col items-center">
-                                <dt className="order-2 text-[12px] font-bold uppercase tracking-[0.1em] text-text-muted">{t(`hearings.scoreboard.${key}`)}</dt>
+                                <dt className="order-2 text-[12px] font-bold uppercase tracking-[0.1em] text-text-muted">{t(`hearings.scoreboard.${key}`, { count: score[key] })}</dt>
                                 <dd className="m-0 font-serif text-[40px] font-black leading-none text-ink">{score[key]}</dd>
                             </div>
                         ))}

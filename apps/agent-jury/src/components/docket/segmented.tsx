@@ -19,7 +19,7 @@ interface SegmentedProps<T extends string> {
 /** Toggle buttons with aria-pressed (language switch, list filters). */
 export function Segmented<T extends string>({ label, value, options, onChange, size = "md" }: SegmentedProps<T>) {
     return (
-        <div role="group" aria-label={label} className={cn("flex border border-ink", size === "md" && "gap-1 p-[3px]")}>
+        <div role="group" aria-label={label} className={cn("flex max-w-full overflow-x-auto border border-ink", size === "md" && "gap-1 p-[3px]")}>
             {options.map((option) => {
                 const pressed = option.value === value;
                 return (
@@ -31,7 +31,7 @@ export function Segmented<T extends string>({ label, value, options, onChange, s
                         lang={option.lang}
                         onClick={() => onChange(option.value)}
                         className={cn(
-                            "min-w-11 font-semibold",
+                            "min-w-11 shrink-0 whitespace-nowrap font-semibold",
                             size === "sm" ? "min-h-9 text-[13px] font-bold" : "min-h-[34px] px-3.5 text-[14px]",
                             pressed ? "bg-ink text-ink-inverse" : "bg-transparent text-ink hover:bg-paper-hover",
                         )}

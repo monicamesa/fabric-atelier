@@ -23,6 +23,13 @@ const HEARINGS = [
     hearing("00000000-0000-4000-8000-0000000000d3", OTHER_AGENT.id, at("2026-11-10T14:00:00Z")),
 ];
 const EVENTS = HEARINGS.map((row) => event(row.id, "completed", "2026-11-10T14:30:00Z"));
+const verdict = (hearing_id: string, case_id: string, judgeVerdict: string) => ({ id: `${hearing_id}-${case_id}`, hearing_id, case_id, agentAnswer: "x", judgeVerdict, judgeMessage: "Yes", createdAt: "2026-11-10T14:20:00Z" });
+const VERDICTS = [
+    verdict(HEARINGS[0].id, "c1", "correct"),
+    verdict(HEARINGS[0].id, "c2", "incorrect"),
+    verdict(HEARINGS[1].id, "c1", "correct"),
+    verdict(HEARINGS[1].id, "c2", "correct"),
+];
 
 function ruledCase(id: string, text: string, answer: string, authorEmail = ADMIN.email) {
     return {
@@ -59,7 +66,7 @@ function fakeClient() {
             Hearing: { select: () => page(HEARINGS) },
             HearingCase: { select: () => page([]) },
             HearingEvent: { select: () => page(EVENTS) },
-            Verdict: { select: () => page([]) },
+            Verdict: { select: () => page(VERDICTS) },
         },
         auth: { getSession: () => ({ isAuthenticated: true, user: ADMIN }) },
     } as unknown as AppRayfinClient;
@@ -86,6 +93,42 @@ beforeAll(async () => {
 });
 
 describe("HearingsScreen", () => {
+    it("uses the plural rules in every counter of the list, in both languages", async () => {
+        await i18n.changeLanguage("en");
+        renderHearings();
+        expect(await screen.findByText(/1 correct · 1 incorrect · 0 unclear/)).toBeInTheDocument();
+        expect(screen.getByText(/2 correct · 0 incorrect · 0 unclear/)).toBeInTheDocument();
+        expect(screen.getAllByText(/2 questions/).length).toBeGreaterThan(0);
+    });
+
+    it("says 1 correcta / 1 incorrecta and 2 correctas in Spanish", async () => {
+        await i18n.changeLanguage("es");
+        renderHearings();
+        expect(await screen.findByText(/1 correcta · 1 incorrecta · 0 sin claro/)).toBeInTheDocument();
+        expect(screen.getByText(/2 correctas · 0 incorrectas · 0 sin claro/)).toBeInTheDocument();
+        await i18n.changeLanguage("en");
+    });
+
+    it("puts the expected answer under the question on a phone and to its right from 640 px", async () => {
+        await i18n.changeLanguage("en");
+        renderHearings();
+        const label = (await screen.findByRole("checkbox", { name: /How many orders were placed/ })).closest("label")!;
+        const content = label.querySelector("span")!;
+        expect(content).toHaveClass("flex-col");
+        expect(content).toHaveClass("min-[640px]:flex-row");
+        const expected = label.querySelector("[title]")!;
+        expect(expected).toHaveClass("max-w-full");
+        expect(expected).toHaveClass("min-[640px]:max-w-[16rem]");
+    });
+
+    it("keeps agent names on one line and lets the tab group scroll", async () => {
+        await i18n.changeLanguage("en");
+        renderHearings();
+        const group = await screen.findByRole("group", { name: /agent/i });
+        expect(group).toHaveClass("overflow-x-auto");
+        for (const button of within(group).getAllByRole("button")) expect(button).toHaveClass("whitespace-nowrap");
+    });
+
     it("lists every hearing of the agent, newest first, and none of another agent's", async () => {
         await i18n.changeLanguage("en");
         renderHearings();

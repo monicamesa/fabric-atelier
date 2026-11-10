@@ -105,18 +105,22 @@ export function HearingsScreen({ client, agents, agent, docket, jurors, viewer, 
                                 return (
                                     <label
                                         key={item.record.id}
-                                        className="flex min-h-11 cursor-pointer flex-wrap items-center gap-x-3 gap-y-1 border border-rule bg-paper px-3 py-2 has-[:checked]:border-2 has-[:checked]:border-ink"
+                                        className="flex min-h-11 cursor-pointer items-start gap-3 border border-rule bg-paper px-3 py-2 has-[:checked]:border-2 has-[:checked]:border-ink min-[640px]:items-center"
                                     >
-                                        <input type="checkbox" checked={checked} disabled={full} onChange={() => toggle(item.record.id)} className="size-5 accent-[var(--ink)]" />
-                                        <CaseNumber id={item.record.id} />
-                                        <span className="min-w-0 flex-1 font-serif text-[18px] font-bold text-ink">{item.record.text}</span>
-                                        {expected && (
-                                            <span title={expected} className="max-w-[16rem] shrink-0 truncate font-mono text-[15px] text-text">
-                                                <span aria-hidden="true">→ </span>
-                                                <span className="sr-only">{t("hearings.launch.expected")} </span>
-                                                {expected}
+                                        <input type="checkbox" checked={checked} disabled={full} onChange={() => toggle(item.record.id)} className="mt-0.5 size-5 shrink-0 accent-[var(--ink)] min-[640px]:mt-0" />
+                                        <span className="flex min-w-0 flex-1 flex-col gap-1 min-[640px]:flex-row min-[640px]:items-center min-[640px]:gap-3">
+                                            <span className="flex min-w-0 flex-1 flex-wrap items-baseline gap-x-3 gap-y-1">
+                                                <CaseNumber id={item.record.id} />
+                                                <span className="font-serif text-[18px] font-bold text-ink">{item.record.text}</span>
                                             </span>
-                                        )}
+                                            {expected && (
+                                                <span title={expected} className="max-w-full shrink-0 truncate font-mono text-[15px] text-text min-[640px]:max-w-[16rem]">
+                                                    <span aria-hidden="true">→ </span>
+                                                    <span className="sr-only">{t("hearings.launch.expected")} </span>
+                                                    {expected}
+                                                </span>
+                                            )}
+                                        </span>
                                     </label>
                                 );
                             })}
@@ -193,7 +197,7 @@ export function HearingsScreen({ client, agents, agent, docket, jurors, viewer, 
                                     </div>
                                     <p className="m-0 text-[14px] text-text-muted">
                                         {t(`hearings.stage.${view.hearing.stage}`)} · {t("hearings.list.questions", { count: view.total })} ·{" "}
-                                        {t("hearings.list.scoreline", { correct: score.correct, incorrect: score.incorrect, unclear: score.unclear })}
+                                        {(["correct", "incorrect", "unclear"] as const).map((key) => t(`hearings.list.score.${key}`, { count: score[key] })).join(" · ")}
                                     </p>
                                 </div>
                                 <Button variant="secondary" compact onClick={() => onOpenHearing(view.hearing.id)}>

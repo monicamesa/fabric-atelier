@@ -210,7 +210,7 @@ function Clipping({ item, myUserId, onOpen }: { item: DocketCase; myUserId?: str
             {state === "under_review" && (
                 <>
                     <span className="flex flex-wrap justify-between gap-2 text-[14px]">
-                        <span className="text-text">{t("cases.votesOf", { count: leading, total: CONSENSUS_MIN_VOTES })}</span>
+                        <span className="text-text">{t("cases.votesOf", { votes: leading, count: CONSENSUS_MIN_VOTES })}</span>
                         {item.needsMyVote ? (
                             <span className="font-semibold text-action-text">{t("cases.yourVote")}</span>
                         ) : voted ? (
