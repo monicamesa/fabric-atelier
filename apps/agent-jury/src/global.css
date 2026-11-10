@@ -192,6 +192,16 @@
   animation: docket-gavel 2.6s ease-in-out infinite;
 }
 
+/* Verdict stamp lands: scale 2.2 -> 1 in about half a second (design guide, section 7). */
+@keyframes docket-stamp {
+  from { transform: rotate(-8deg) scale(2.2); opacity: 0; }
+  to { transform: rotate(-8deg) scale(1); opacity: 1; }
+}
+
+.docket-stamp {
+  animation: docket-stamp 0.5s ease-out;
+}
+
 @utility icon-size-* {
   width: --value(--icon-size-*);
   height: --value(--icon-size-*);

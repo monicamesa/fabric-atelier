@@ -33,3 +33,7 @@ secrets:
     description: Database name of the app SQL database (admin Function T-SQL)
   - name: LEGACY_CHECK_CUTOFF_UTC
     description: Optional. Admin log rows before this ISO UTC time count as automated checks. Leave unset.
+  - name: HEARING_WORKSPACE_ID
+    description: Workspace that holds the evaluate_agent notebook (hearing actions). Unset on deployments without hearings.
+  - name: HEARING_NOTEBOOK_ID
+    description: Item of the evaluate_agent notebook (hearing actions). Unset on deployments without hearings.

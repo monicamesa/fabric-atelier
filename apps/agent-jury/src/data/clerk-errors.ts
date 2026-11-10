@@ -12,6 +12,11 @@ export type ClerkErrorKey =
     | "invalid"
     | "notFound"
     | "notSignedIn"
+    | "limitExceeded"
+    | "noCases"
+    | "hearingInProgress"
+    | "cooldown"
+    | "fabricError"
     | "unexpected";
 
 export interface ClerkErrorView {
@@ -44,6 +49,16 @@ export function describeClerkError(error: unknown): ClerkErrorView {
             return { key: "invalid", technicalDetails };
         case "not_found":
             return { key: "notFound", technicalDetails };
+        case "limit_exceeded":
+            return { key: "limitExceeded", technicalDetails };
+        case "no_cases":
+            return { key: "noCases", technicalDetails };
+        case "hearing_in_progress":
+            return { key: "hearingInProgress", technicalDetails };
+        case "cooldown":
+            return { key: "cooldown", technicalDetails };
+        case "fabric_error":
+            return { key: "fabricError", technicalDetails };
     }
     switch (result.code) {
         case 403:

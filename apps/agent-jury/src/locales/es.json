@@ -64,6 +64,7 @@
         "label": "Principal",
         "home": "Inicio",
         "cases": "Casos",
+        "hearings": "Vistas",
         "clerk": "Secretaría"
     },
     "loading": {
@@ -487,8 +488,111 @@
             "notFound": "Ese jurado o agente ya no existe. Recarga la página.",
             "notSignedIn": "Tienes que iniciar sesión para hacer esto.",
             "unexpected": "Algo ha fallado por nuestra parte. Vuelve a intentarlo.",
-            "nothingChanged": "No se ha cambiado nada."
+            "nothingChanged": "No se ha cambiado nada.",
+            "limitExceeded": "En una vista caben pocas preguntas. Elige menos.",
+            "noCases": "Solo los casos fallados pueden ir a una vista. Recarga la página y elige de nuevo.",
+            "hearingInProgress": "Hay otra vista en curso. Espera a que termine y vuelve a intentarlo.",
+            "cooldown": "La última vista terminó hace menos de diez minutos. Deja descansar la capacidad y vuelve a intentarlo.",
+            "fabricError": "Fabric no pudo iniciar ni comprobar la vista. No se ha perdido nada; la vista queda registrada como fallida."
         }
+    },
+    "hearings": {
+        "kicker": "La sala",
+        "title": "Vistas",
+        "help": "En una vista el agente se sienta en el estrado. Responde a las preguntas que el jurado ya ha fallado y el juez de IA dice si cada respuesta coincide con la del jurado.",
+        "state": {
+            "in_progress": "En sesión",
+            "completed": "Terminada",
+            "failed": "Fallida",
+            "cancelled": "Cancelada",
+            "no_news": "Sin noticias"
+        },
+        "stage": {
+            "production": "Versión publicada",
+            "sandbox": "Versión borrador"
+        },
+        "list": {
+            "title": "Vistas pasadas y en curso",
+            "none": "Todavía no hay ninguna vista de este agente. Las preguntas falladas del jurado esperan la primera.",
+            "noneViewer": "Todavía no hay ninguna vista de este agente. Un admin puede iniciar una.",
+            "startedBy": "Iniciada {{when}} por {{who}}",
+            "questions": "{{count}} preguntas",
+            "scoreline": "{{correct}} correctas · {{incorrect}} incorrectas · {{unclear}} sin claro",
+            "open": "Abrir la vista"
+        },
+        "launch": {
+            "title": "Iniciar una vista",
+            "help": "Elige qué preguntas falladas se le hacen al agente. Solo se pueden hacer las que el jurado ya ha fallado; su respuesta fallada es con la que compara el juez.",
+            "pick": "Preguntas falladas",
+            "noRuled": "Este agente todavía no tiene casos fallados. Un caso está fallado cuando dos jurados respaldan una respuesta y uno de ellos es aprobador.",
+            "selected": "{{count}} de {{max}} elegidas",
+            "stage": "¿Qué versión del agente?",
+            "estimate": "Unos {{minutes}} minutos: aproximadamente {{seconds}} segundos por pregunta, más unos dos minutos para preparar la sala.",
+            "capacity": "Las vistas usan la capacidad que comparten esta app y sus agentes. Solo se celebra una vista a la vez, con diez minutos de descanso entre ellas.",
+            "submit": "Iniciar la vista",
+            "starting": "Abriendo la sesión…",
+            "busy": "Hay una vista en curso. Inicia la siguiente cuando termine.",
+            "adminOnly": "Solo los admins pueden iniciar una vista."
+        },
+        "session": {
+            "kicker": "En sesión",
+            "title": "Interrogando a {{agent}}",
+            "collected": "{{count}} casos fallados reunidos",
+            "started": "Vista iniciada en Fabric",
+            "asking": "Pregunta {{current}} de {{total}}",
+            "rules": "El juez falla",
+            "progress": "Progreso de la vista",
+            "estimate": "Quedan unos {{minutes}} minutos. Puedes irte: la vista sigue y la encontrarás en Vistas.",
+            "overtime": "Está tardando más de lo previsto. Puedes irte: la vista sigue.",
+            "step": {
+                "done": "hecho",
+                "now": "en curso",
+                "next": "siguiente"
+            },
+            "leave": "Volver a Vistas"
+        },
+        "refresh": {
+            "button": "Actualizar",
+            "lastRead": "Última lectura {{time}}",
+            "auto": "Esta página se vuelve a leer cada minuto mientras la pestaña esté abierta y la vista en sesión.",
+            "paused": "Las actualizaciones automáticas se han detenido. Pulsa Actualizar para comprobar de nuevo."
+        },
+        "ended": {
+            "completed": "La vista ha terminado: {{count}} veredictos.",
+            "failed": "La vista ha fallado. {{detail}}",
+            "cancelled": "La vista se ha cancelado. Los veredictos de abajo se dieron antes.",
+            "no_news": "No hay noticias de esta vista desde hace más de lo previsto. Puede haberse detenido."
+        },
+        "actions": {
+            "cancel": "Cancelar la vista",
+            "cancelling": "Cancelando…",
+            "check": "Consultar a Fabric",
+            "checking": "Preguntando a Fabric…",
+            "checkHelp": "Una sola pregunta a Fabric sobre el trabajo, nada más.",
+            "reported": "Fabric indica que el trabajo está {{status}}."
+        },
+        "verdicts": {
+            "title": "Veredictos según llegan",
+            "empty": "Todavía no hay veredictos. El primero aparece cuando el agente responde a la pregunta 1.",
+            "position": "Pregunta {{position}} de {{total}} · caso {{number}}",
+            "expects": "El jurado espera",
+            "answered": "El agente respondió",
+            "judge": "El juez de IA falla",
+            "correct": "Correcta",
+            "incorrect": "Incorrecta",
+            "unclear": "Sin claro",
+            "waiting": "Esperando al agente…",
+            "agentVersion": "Versión del agente {{version}}, publicada {{when}}",
+            "reviewSoon": "En el siguiente paso el jurado podrá confirmar o recurrir cada veredicto."
+        },
+        "scoreboard": {
+            "title": "Marcador",
+            "correct": "correctas",
+            "incorrect": "incorrectas",
+            "unclear": "sin claro"
+        },
+        "notFound": "Esa vista no existe.",
+        "back": "Volver a Vistas"
     },
     "errors": {
         "load": "No se han podido cargar los datos.",

@@ -9,6 +9,7 @@ import {
   type ClerkReason,
   type ClerkResult,
 } from './clerk-actions.js';
+import { cancelHearing, checkWithFabric, launchHearing, type HearingRuntime } from './hearing-actions.js';
 
 // The browser inserts an AdminRequest (its insert policy proves requesterEmail); this code runs only
 // what that row says, once, within 2 minutes, and only for an active admin.
@@ -29,6 +30,8 @@ interface Outcome {
   reason: ClerkReason;
   detail: string;
   log?: AdminLogEntry[];
+  hearingId?: string;
+  jobStatus?: string;
 }
 
 const UNIQUE_VIOLATION = new Set([2601, 2627]);
@@ -39,11 +42,29 @@ const notFound = (detail: string): Outcome => ({ code: 404, reason: 'not_found',
 export interface AdminRequestOptions {
   /** Log rows processed before this moment count as automated checks (LEGACY_CHECK_CUTOFF_UTC). */
   legacyCheckCutoff?: Date;
+  /** Fabric token, notebook and database settings for the hearing actions; read lazily so other actions never need them. */
+  hearing?: () => HearingRuntime;
 }
 
-async function runCommand(transaction: sql.Transaction, command: ClerkCommand, options: AdminRequestOptions): Promise<Outcome> {
+const notConfigured = (): HearingRuntime => {
+  throw new Error('Hearings are not configured.');
+};
+
+async function runCommand(
+  transaction: sql.Transaction,
+  command: ClerkCommand,
+  options: AdminRequestOptions,
+  context: { requestId: string; requesterEmail: string },
+): Promise<Outcome> {
   const request = () => new sql.Request(transaction);
+  const runtime = options.hearing ?? notConfigured;
   switch (command.action) {
+    case 'launchHearing':
+      return launchHearing(transaction, command, context, runtime);
+    case 'cancelHearing':
+      return cancelHearing(transaction, command, runtime);
+    case 'checkWithFabric':
+      return checkWithFabric(transaction, command, runtime);
     case 'swearInJuror': {
       const existing = await request()
         .input('email', sql.NVarChar(254), command.email)
@@ -188,7 +209,7 @@ export async function executeAdminRequest(
   await transaction.begin();
   try {
     if (command) {
-      outcome = await runCommand(transaction, command, options);
+      outcome = await runCommand(transaction, command, options, { requestId, requesterEmail: stored.requesterEmail });
     }
     const final = outcome as Outcome;
     // The unique requestId makes the request single-use, whatever the outcome.

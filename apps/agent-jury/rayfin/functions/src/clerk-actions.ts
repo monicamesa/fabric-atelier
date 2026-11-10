@@ -1,5 +1,6 @@
 // Pure rules for clerkExecute, shared with the frontend (no Node or mssql imports).
 // The Function enforces them; the UI uses the same rules only to hide actions.
+import { HEARING_MAX_CASES, HEARING_STAGES, type HearingStage } from './hearing-rules.js';
 
 export const JUROR_ROLES = ['expert', 'approver', 'admin'] as const;
 export type JurorRole = (typeof JUROR_ROLES)[number];
@@ -12,6 +13,9 @@ export const CLERK_ACTIONS = [
   'registerAgent',
   'setAgentActive',
   'readAdminLog',
+  'launchHearing',
+  'cancelHearing',
+  'checkWithFabric',
 ] as const;
 export type ClerkAction = (typeof CLERK_ACTIONS)[number];
 
@@ -23,7 +27,12 @@ export type ClerkCommand =
   | { action: 'editJurorDetails'; jurorId: string; displayName?: string; team?: string }
   | { action: 'registerAgent'; name: string; workspaceId: string; itemId: string }
   | { action: 'setAgentActive'; agentId: string; active: boolean }
-  | { action: 'readAdminLog'; limit: number };
+  | { action: 'readAdminLog'; limit: number }
+  // Starts a hearing over the chosen ruled cases of one agent (limits and cooldown enforced by the Function).
+  | { action: 'launchHearing'; agentId: string; stage: HearingStage; caseIds: string[] }
+  | { action: 'cancelHearing'; hearingId: string }
+  // One job-status call to Fabric, for a hearing that has gone quiet.
+  | { action: 'checkWithFabric'; hearingId: string };
 
 export type ClerkReason =
   | 'ok'
@@ -36,9 +45,14 @@ export type ClerkReason =
   | 'already_exists'
   | 'not_found'
   | 'already_processed'
+  | 'limit_exceeded'
+  | 'no_cases'
+  | 'hearing_in_progress'
+  | 'cooldown'
+  | 'fabric_error'
   | 'server_error';
 
-export type ClerkCode = 200 | 400 | 403 | 404 | 409 | 422 | 500;
+export type ClerkCode = 200 | 400 | 403 | 404 | 409 | 422 | 500 | 502;
 
 export interface AdminLogEntry {
   requestId: string;
@@ -59,6 +73,10 @@ export interface ClerkResult {
   reason: ClerkReason;
   detail: string;
   log?: AdminLogEntry[];
+  /** launchHearing: the new hearing. cancelHearing and checkWithFabric: the hearing asked about. */
+  hearingId?: string;
+  /** checkWithFabric: the job status Fabric reported. */
+  jobStatus?: string;
 }
 
 export const MAX_LOG_ENTRIES = 200;
@@ -183,6 +201,26 @@ export function parseCommand(action: string, payloadText: string): ParseResult {
         }
         return { ok: true, command: { action: 'readAdminLog', limit } };
       }
+      case 'launchHearing': {
+        const stage = fields.stage;
+        if (typeof stage !== 'string' || !(HEARING_STAGES as readonly string[]).includes(stage)) {
+          throw new PayloadError(`stage must be one of ${HEARING_STAGES.join(', ')}.`);
+        }
+        const ids = fields.caseIds;
+        if (!Array.isArray(ids) || ids.length < 1 || ids.length > HEARING_MAX_CASES) {
+          throw new PayloadError(`caseIds must list 1 to ${HEARING_MAX_CASES} case ids.`);
+        }
+        const caseIds = ids.map((id) => {
+          if (typeof id !== 'string' || !GUID.test(id)) throw new PayloadError('every case id must be a GUID.');
+          return id.toLowerCase();
+        });
+        if (new Set(caseIds).size !== caseIds.length) throw new PayloadError('caseIds must not repeat.');
+        return { ok: true, command: { action: 'launchHearing', agentId: guid(fields, 'agentId'), stage: stage as HearingStage, caseIds } };
+      }
+      case 'cancelHearing':
+        return { ok: true, command: { action: 'cancelHearing', hearingId: guid(fields, 'hearingId') } };
+      case 'checkWithFabric':
+        return { ok: true, command: { action: 'checkWithFabric', hearingId: guid(fields, 'hearingId') } };
     }
   } catch (error) {
     if (error instanceof PayloadError) {

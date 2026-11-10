@@ -8,11 +8,24 @@ const entityFiles = readdirSync(dataDir).filter((name) => name.endsWith(".ts") &
 const sources = Object.fromEntries(entityFiles.map((name) => [name, readFileSync(join(dataDir, name), "utf8")]));
 
 const INSERT_ONLY = ["Case.ts", "Testimony.ts", "CaseDismissal.ts", "Vote.ts"];
-const READ_ONLY = ["Juror.ts", "Agent.ts"];
+const READ_ONLY = ["Juror.ts", "Agent.ts", "Hearing.ts", "HearingCase.ts", "HearingEvent.ts", "Verdict.ts"];
 
 describe("entity definitions", () => {
-    it("cover the I1a–I1c entities", () => {
-        expect(entityFiles.sort()).toEqual(["AdminRequest.ts", "AdminRequestResult.ts", "Agent.ts", "Case.ts", "CaseDismissal.ts", "Juror.ts", "Testimony.ts", "Vote.ts"]);
+    it("cover the I1a–I3a entities", () => {
+        expect(entityFiles.sort()).toEqual([
+            "AdminRequest.ts",
+            "AdminRequestResult.ts",
+            "Agent.ts",
+            "Case.ts",
+            "CaseDismissal.ts",
+            "Hearing.ts",
+            "HearingCase.ts",
+            "HearingEvent.ts",
+            "Juror.ts",
+            "Testimony.ts",
+            "Verdict.ts",
+            "Vote.ts",
+        ]);
     });
 
     it("AdminRequestResult is written only by the admin Function and readable only by the requester", () => {

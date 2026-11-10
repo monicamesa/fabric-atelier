@@ -24,6 +24,8 @@ declare module '@microsoft/fabric-user-data-functions' {
   interface RayfinSecretRegistry {
     APP_SQL_DATABASE: string;
     APP_SQL_SERVER: string;
+    HEARING_NOTEBOOK_ID: string;
+    HEARING_WORKSPACE_ID: string;
     LEGACY_CHECK_CUTOFF_UTC: string;
   }
 }

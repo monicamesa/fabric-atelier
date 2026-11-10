@@ -6,17 +6,24 @@ export type Route =
     | { page: "home"; agentId?: string }
     | { page: "cases"; agentId?: string; filter: CasesFilter; query: string }
     | { page: "case"; caseId: string }
+    | { page: "hearings"; agentId?: string }
+    | { page: "hearing"; hearingId: string }
     | { page: "clerk" };
 
 const ID = /^[0-9a-f-]{1,36}$/i;
 
-/** Reads `#home?agent=…`, `#cases?agent=…&filter=vote&q=…`, `#case/<id>` and `#clerk`. Anything else is Home. */
+/** Reads `#home?agent=…`, `#cases?agent=…&filter=vote&q=…`, `#case/<id>`, `#hearings?agent=…`, `#hearing/<id>` and `#clerk`. Anything else is Home. */
 export function parseRoute(hash: string): Route {
     const [path, search = ""] = hash.replace(/^#/, "").split("?");
     const params = new URLSearchParams(search);
     const agent = params.get("agent");
     const agentId = agent && ID.test(agent) ? agent : undefined;
     if (path === "clerk") return { page: "clerk" };
+    if (path.startsWith("hearing/")) {
+        const hearingId = path.slice("hearing/".length);
+        if (ID.test(hearingId)) return { page: "hearing", hearingId };
+    }
+    if (path === "hearings") return { page: "hearings", agentId };
     if (path.startsWith("case/")) {
         const caseId = path.slice("case/".length);
         if (ID.test(caseId)) return { page: "case", caseId };
@@ -34,6 +41,10 @@ export function formatRoute(route: Route): string {
             return "#clerk";
         case "case":
             return `#case/${route.caseId}`;
+        case "hearing":
+            return `#hearing/${route.hearingId}`;
+        case "hearings":
+            return route.agentId ? `#hearings?agent=${route.agentId}` : "#hearings";
         case "cases": {
             const params = new URLSearchParams();
             if (route.agentId) params.set("agent", route.agentId);

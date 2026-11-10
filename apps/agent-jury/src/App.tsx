@@ -16,8 +16,10 @@ import { ClerksOffice } from "@/screens/clerks-office/clerks-office.screen";
 import { useDocket, type DocketState } from "@/screens/docket/use-docket";
 import { viewerFor, type Viewer } from "@/screens/docket/viewer";
 import { HomeScreen } from "@/screens/home/home.screen";
+import { HearingScreen } from "@/screens/hearings/hearing.screen";
+import { HearingsScreen } from "@/screens/hearings/hearings.screen";
 
-type Page = "home" | "cases" | "clerk";
+type Page = "home" | "cases" | "hearings" | "clerk";
 
 function connect(): { client?: AppRayfinClient; error?: unknown } {
     try {
@@ -81,22 +83,24 @@ function App() {
     const activeAgents = useMemo(() => (agentList.data ?? []).filter((agent) => agent.active), [agentList.data]);
 
     // D6: the agent lives in the URL; the default is the first active agent by name.
-    const routeAgentId = route.page === "home" || route.page === "cases" ? route.agentId : undefined;
+    const routeAgentId = route.page === "home" || route.page === "cases" || route.page === "hearings" ? route.agentId : undefined;
     const agent: AgentRow | undefined = activeAgents.find((row) => row.id === routeAgentId) ?? activeAgents[0];
 
     // A #clerk link waits for the jury list; non-admins then land on Home. clerkExecute is the real check.
-    const page: Page | "case" = route.page === "clerk" ? (isAdmin || !jury.data ? "clerk" : "home") : route.page;
-    const current: Page = page === "case" ? "cases" : page;
+    const page: Page | "case" | "hearing" = route.page === "clerk" ? (isAdmin || !jury.data ? "clerk" : "home") : route.page;
+    const current: Page = page === "case" ? "cases" : page === "hearing" ? "hearings" : page;
 
     const items: NavItem<Page>[] = [
         { id: "home", label: t("nav.home") },
         { id: "cases", label: t("nav.cases") },
+        { id: "hearings", label: t("nav.hearings") },
     ];
     if (isAdmin) items.push({ id: "clerk", label: t("nav.clerk") });
 
     function go(next: Page) {
         if (next === "clerk") navigate({ page: "clerk" });
         else if (next === "cases") navigate({ page: "cases", agentId: agent?.id, filter: "all", query: "" });
+        else if (next === "hearings") navigate({ page: "hearings", agentId: agent?.id });
         else navigate({ page: "home", agentId: agent?.id });
     }
     const openCase = (caseId: string) => navigate({ page: "case", caseId });
@@ -132,7 +136,35 @@ function App() {
     }
     const ready = Boolean(jury.data && agentList.data);
 
+    if (route.page === "hearing") {
+        return layout(
+            <HearingScreen
+                key={route.hearingId}
+                client={client}
+                hearingId={route.hearingId}
+                agents={agentList.data}
+                jurors={jury.data}
+                viewer={viewer}
+                onBack={() => navigate({ page: "hearings", agentId: agent?.id })}
+            />,
+        );
+    }
+
     const renderPage = (docket?: DocketState) => {
+        if (route.page === "hearings" && agent && docket) {
+            return (
+                <HearingsScreen
+                    client={client}
+                    agents={activeAgents}
+                    agent={agent}
+                    docket={docket}
+                    jurors={jury.data}
+                    viewer={viewer}
+                    onChangeAgent={(agentId) => navigate({ page: "hearings", agentId })}
+                    onOpenHearing={(hearingId) => navigate({ page: "hearing", hearingId })}
+                />
+            );
+        }
         if (route.page === "cases" && agent && docket) {
             return (
                 <CasesScreen

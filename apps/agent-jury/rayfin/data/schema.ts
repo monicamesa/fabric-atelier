@@ -4,6 +4,10 @@ import { Case } from './Case.js';
 import { Testimony } from './Testimony.js';
 import { CaseDismissal } from './CaseDismissal.js';
 import { Vote } from './Vote.js';
+import { Hearing } from './Hearing.js';
+import { HearingCase } from './HearingCase.js';
+import { HearingEvent } from './HearingEvent.js';
+import { Verdict } from './Verdict.js';
 import { AdminRequest } from './AdminRequest.js';
 import { AdminRequestResult } from './AdminRequestResult.js';
 
@@ -14,8 +18,12 @@ export type AgentJurySchema = {
   Testimony: Testimony;
   CaseDismissal: CaseDismissal;
   Vote: Vote;
+  Hearing: Hearing;
+  HearingCase: HearingCase;
+  HearingEvent: HearingEvent;
+  Verdict: Verdict;
   AdminRequest: AdminRequest;
   AdminRequestResult: AdminRequestResult;
 };
 
-export const schema = [Juror, Agent, Case, Testimony, CaseDismissal, Vote, AdminRequest, AdminRequestResult];
+export const schema = [Juror, Agent, Case, Testimony, CaseDismissal, Vote, Hearing, HearingCase, HearingEvent, Verdict, AdminRequest, AdminRequestResult];

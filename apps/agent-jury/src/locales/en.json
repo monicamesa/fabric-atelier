@@ -64,6 +64,7 @@
         "label": "Main",
         "home": "Home",
         "cases": "Cases",
+        "hearings": "Hearings",
         "clerk": "Clerk's office"
     },
     "loading": {
@@ -487,8 +488,111 @@
             "notFound": "That juror or agent no longer exists. Reload the page.",
             "notSignedIn": "You need to be signed in to do this.",
             "unexpected": "Something went wrong on our side. Please try again.",
-            "nothingChanged": "Nothing was changed."
+            "nothingChanged": "Nothing was changed.",
+            "limitExceeded": "A hearing takes only a few questions. Choose fewer.",
+            "noCases": "Only ruled cases can go to a hearing. Reload the page and choose again.",
+            "hearingInProgress": "Another hearing is in session. Wait for it to end, then try again.",
+            "cooldown": "The last hearing ended less than ten minutes ago. Give the capacity a rest and try again.",
+            "fabricError": "Fabric could not start or check the hearing. Nothing was lost; the hearing is recorded as failed."
         }
+    },
+    "hearings": {
+        "kicker": "The courtroom",
+        "title": "Hearings",
+        "help": "A hearing puts an agent on the stand. It answers the questions the jury has ruled on, and the AI judge says whether each answer matches the jury's.",
+        "state": {
+            "in_progress": "In session",
+            "completed": "Finished",
+            "failed": "Failed",
+            "cancelled": "Cancelled",
+            "no_news": "No news"
+        },
+        "stage": {
+            "production": "Published version",
+            "sandbox": "Draft version"
+        },
+        "list": {
+            "title": "Past and current hearings",
+            "none": "No hearing yet for this agent. The jury's ruled questions are waiting for the first one.",
+            "noneViewer": "No hearing yet for this agent. An admin can start one.",
+            "startedBy": "Started {{when}} by {{who}}",
+            "questions": "{{count}} questions",
+            "scoreline": "{{correct}} correct · {{incorrect}} incorrect · {{unclear}} unclear",
+            "open": "Open the hearing"
+        },
+        "launch": {
+            "title": "Start a hearing",
+            "help": "Choose which ruled questions to put to the agent. Only questions the jury has ruled on can be asked; their ruled answer is what the judge compares against.",
+            "pick": "Ruled questions",
+            "noRuled": "This agent has no ruled cases yet. A case is ruled when two jurors back one answer and one of them is an approver.",
+            "selected": "{{count}} of {{max}} selected",
+            "stage": "Which version of the agent?",
+            "estimate": "About {{minutes}} minutes: roughly {{seconds}} seconds per question, plus about two minutes to get the courtroom ready.",
+            "capacity": "Hearings use the capacity that this app and its agents share. One hearing runs at a time, with ten minutes of rest between hearings.",
+            "submit": "Start the hearing",
+            "starting": "Calling the court to order…",
+            "busy": "A hearing is in session. Start the next one when it ends.",
+            "adminOnly": "Only admins can start a hearing."
+        },
+        "session": {
+            "kicker": "In session",
+            "title": "Questioning the {{agent}}",
+            "collected": "{{count}} ruled cases collected",
+            "started": "Hearing started in Fabric",
+            "asking": "Asking question {{current}} of {{total}}",
+            "rules": "The judge rules",
+            "progress": "Hearing progress",
+            "estimate": "About {{minutes}} minutes left. You can leave: the hearing keeps going and you will find it in Hearings.",
+            "overtime": "Taking longer than expected. You can leave: the hearing keeps going.",
+            "step": {
+                "done": "done",
+                "now": "in progress",
+                "next": "next"
+            },
+            "leave": "Back to Hearings"
+        },
+        "refresh": {
+            "button": "Refresh",
+            "lastRead": "Last read {{time}}",
+            "auto": "This page re-reads itself every minute while this tab is open and the hearing is in session.",
+            "paused": "Automatic updates stopped. Press Refresh to check again."
+        },
+        "ended": {
+            "completed": "The hearing is over: {{count}} verdicts.",
+            "failed": "The hearing failed. {{detail}}",
+            "cancelled": "The hearing was cancelled. The verdicts below were given before that.",
+            "no_news": "No news from this hearing for longer than expected. It may have stopped."
+        },
+        "actions": {
+            "cancel": "Cancel the hearing",
+            "cancelling": "Cancelling…",
+            "check": "Check with Fabric",
+            "checking": "Asking Fabric…",
+            "checkHelp": "One question to Fabric about the job, no more.",
+            "reported": "Fabric reports the job as {{status}}."
+        },
+        "verdicts": {
+            "title": "Verdicts as they arrive",
+            "empty": "No verdicts yet. The first appears when the agent has answered question 1.",
+            "position": "Question {{position}} of {{total}} · case {{number}}",
+            "expects": "The jury expects",
+            "answered": "The agent answered",
+            "judge": "The AI judge rules",
+            "correct": "Correct",
+            "incorrect": "Incorrect",
+            "unclear": "Unclear",
+            "waiting": "Waiting for the agent…",
+            "agentVersion": "Agent version {{version}}, published {{when}}",
+            "reviewSoon": "The jury will be able to confirm or appeal each verdict in the next step."
+        },
+        "scoreboard": {
+            "title": "Scoreboard",
+            "correct": "correct",
+            "incorrect": "incorrect",
+            "unclear": "unclear"
+        },
+        "notFound": "That hearing does not exist.",
+        "back": "Back to Hearings"
     },
     "errors": {
         "load": "The data could not be loaded.",
