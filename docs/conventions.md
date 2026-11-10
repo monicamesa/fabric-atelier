@@ -35,6 +35,7 @@ Rules shared by every app in Fabric Atelier.
 - The production and test app items run on the same F2 capacity. The Data Agent will join them later. Every request to either app consumes CU from that shared capacity, and an overloaded capacity throttles all of them: Fabric first delays each interactive request by 20 seconds, then rejects it.
 - Run the deployed checks (`scripts/i1*-checks.mjs`) only when code that affects security or data changes: entities, policies, roles, Functions, seed or data services. Run them once, against the test item.
 - Take screenshots once per iteration, before the review.
+- Take screenshots against a local Vite server pointed at the test deployment (a second port such as 5180, with the `VITE_*` values passed as process environment variables so `.env.local` stays untouched), never against the hosted app: the hosted app asks for Fabric sign-in, which a headless browser cannot complete. A screenshot of a state that cannot be reproduced twice (for example a hearing in session) may be composed from the real data of a finished run; label it as composite in the doc and in the caption.
 - Never poll a deployed app in a loop, and never leave scripts or a local dev server pointed at it running unattended. To wait for a long job, check its status by hand.
 - If every request suddenly takes about 20 s, check the Capacity Metrics app for "Interactive delay" before measuring or debugging anything else.
 
