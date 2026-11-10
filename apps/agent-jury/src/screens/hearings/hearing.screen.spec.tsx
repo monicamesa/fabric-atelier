@@ -11,7 +11,7 @@ const AGENT: AgentRow = { id: "00000000-0000-4000-8000-000000000023", name: "Sal
 const JURORS: JurorRow[] = [{ id: "j4", email: "dario.admin@example.com", displayName: "Dario A.", role: "admin", team: null, active: true }];
 const recent = (secondsAgo: number) => new Date(Date.now() - secondsAgo * 1000).toISOString();
 
-function fakeClient(events: object[], verdicts: object[]) {
+function fakeClient(events: object[], verdicts: object[], startedSecondsAgo = 90) {
     const page = (items: unknown[]) => {
         const builder: Record<string, unknown> = {};
         for (const name of ["where", "orderBy", "first", "after"]) builder[name] = () => builder;
@@ -20,7 +20,7 @@ function fakeClient(events: object[], verdicts: object[]) {
     };
     return {
         data: {
-            Hearing: { select: () => page([{ id: HEARING_ID, agent_id: AGENT.id, stage: "production", launchedByEmail: "dario.admin@example.com", caseCount: 2, createdAt: recent(90) }]) },
+            Hearing: { select: () => page([{ id: HEARING_ID, agent_id: AGENT.id, stage: "production", launchedByEmail: "dario.admin@example.com", caseCount: 2, createdAt: recent(startedSecondsAgo) }]) },
             HearingCase: {
                 select: () =>
                     page([
@@ -36,9 +36,9 @@ function fakeClient(events: object[], verdicts: object[]) {
     } as unknown as AppRayfinClient;
 }
 
-function renderHearing(events: object[], verdicts: object[]) {
+function renderHearing(events: object[], verdicts: object[], startedSecondsAgo = 90) {
     const viewer = viewerFor({ isAuthenticated: true, user: { id: "sub-dario", email: "dario.admin@example.com" } }, JURORS);
-    render(<HearingScreen client={fakeClient(events, verdicts)} hearingId={HEARING_ID} agents={[AGENT]} jurors={JURORS} viewer={viewer} onBack={() => {}} />);
+    render(<HearingScreen client={fakeClient(events, verdicts, startedSecondsAgo)} hearingId={HEARING_ID} agents={[AGENT]} jurors={JURORS} viewer={viewer} onBack={() => {}} />);
 }
 
 beforeAll(async () => {
@@ -58,9 +58,13 @@ describe("HearingScreen", () => {
         const panel = await screen.findByRole("region", { name: "In session" });
         expect(within(panel).getByRole("progressbar")).toHaveAttribute("aria-valuenow", "1");
         expect(within(panel).getByText("Asking question 2 of 2")).toBeInTheDocument();
+        const gavel = panel.querySelector("svg")!;
+        expect(gavel).toHaveClass("text-ticker-text");
+        expect(gavel).not.toHaveClass("text-ink");
         expect(screen.getByText("Incorrect")).toBeInTheDocument();
         expect(screen.getByText("997")).toBeInTheDocument();
-        expect(screen.getByText(/494 orders/)).toBeInTheDocument();
+        expect(screen.getByText(/494 orders/).tagName).toBe("STRONG");
+        expect(document.body.textContent).not.toContain("**");
         expect(screen.getByText(/Waiting for the agent/)).toBeInTheDocument();
         expect(screen.getByRole("button", { name: "Cancel the hearing" })).toBeInTheDocument();
     });
@@ -81,5 +85,33 @@ describe("HearingScreen", () => {
         expect(screen.queryByRole("button", { name: "Cancel the hearing" })).not.toBeInTheDocument();
         expect(screen.getByText("Correct")).toBeInTheDocument();
         fireEvent.click(screen.getByRole("button", { name: "Refresh" }));
+    });
+
+    it("has its own header and a way back to the list, in English and in Spanish", async () => {
+        const events = [{ id: "e9", hearing_id: HEARING_ID, kind: "completed", detail: null, createdAt: recent(10) }];
+        renderHearing(events, []);
+        const heading = await screen.findByRole("heading", { level: 1 });
+        expect(heading.textContent).toMatch(/^Hearing · .+ · Sales Agent$/);
+        expect(screen.queryByRole("heading", { name: "Hearings" })).not.toBeInTheDocument();
+        const back = screen.getByRole("link", { name: "← All hearings" });
+        expect(back).toHaveAttribute("href", `#hearings?agent=${AGENT.id}`);
+
+        await i18n.changeLanguage("es");
+        expect((await screen.findByRole("heading", { level: 1 })).textContent).toMatch(/^Vista · .+ · Sales Agent$/);
+        expect(screen.getByRole("link", { name: "← Todas las vistas" })).toBeInTheDocument();
+        await i18n.changeLanguage("en");
+    });
+
+    it.each([
+        ["en", 150, "About 1 minute left."],
+        ["en", 90, "About 2 minutes left."],
+        ["es", 150, "Queda aproximadamente 1 minuto."],
+        ["es", 90, "Quedan unos 2 minutos."],
+    ])("pluralises the time left (%s, started %i s ago)", async (language, startedSecondsAgo, expected) => {
+        await i18n.changeLanguage(language);
+        renderHearing([{ id: "e1", hearing_id: HEARING_ID, kind: "launched", detail: "job", createdAt: recent(startedSecondsAgo) }], [], startedSecondsAgo);
+        const panel = await screen.findByRole("region", { name: language === "en" ? "In session" : "En sesión" });
+        expect(within(panel).getByText(new RegExp(`^${expected.replace(/\./g, "\\.")}`))).toBeInTheDocument();
+        await i18n.changeLanguage("en");
     });
 });

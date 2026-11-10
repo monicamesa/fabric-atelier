@@ -101,14 +101,22 @@ export function HearingsScreen({ client, agents, agent, docket, jurors, viewer, 
                             {ruled.map((item) => {
                                 const checked = chosen.includes(item.record.id);
                                 const full = !checked && chosen.length >= HEARING_MAX_CASES;
+                                const expected = item.testimonies.find((testimony) => testimony.id === item.analysis.rulingTestimonyId)?.answer;
                                 return (
                                     <label
                                         key={item.record.id}
-                                        className="flex min-h-11 cursor-pointer items-center gap-3 border border-rule bg-paper px-3 py-2 has-[:checked]:border-2 has-[:checked]:border-ink"
+                                        className="flex min-h-11 cursor-pointer flex-wrap items-center gap-x-3 gap-y-1 border border-rule bg-paper px-3 py-2 has-[:checked]:border-2 has-[:checked]:border-ink"
                                     >
                                         <input type="checkbox" checked={checked} disabled={full} onChange={() => toggle(item.record.id)} className="size-5 accent-[var(--ink)]" />
                                         <CaseNumber id={item.record.id} />
-                                        <span className="font-serif text-[18px] font-bold text-ink">{item.record.text}</span>
+                                        <span className="min-w-0 flex-1 font-serif text-[18px] font-bold text-ink">{item.record.text}</span>
+                                        {expected && (
+                                            <span title={expected} className="max-w-[16rem] shrink-0 truncate font-mono text-[15px] text-text">
+                                                <span aria-hidden="true">→ </span>
+                                                <span className="sr-only">{t("hearings.launch.expected")} </span>
+                                                {expected}
+                                            </span>
+                                        )}
                                     </label>
                                 );
                             })}
@@ -124,7 +132,7 @@ export function HearingsScreen({ client, agents, agent, docket, jurors, viewer, 
                         </SelectField>
                         <div className="flex flex-col gap-1 text-[14px] text-text">
                             <p className="m-0 font-semibold">
-                                {t("hearings.launch.estimate", { minutes: Math.ceil(estimate / 60), seconds: SECONDS_PER_QUESTION })}
+                                {t("hearings.launch.estimate", { count: Math.ceil(estimate / 60), seconds: SECONDS_PER_QUESTION })}
                             </p>
                             <p className="m-0 text-text-muted">{t("hearings.launch.capacity")}</p>
                         </div>
@@ -135,10 +143,22 @@ export function HearingsScreen({ client, agents, agent, docket, jurors, viewer, 
                         </p>
                     )}
                     <ClerkError view={error} />
-                    <div>
-                        <Button variant="primary" disabled={starting || busy || chosen.length === 0} onClick={() => void start()}>
-                            {starting ? t("hearings.launch.starting") : t("hearings.launch.submit")}
-                        </Button>
+                    <div className="flex flex-col gap-2">
+                        <div>
+                            <Button
+                                variant="primary"
+                                disabled={starting || busy || chosen.length === 0}
+                                aria-describedby={chosen.length === 0 ? "start-reason" : undefined}
+                                onClick={() => void start()}
+                            >
+                                {starting ? t("hearings.launch.starting") : t("hearings.launch.submit")}
+                            </Button>
+                        </div>
+                        {chosen.length === 0 && (
+                            <p id="start-reason" className="m-0 text-[14px] text-text-muted">
+                                {t("hearings.launch.chooseOne")}
+                            </p>
+                        )}
                     </div>
                 </section>
             ) : (

@@ -29,7 +29,7 @@ export function SessionPanel({ view, agentName, onLeave }: { view: HearingView; 
     return (
         <section aria-label={t("hearings.session.kicker")} className="flex flex-col gap-4 bg-ticker-bg p-6 text-ticker-text">
             <div className="flex items-center gap-3">
-                <Gavel loop className="size-9 shrink-0" />
+                <Gavel loop className="size-9 shrink-0 text-ticker-text" />
                 <span className="text-[13px] font-bold uppercase tracking-[0.16em] text-ticker-text">{t("hearings.session.kicker")}</span>
             </div>
             <h2 className="m-0 font-serif text-[28px] font-black leading-tight">{t("hearings.session.title", { agent: agentName })}</h2>

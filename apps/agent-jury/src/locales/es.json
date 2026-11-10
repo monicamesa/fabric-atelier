@@ -26,7 +26,7 @@
     },
     "caseState": {
         "under_review": "En revisión",
-        "ruled": "Fallado",
+        "ruled": "Resuelto",
         "disputed": "En disputa",
         "dismissed": "Desestimado"
     },
@@ -39,8 +39,8 @@
         "case": "Caso",
         "answer": "Respuesta",
         "testimony": "Testimonio",
-        "ruling": "Fallo",
-        "ruled": "Fallado",
+        "ruling": "Resolución",
+        "ruled": "Resuelto",
         "dispute": "Disputa",
         "disputed": "En disputa",
         "appeal": "Recurso",
@@ -73,8 +73,8 @@
         "readingRecord": "Leyendo el acta…"
     },
     "ticker": {
-        "label": "Últimos fallos",
-        "title": "Últimos fallos"
+        "label": "Últimas resoluciones",
+        "title": "Últimas resoluciones"
     },
     "glossary": {
         "case": {
@@ -82,8 +82,8 @@
             "meaning": "Una pregunta de negocio para poner a prueba al agente."
         },
         "ruling": {
-            "term": "Fallo",
-            "meaning": "El jurado se pone de acuerdo en la respuesta correcta. Los casos fallados pasan a ser jurisprudencia."
+            "term": "Resolución",
+            "meaning": "El jurado se pone de acuerdo en la respuesta correcta. Los casos resueltos por el jurado pasan a ser jurisprudencia."
         },
         "hearing": {
             "term": "Vista",
@@ -105,7 +105,7 @@
         "kicker_one": "{{agent}} · {{count}} caso",
         "kicker_other": "{{agent}} · {{count}} casos",
         "title": "Todos los casos",
-        "help": "Cada caso avanza de izquierda a derecha: el jurado lo revisa, resuelve las disputas y falla. Los casos fallados pasan a ser jurisprudencia, la prueba que el agente tiene que superar.",
+        "help": "Cada caso avanza de izquierda a derecha: el jurado lo revisa, resuelve las disputas y dicta su resolución. Los casos resueltos por el jurado pasan a ser jurisprudencia, la prueba que el agente tiene que superar.",
         "search": "Buscar preguntas",
         "searchPlaceholder": "Buscar preguntas",
         "filter": "Mostrar casos",
@@ -174,7 +174,7 @@
         "byTeam": "{{name}}, {{team}}",
         "votes_one": "{{count}} voto",
         "votes_other": "{{count}} votos",
-        "ruling": "Fallo",
+        "ruling": "Resolución",
         "progress": "{{count}} de {{total}} votos a favor",
         "against_one": "{{count}} en contra",
         "against_other": "{{count}} en contra"
@@ -228,7 +228,7 @@
         "notCounted": "no cuenta: no es un jurado activo",
         "noReason": "sin motivo, no cuenta",
         "futureDated": "con fecha futura, no cuenta",
-        "footnote": "El acta nunca se edita. Cada voto y cada respuesta se quedan aquí, así que cualquiera puede ver cómo llegó el jurado a su fallo."
+        "footnote": "El acta nunca se edita. Cada voto y cada respuesta se quedan aquí, así que cualquiera puede ver cómo llegó el jurado a su resolución."
     },
     "answerForm": {
         "answer": "Respuesta",
@@ -283,7 +283,7 @@
         },
         "approver": {
             "label": "Aprobador",
-            "description": "además confirma los fallos: un caso necesita el voto de un aprobador para quedar fallado"
+            "description": "además confirma las resoluciones: un caso necesita el voto de un aprobador para quedar resuelto por el jurado"
         },
         "admin": {
             "label": "Admin",
@@ -487,23 +487,23 @@
             "invalid": "Hay campos no válidos. Revísalos y vuelve a intentarlo.",
             "notFound": "Ese jurado o agente ya no existe. Recarga la página.",
             "notSignedIn": "Tienes que iniciar sesión para hacer esto.",
-            "unexpected": "Algo ha fallado por nuestra parte. Vuelve a intentarlo.",
+            "unexpected": "Algo ha salido mal por nuestra parte. Vuelve a intentarlo.",
             "nothingChanged": "No se ha cambiado nada.",
             "limitExceeded": "En una vista caben pocas preguntas. Elige menos.",
-            "noCases": "Solo los casos fallados pueden ir a una vista. Recarga la página y elige de nuevo.",
+            "noCases": "Solo los casos resueltos por el jurado pueden ir a una vista. Recarga la página y elige de nuevo.",
             "hearingInProgress": "Hay otra vista en curso. Espera a que termine y vuelve a intentarlo.",
             "cooldown": "La última vista terminó hace menos de diez minutos. Deja descansar la capacidad y vuelve a intentarlo.",
-            "fabricError": "Fabric no pudo iniciar ni comprobar la vista. No se ha perdido nada; la vista queda registrada como fallida."
+            "fabricError": "Fabric no pudo iniciar ni comprobar la vista. No se ha perdido nada; la vista queda registrada como terminada con error."
         }
     },
     "hearings": {
         "kicker": "La sala",
         "title": "Vistas",
-        "help": "En una vista el agente se sienta en el estrado. Responde a las preguntas que el jurado ya ha fallado y el juez de IA dice si cada respuesta coincide con la del jurado.",
+        "help": "En una vista el agente se sienta en el estrado. Responde a las preguntas que el jurado ya ha resuelto y el juez de IA dice si cada respuesta coincide con la del jurado.",
         "state": {
             "in_progress": "En sesión",
             "completed": "Terminada",
-            "failed": "Fallida",
+            "failed": "Con error",
             "cancelled": "Cancelada",
             "no_news": "Sin noticias"
         },
@@ -513,21 +513,26 @@
         },
         "list": {
             "title": "Vistas pasadas y en curso",
-            "none": "Todavía no hay ninguna vista de este agente. Las preguntas falladas del jurado esperan la primera.",
+            "none": "Todavía no hay ninguna vista de este agente. Las preguntas resueltas por el jurado esperan la primera.",
             "noneViewer": "Todavía no hay ninguna vista de este agente. Un admin puede iniciar una.",
             "startedBy": "Iniciada {{when}} por {{who}}",
-            "questions": "{{count}} preguntas",
+            "questions_one": "{{count}} pregunta",
+            "questions_other": "{{count}} preguntas",
             "scoreline": "{{correct}} correctas · {{incorrect}} incorrectas · {{unclear}} sin claro",
             "open": "Abrir la vista"
         },
         "launch": {
             "title": "Iniciar una vista",
-            "help": "Elige qué preguntas falladas se le hacen al agente. Solo se pueden hacer las que el jurado ya ha fallado; su respuesta fallada es con la que compara el juez.",
-            "pick": "Preguntas falladas",
-            "noRuled": "Este agente todavía no tiene casos fallados. Un caso está fallado cuando dos jurados respaldan una respuesta y uno de ellos es aprobador.",
-            "selected": "{{count}} de {{max}} elegidas",
+            "help": "Elige qué preguntas resueltas por el jurado se le hacen al agente. Solo se pueden hacer las que el jurado ya ha resuelto; el juez compara con la respuesta que acordó el jurado.",
+            "pick": "Preguntas resueltas por el jurado",
+            "noRuled": "Este agente todavía no tiene casos resueltos por el jurado. Un caso queda resuelto cuando dos jurados respaldan una respuesta y uno de ellos es aprobador.",
+            "selected_one": "{{count}} elegida · máximo {{max}}",
+            "selected_other": "{{count}} elegidas · máximo {{max}}",
+            "chooseOne": "Elige al menos una pregunta",
+            "expected": "Respuesta esperada",
             "stage": "¿Qué versión del agente?",
-            "estimate": "Unos {{minutes}} minutos: aproximadamente {{seconds}} segundos por pregunta, más unos dos minutos para preparar la sala.",
+            "estimate_one": "Alrededor de {{count}} minuto: aproximadamente {{seconds}} segundos por pregunta, más unos dos minutos para preparar la sala.",
+            "estimate_other": "Unos {{count}} minutos: aproximadamente {{seconds}} segundos por pregunta, más unos dos minutos para preparar la sala.",
             "capacity": "Las vistas usan la capacidad que comparten esta app y sus agentes. Solo se celebra una vista a la vez, con diez minutos de descanso entre ellas.",
             "submit": "Iniciar la vista",
             "starting": "Abriendo la sesión…",
@@ -537,10 +542,11 @@
         "session": {
             "kicker": "En sesión",
             "title": "Interrogando a {{agent}}",
-            "collected": "{{count}} casos fallados reunidos",
+            "collected_one": "{{count}} caso resuelto por el jurado reunido",
+            "collected_other": "{{count}} casos resueltos por el jurado reunidos",
             "started": "Vista iniciada en Fabric",
             "asking": "Pregunta {{current}} de {{total}}",
-            "rules": "El juez falla",
+            "rules": "El juez da su veredicto",
             "progress": "Progreso de la vista",
             "estimate_one": "Queda aproximadamente {{count}} minuto. Puedes irte: la vista sigue y la encontrarás en Vistas.",
             "estimate_other": "Quedan unos {{count}} minutos. Puedes irte: la vista sigue y la encontrarás en Vistas.",
@@ -559,8 +565,9 @@
             "paused": "Las actualizaciones automáticas se han detenido. Pulsa Actualizar para comprobar de nuevo."
         },
         "ended": {
-            "completed": "La vista ha terminado: {{count}} veredictos.",
-            "failed": "La vista ha fallado. {{detail}}",
+            "completed_one": "La vista ha terminado: {{count}} veredicto.",
+            "completed_other": "La vista ha terminado: {{count}} veredictos.",
+            "failed": "La vista ha terminado con error. {{detail}}",
             "cancelled": "La vista se ha cancelado. Los veredictos de abajo se dieron antes.",
             "no_news": "No hay noticias de esta vista desde hace más de lo previsto. Puede haberse detenido."
         },
@@ -578,7 +585,7 @@
             "position": "Pregunta {{position}} de {{total}} · caso {{number}}",
             "expects": "El jurado espera",
             "answered": "El agente respondió",
-            "judge": "El juez de IA falla",
+            "judge": "El juez de IA da su veredicto",
             "correct": "Correcta",
             "incorrect": "Incorrecta",
             "unclear": "Sin claro",
@@ -593,6 +600,12 @@
             "unclear": "sin claro"
         },
         "notFound": "Esa vista no existe.",
+        "detail": {
+            "all": "← Todas las vistas",
+            "title": "Vista · {{when}} · {{agent}}",
+            "help": "Cada veredicto compara la respuesta del agente con la que acordó el jurado.",
+            "startedBy": "Iniciada por {{who}}"
+        },
         "back": "Volver a Vistas"
     },
     "errors": {

@@ -17,6 +17,11 @@ describe("translation files", () => {
         expect(esEntries.map(([key]) => key).sort()).toEqual(enEntries.map(([key]) => key).sort());
     });
 
+    it("never use the 'fall…' family in Spanish (fallo, falla, fallado, fallida): it reads as 'failed' (ruled = resuelto, ruling = resolución)", () => {
+        const offenders = esEntries.filter(([, value]) => typeof value === "string" && /fall/i.test(value)).map(([key]) => key);
+        expect(offenders).toEqual([]);
+    });
+
     it("have only non-empty string values", () => {
         for (const [key, value] of [...enEntries, ...esEntries]) {
             expect(typeof value, key).toBe("string");

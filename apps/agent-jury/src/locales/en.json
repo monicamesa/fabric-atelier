@@ -516,7 +516,8 @@
             "none": "No hearing yet for this agent. The jury's ruled questions are waiting for the first one.",
             "noneViewer": "No hearing yet for this agent. An admin can start one.",
             "startedBy": "Started {{when}} by {{who}}",
-            "questions": "{{count}} questions",
+            "questions_one": "{{count}} question",
+            "questions_other": "{{count}} questions",
             "scoreline": "{{correct}} correct · {{incorrect}} incorrect · {{unclear}} unclear",
             "open": "Open the hearing"
         },
@@ -525,9 +526,13 @@
             "help": "Choose which ruled questions to put to the agent. Only questions the jury has ruled on can be asked; their ruled answer is what the judge compares against.",
             "pick": "Ruled questions",
             "noRuled": "This agent has no ruled cases yet. A case is ruled when two jurors back one answer and one of them is an approver.",
-            "selected": "{{count}} of {{max}} selected",
+            "selected_one": "{{count}} selected · max {{max}}",
+            "selected_other": "{{count}} selected · max {{max}}",
+            "chooseOne": "Choose at least one question",
+            "expected": "Expected answer",
             "stage": "Which version of the agent?",
-            "estimate": "About {{minutes}} minutes: roughly {{seconds}} seconds per question, plus about two minutes to get the courtroom ready.",
+            "estimate_one": "About {{count}} minute: roughly {{seconds}} seconds per question, plus about two minutes to get the courtroom ready.",
+            "estimate_other": "About {{count}} minutes: roughly {{seconds}} seconds per question, plus about two minutes to get the courtroom ready.",
             "capacity": "Hearings use the capacity that this app and its agents share. One hearing runs at a time, with ten minutes of rest between hearings.",
             "submit": "Start the hearing",
             "starting": "Calling the court to order…",
@@ -537,7 +542,8 @@
         "session": {
             "kicker": "In session",
             "title": "Questioning the {{agent}}",
-            "collected": "{{count}} ruled cases collected",
+            "collected_one": "{{count}} ruled case collected",
+            "collected_other": "{{count}} ruled cases collected",
             "started": "Hearing started in Fabric",
             "asking": "Asking question {{current}} of {{total}}",
             "rules": "The judge rules",
@@ -559,7 +565,8 @@
             "paused": "Automatic updates stopped. Press Refresh to check again."
         },
         "ended": {
-            "completed": "The hearing is over: {{count}} verdicts.",
+            "completed_one": "The hearing is over: {{count}} verdict.",
+            "completed_other": "The hearing is over: {{count}} verdicts.",
             "failed": "The hearing failed. {{detail}}",
             "cancelled": "The hearing was cancelled. The verdicts below were given before that.",
             "no_news": "No news from this hearing for longer than expected. It may have stopped."
@@ -593,6 +600,12 @@
             "unclear": "unclear"
         },
         "notFound": "That hearing does not exist.",
+        "detail": {
+            "all": "← All hearings",
+            "title": "Hearing · {{when}} · {{agent}}",
+            "help": "Each verdict compares the agent's answer with the answer the jury agreed on.",
+            "startedBy": "Started by {{who}}"
+        },
         "back": "Back to Hearings"
     },
     "errors": {

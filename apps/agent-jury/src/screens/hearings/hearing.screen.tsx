@@ -4,7 +4,6 @@ import { Button } from "@/components/docket/button";
 import { Chip, type ChipTone } from "@/components/docket/chip";
 import { Deliberating } from "@/components/docket/gavel";
 import { Objection } from "@/components/docket/objection";
-import { PageHeader } from "@/components/docket/page-header";
 import { Stamp } from "@/components/docket/stamp";
 import { CaseNumber } from "@/components/docket/status-chip";
 import { EmptyState } from "@/components/docket/states";
@@ -17,6 +16,7 @@ import { useClerkAction } from "@/hooks/use-clerk-action";
 import { isAppLanguage, type AppLanguage } from "@/i18n/language-preference";
 import { formatDateTime } from "@/lib/format";
 import type { AppRayfinClient } from "@/lib/rayfin-client";
+import { formatRoute } from "@/lib/route";
 import { ClerkError } from "../clerks-office/clerk-feedback";
 import { personName, type Viewer } from "../docket/viewer";
 import { questionFor, scoreboard, viewHearing, type HearingView } from "./hearing-view";
@@ -143,27 +143,28 @@ export function HearingScreen({ client, hearingId, agents, jurors, viewer, onBac
     const tone = STATE_TONE[view.state];
     return (
         <div className="flex flex-col gap-6">
-            <PageHeader
-                kicker={`${t("hearings.kicker")} · ${agentName}`}
-                title={t("hearings.title")}
-                help={t("hearings.help")}
-                aside={
-                    <div className="flex flex-col items-start gap-2 min-[900px]:items-end">
-                        <Chip tone={tone.tone} filled={tone.filled}>
-                            {t(`hearings.state.${view.state}`)}
-                        </Chip>
-                        <p className="m-0 text-[14px] text-text-muted">
-                            {t("hearings.list.startedBy", {
-                                when: formatDateTime(view.hearing.createdAt, language),
-                                who: jurors ? personName(view.hearing.launchedByEmail, jurors) : "",
-                            })}
-                        </p>
-                        <p className="m-0 text-[14px] text-text-muted">
-                            {t(`hearings.stage.${view.hearing.stage}`)} · {t("hearings.list.questions", { count: view.total })}
-                        </p>
-                    </div>
-                }
-            />
+            <a href={formatRoute({ page: "hearings", agentId: view.hearing.agent_id })} className="w-fit text-[15px] font-semibold text-ink underline">
+                {t("hearings.detail.all")}
+            </a>
+            <div className="grid grid-cols-[minmax(0,1fr)] items-end gap-6 border-b-[6px] border-double border-ink pb-5 min-[900px]:grid-cols-[minmax(0,1fr)_380px] min-[900px]:gap-10">
+                <div className="flex flex-col gap-2">
+                    <h1 className="m-0 font-serif text-[34px] font-black leading-[1.05] tracking-[-0.02em] text-ink min-[900px]:text-[44px]">
+                        {t("hearings.detail.title", { when: formatDateTime(view.hearing.createdAt, language), agent: agentName })}
+                    </h1>
+                    <p className="m-0 max-w-[700px] text-[17px] leading-normal text-text">{t("hearings.detail.help")}</p>
+                </div>
+                <div className="flex flex-col items-start gap-2 min-[900px]:items-end">
+                    <Chip tone={tone.tone} filled={tone.filled}>
+                        {t(`hearings.state.${view.state}`)}
+                    </Chip>
+                    <p className="m-0 text-[14px] text-text-muted">
+                        {t("hearings.detail.startedBy", { who: jurors ? personName(view.hearing.launchedByEmail, jurors) : "" })}
+                    </p>
+                    <p className="m-0 text-[14px] text-text-muted">
+                        {t(`hearings.stage.${view.hearing.stage}`)} · {t("hearings.list.questions", { count: view.total })}
+                    </p>
+                </div>
+            </div>
 
             {running && <SessionPanel view={view} agentName={agentName} onLeave={onBack} />}
             {view.state === "completed" && (

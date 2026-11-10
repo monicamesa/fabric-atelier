@@ -52,7 +52,7 @@ Contrast: all text pairs above meet WCAG AA (4.5:1) at the sizes used. Don't int
 |---|---|---|
 | `under_review` | UNDER REVIEW / EN REVISIÓN | `--review` |
 | `disputed` | DISPUTED / EN DISPUTA | `--action` |
-| `ruled` | RULED / FALLADO | `--ruled` |
+| `ruled` | RULED / RESUELTO | `--ruled` |
 | `dismissed` | DISMISSED / DESESTIMADO | muted, dashed border, struck-through question |
 | appeal won (on a verdict) | JUDGE OVERRULED / JUEZ CORREGIDO | `--overruled` |
 
@@ -167,7 +167,7 @@ All of these are disabled under `@media (prefers-reduced-motion: reduce)`.
 | Defendant (agent) | Agent (on the stand) | Agente (en el estrado) |
 | Case | Case | Caso |
 | Testimony (expected answer) | Answer / testimony | Respuesta / testimonio |
-| Ruling | Ruling / ruled | Fallo / fallado |
+| Ruling | Ruling / ruled | Resolución / resuelto |
 | Dispute | Dispute / disputed | Disputa / en disputa |
 | Appeal (UI term; stored as a `VerdictReview` that disagrees with the judge) | Appeal | Recurso |
 | Case law | Case law | Jurisprudencia |

@@ -209,15 +209,17 @@ Requisitos de idioma:
 
 Estados de un case: `under_review`, `ruled` (aprobado), `disputed`, `dismissed` (retirado).
 
-**Glosario: "fallado", "fallo" y "veredicto".** En español "fallar" es dictar un fallo, como hace un tribunal. En esta documentación (especificación, planes de iteración y estado):
+**Glosario: "resuelto", "resolución" y "veredicto".** Esta documentación (y los planes de iteración y el estado) usaba antes "fallado" y "fallo" para lo que el jurado decide. Se dejó de usar porque suena a "que ha fallado": ahora se usa **resuelto** y **resolución**, y las menciones antiguas de "case fallado" o "fallo del jurado" significan lo mismo.
 
 | Término | Significa | No significa |
 |---|---|---|
-| **case fallado** / **fallo** del jurado | Un case en estado `ruled`: el jurado ha aprobado su respuesta esperada (R3) | Un case que "ha fallado" o que el agente ha contestado mal |
-| **veredicto** (del juez) | El resultado del LLM al comparar la respuesta del agente con la esperada: `correct`, `incorrect` o `unclear` (`Verdict.judgeVerdict`) | El fallo del jurado |
-| **respuesta incorrecta del agente** | Un `Verdict` con `judgeVerdict = incorrect` | Un case fallado |
+| **case resuelto** (antes "fallado") / **resolución** del jurado (antes "fallo") | Un case en estado `ruled`: el jurado ha aprobado su respuesta esperada (R3) | Un case que "ha fallado" o que el agente ha contestado mal |
+| **veredicto** | Solo el del juez de IA: el resultado al comparar la respuesta del agente con la esperada (`correct`, `incorrect` o `unclear`; `Verdict.judgeVerdict`). El juez "da su veredicto" | La resolución del jurado |
+| **respuesta incorrecta del agente** | Un `Verdict` con `judgeVerdict = incorrect` | Un case resuelto |
 
-Cuando haga falta hablar del agente que responde mal, se dice "veredicto `incorrect`" o "respuesta incorrecta", nunca "case fallado". En inglés (código e interfaz) se usa siempre `ruled`.
+Cuando haga falta hablar del agente que responde mal, se dice "veredicto `incorrect`" o "respuesta incorrecta", nunca "case resuelto" ni "case fallado". En inglés (código e interfaz) se usa siempre `ruled`.
+
+**En la interfaz en español no aparece ninguna palabra de la familia "fall…"** (fallo, falla, fallado, fallida…): el estado `ruled` se llama **Resuelto** ("Preguntas resueltas por el jurado"), la decisión del jurado es la **resolución** ("Últimas resoluciones"), "veredicto" es solo del juez de IA y los errores se dicen "con error" o "algo ha salido mal". Un test comprueba que ninguna cadena de `es.json` contiene "fall…".
 
 Regla: la metáfora se usa en títulos y navegación, pero cada pantalla incluye una línea de ayuda en lenguaje llano para que un usuario de negocio entienda qué hace sin conocer la metáfora.
 
