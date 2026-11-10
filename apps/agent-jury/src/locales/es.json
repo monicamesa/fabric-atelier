@@ -542,7 +542,8 @@
             "asking": "Pregunta {{current}} de {{total}}",
             "rules": "El juez falla",
             "progress": "Progreso de la vista",
-            "estimate": "Quedan unos {{minutes}} minutos. Puedes irte: la vista sigue y la encontrarás en Vistas.",
+            "estimate_one": "Queda aproximadamente {{count}} minuto. Puedes irte: la vista sigue y la encontrarás en Vistas.",
+            "estimate_other": "Quedan unos {{count}} minutos. Puedes irte: la vista sigue y la encontrarás en Vistas.",
             "overtime": "Está tardando más de lo previsto. Puedes irte: la vista sigue.",
             "step": {
                 "done": "hecho",

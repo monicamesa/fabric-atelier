@@ -542,7 +542,8 @@
             "asking": "Asking question {{current}} of {{total}}",
             "rules": "The judge rules",
             "progress": "Hearing progress",
-            "estimate": "About {{minutes}} minutes left. You can leave: the hearing keeps going and you will find it in Hearings.",
+            "estimate_one": "About {{count}} minute left. You can leave: the hearing keeps going and you will find it in Hearings.",
+            "estimate_other": "About {{count}} minutes left. You can leave: the hearing keeps going and you will find it in Hearings.",
             "overtime": "Taking longer than expected. You can leave: the hearing keeps going.",
             "step": {
                 "done": "done",

@@ -52,7 +52,7 @@ export function SessionPanel({ view, agentName, onLeave }: { view: HearingView; 
                 <div className="h-full bg-action" style={{ width: `${percent}%` }} />
             </div>
             <p className="m-0 text-[15px]">
-                {view.overtime ? t("hearings.session.overtime") : t("hearings.session.estimate", { minutes })}
+                {view.overtime ? t("hearings.session.overtime") : t("hearings.session.estimate", { count: minutes })}
             </p>
             <div>
                 <Button variant="quiet" compact onClick={onLeave} className="border-ticker-text text-ticker-text hover:bg-transparent hover:underline">

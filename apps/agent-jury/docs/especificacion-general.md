@@ -103,6 +103,7 @@ El admin exporta las preguntas aprobadas de un agente a un CSV con columnas `que
 - **R6. La verdad se calcula, no se escribe.** El estado de una pregunta (`under_review`, `ruled`, `disputed` o `dismissed`) no es un campo editable por el cliente: se deriva de propuestas, votos y retiradas (sección 7).
 - **R7. Cases no verificados.** Cualquier usuario autenticado puede insertar un case, pero solo cuentan los que tiene como autor un juror activo. Los demás se muestran como "no verificados" (*unverified*) y nunca entran en una evaluación ni en el export. Lo mismo vale para los testimonies: solo cuentan los de jurors activos.
 - **R8. Retirada.** Un case está `dismissed` si tiene al menos un `CaseDismissal` válido: insertado por el autor del case o por un admin. Las retiradas de otros usuarios se ignoran.
+- **R9. Respuesta esperada incorrecta.** Un case `ruled` vuelve a `under_review` si tiene un `VerdictReview` válido con motivo `expected_answer_wrong`, presentado por un **aprobador activo** y posterior al fallo, y no hay desde entonces un voto nuevo que lo vuelva a aprobar (R3). Se aplica a **cualquier case `ruled`, sea cual sea el veredicto del juez** (también cuando el juez dio `correct` porque el agente coincide con una respuesta esperada equivocada). "Fallado" aquí significa `ruled` (ver el glosario de la sección 9.1), no "con veredicto fallido".
 
 **Riesgo conocido: las fechas las pone el cliente.** Rayfin no genera `createdAt` en el servidor (el `default` de `@date` es un valor fijo y las tablas no tienen columnas de fecha del sistema). Un cliente podría fechar un voto en el futuro para que fuera siempre el último (R1). Mitigación: el cálculo ignora los registros fechados más de 5 minutos en el futuro y el acta los marca. Revisar si una versión futura de Rayfin admite fechas generadas por el servidor.
 
@@ -207,6 +208,16 @@ Requisitos de idioma:
 | Ejecución de evaluación | **Hearing** | **Vista** | `Hearing` |
 
 Estados de un case: `under_review`, `ruled` (aprobado), `disputed`, `dismissed` (retirado).
+
+**Glosario: "fallado", "fallo" y "veredicto".** En español "fallar" es dictar un fallo, como hace un tribunal. En esta documentación (especificación, planes de iteración y estado):
+
+| Término | Significa | No significa |
+|---|---|---|
+| **case fallado** / **fallo** del jurado | Un case en estado `ruled`: el jurado ha aprobado su respuesta esperada (R3) | Un case que "ha fallado" o que el agente ha contestado mal |
+| **veredicto** (del juez) | El resultado del LLM al comparar la respuesta del agente con la esperada: `correct`, `incorrect` o `unclear` (`Verdict.judgeVerdict`) | El fallo del jurado |
+| **respuesta incorrecta del agente** | Un `Verdict` con `judgeVerdict = incorrect` | Un case fallado |
+
+Cuando haga falta hablar del agente que responde mal, se dice "veredicto `incorrect`" o "respuesta incorrecta", nunca "case fallado". En inglés (código e interfaz) se usa siempre `ruled`.
 
 Regla: la metáfora se usa en títulos y navegación, pero cada pantalla incluye una línea de ayuda en lenguaje llano para que un usuario de negocio entienda qué hace sin conocer la metáfora.
 

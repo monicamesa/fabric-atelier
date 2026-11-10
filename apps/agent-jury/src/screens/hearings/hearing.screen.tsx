@@ -20,6 +20,7 @@ import type { AppRayfinClient } from "@/lib/rayfin-client";
 import { ClerkError } from "../clerks-office/clerk-feedback";
 import { personName, type Viewer } from "../docket/viewer";
 import { questionFor, scoreboard, viewHearing, type HearingView } from "./hearing-view";
+import { AgentAnswer } from "./agent-answer";
 import { SessionPanel } from "./session-panel";
 import { useAutoRefresh } from "./use-auto-refresh";
 
@@ -52,7 +53,7 @@ function VerdictCard({ view, verdict, language }: { view: HearingView; verdict: 
                 </div>
                 <div className="flex flex-col gap-1 border-l-4 border-ink pl-3">
                     <span className="text-[12px] font-bold uppercase tracking-[0.12em] text-text-muted">{t("hearings.verdicts.answered")}</span>
-                    <p className="m-0 whitespace-pre-line text-[17px] text-text">{verdict.agentAnswer}</p>
+                    <AgentAnswer text={verdict.agentAnswer} />
                 </div>
             </div>
             {verdict.dataAgentVersion && (
