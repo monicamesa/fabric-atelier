@@ -18,7 +18,7 @@ export class VerdictReview {
   @text({ max: 1000, optional: true }) comment?: string;
   @text({ max: 255 }) reviewerUserId!: string;
   @email({ max: 254 }) reviewerEmail!: string;
-  // "seed" marks example rows written by SQL for the demo; judge trust ignores them.
+  // Marks rows that are not a real juror's opinion ("seed": demo rows written by SQL, "check": script rows); judge trust ignores them.
   @text({ max: 20, optional: true }) source?: string;
   @date() createdAt!: Date;
 }

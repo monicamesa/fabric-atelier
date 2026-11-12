@@ -257,7 +257,7 @@
         "futureDated": "dated in the future, not counted",
         "reviewAgree": "{{who}} agreed with the judge",
         "reviewAppeal": "{{who}} appealed the judge's verdict ({{verdict}})",
-        "reviewReopens": "{{who}} appealed ({{verdict}}) and reopened the case",
+        "reviewReopens": "{{who}} said the expected answer is wrong and reopened the case",
         "beforeReview": "before the review: kept here, no longer counted",
         "footnote": "The record is never edited. Every vote and answer stays here, so anyone can see how the jury got to its ruling."
     },

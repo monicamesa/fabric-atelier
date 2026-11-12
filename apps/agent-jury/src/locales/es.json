@@ -257,7 +257,7 @@
         "futureDated": "con fecha futura, no cuenta",
         "reviewAgree": "{{who}} estuvo de acuerdo con el juez",
         "reviewAppeal": "{{who}} recurrió el veredicto del juez ({{verdict}})",
-        "reviewReopens": "{{who}} recurrió ({{verdict}}) y reabrió el caso",
+        "reviewReopens": "{{who}} dijo que la respuesta esperada es incorrecta y reabrió el caso",
         "beforeReview": "antes de la revisión: se conserva aquí, pero ya no cuenta",
         "footnote": "El acta nunca se edita. Cada voto y cada respuesta se quedan aquí, así que cualquiera puede ver cómo llegó el jurado a su resolución."
     },

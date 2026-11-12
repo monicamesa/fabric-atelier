@@ -32,9 +32,11 @@ export function CourtRecord({ events, letters, jurors, now }: CourtRecordProps) 
         const who = personName(event.actorEmail, jurors);
         if (event.kind === "proposed") return t("record.proposed", { who });
         if (event.kind === "review") {
-            const main = !event.appeal
-                ? t("record.reviewAgree", { who })
-                : t(event.reopens ? "record.reviewReopens" : "record.reviewAppeal", { who, verdict: t(`hearings.review.human.${event.humanVerdict}`) });
+            const main = event.reopens
+                ? t("record.reviewReopens", { who })
+                : !event.appeal
+                  ? t("record.reviewAgree", { who })
+                  : t("record.reviewAppeal", { who, verdict: t(`hearings.review.human.${event.humanVerdict}`) });
             return (
                 <>
                     {main}

@@ -89,9 +89,9 @@ interface Judged {
     at?: string;
 }
 
-/** One verdict: seeded and "expected answer is wrong" reviews don't count; the majority of the rest decides, a tie is pending. */
+/** One verdict: reviews with a source ("seed" demo rows, "check" script rows) and "expected answer is wrong" reviews don't count; the majority of the rest decides, a tie is pending. */
 function judge(verdict: TrustVerdict, reviews: readonly ReviewRecord[]): Judged {
-    const real = reviews.filter((review) => review.source !== "seed");
+    const real = reviews.filter((review) => !review.source);
     if (real.length === 0) return { status: "unreviewed" };
     const counting = real.filter((review) => review.reason !== "expected_answer_wrong");
     if (counting.length === 0) return { status: "excluded" };

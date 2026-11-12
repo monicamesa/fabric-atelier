@@ -214,4 +214,8 @@ describe("court record with reviews", () => {
         const flags = events.filter((event) => event.kind === "vote").map((event) => event.kind === "vote" && event.beforeReview);
         expect(flags).toEqual([true, true, false]);
     });
-});
+    it("flags a reopening review even when it agrees with the judge's verdict, so the record can say the answer was challenged", () => {
+        const agreeingJudge = review(BRUNO, -5, { humanVerdict: "correct" });
+        const events = caseEvents(records([agreeingJudge]));
+        expect(events.find((event) => event.kind === "review")).toMatchObject({ appeal: false, reopens: true });
+    });});

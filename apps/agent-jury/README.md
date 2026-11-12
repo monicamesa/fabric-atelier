@@ -130,6 +130,13 @@ One production deploy per finished block of work. UI-only changes are verified l
 
   If the lookup fails (for example on a deployment that does not have the entity yet), the app treats the Intro as seen instead of blocking the user. Deploy the schema (`rayfin up`) before the code that writes flags.
 
+## Appeals and judge trust (I3b, on `feature/i3b`)
+
+- **Reviewing verdicts.** On a hearing, any active juror answers "Yes, agree" or "No, appeal" under each verdict (keys A · X · J/K · ?). A review is an insert-only `VerdictReview`; the latest one per juror and verdict counts. An appeal (a review that differs from the judge) needs a comment.
+- **R9.** A ruled case is reopened by a valid `expected_answer_wrong` review from an active approver. Votes cast before the review stay visible in the court record ("before the review") but stop counting; jurors vote again.
+- **Judge trust** is computed per agent and per critic-prompt version (a different prompt is a different judge): the current version prominently, earlier ones as history. Rows with a `source` ("seed" demo rows, "check" script rows) never count. Home keeps loading, without the trust line and the judge lines of the ticker, if the verdicts/reviews cannot be read.
+- Plan and decisions: [docs/iteraciones/I3b.md](docs/iteraciones/I3b.md). Demo story in the test deployment: `rayfin/seed/i3b-story-1-ruled-case.sql`, one real hearing (`scripts/i3b-run-hearing.mjs`), `rayfin/seed/i3b-story-2-appeal.sql`, then `scripts/i3b-checks.mjs`.
+
 ## Security model
 
 - **Records are insert-only.** Cases, testimonies, dismissals, votes, verdict reviews and per-user flags are never updated or deleted; every entry keeps its author and date.
