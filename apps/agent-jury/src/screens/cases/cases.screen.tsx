@@ -19,6 +19,7 @@ import { CONSENSUS_MIN_VOTES } from "@/rules/consensus";
 import { cn } from "@/lib/utils";
 import { AgentTabs } from "../docket/agent-tabs";
 import { applyFilter } from "../docket/docket-views";
+import { nextStep, type TurnContext } from "../docket/next-step";
 import { ProposeCaseForm } from "../docket/propose-case-form";
 import type { DocketState } from "../docket/use-docket";
 import type { Viewer } from "../docket/viewer";
@@ -48,6 +49,7 @@ export function CasesScreen({ client, agents, agent, docket, viewer, filter, que
     const [proposing, setProposing] = useState(false);
     const [expanded, setExpanded] = useState<Set<CaseState>>(new Set());
     const data = docket.data;
+    const ctx = useMemo(() => ({ me: viewer.me, canAct: viewer.canAct, role: viewer.juror?.role }), [viewer.me, viewer.canAct, viewer.juror?.role]);
     const visible = useMemo(() => (data ? applyFilter(data.cases, filter, query) : []), [data, filter, query]);
     const waiting = data?.cases.filter((item) => item.needsMyVote).length ?? 0;
 
@@ -159,7 +161,7 @@ export function CasesScreen({ client, agents, agent, docket, viewer, filter, que
                                     </header>
                                     {items.length === 0 && <p className="m-0 text-[14px] text-text-muted">{t("cases.columnEmpty")}</p>}
                                     {shown.map((item) => (
-                                        <Clipping key={item.record.id} item={item} myUserId={viewer.me?.userId} onOpen={() => onOpenCase(item.record.id)} />
+                                        <Clipping key={item.record.id} item={item} ctx={ctx} onOpen={() => onOpenCase(item.record.id)} />
                                     ))}
                                     {items.length > VISIBLE && (
                                         <button
@@ -183,14 +185,14 @@ export function CasesScreen({ client, agents, agent, docket, viewer, filter, que
 }
 
 /** One case on the board: number · category, the question, and why it sits in this column. */
-function Clipping({ item, myUserId, onOpen }: { item: DocketCase; myUserId?: string; onOpen: () => void }) {
+function Clipping({ item, ctx, onOpen }: { item: DocketCase; ctx: TurnContext; onOpen: () => void }) {
     const { t } = useTranslation();
     const { record, analysis } = item;
     const state = analysis.state;
+    const step = nextStep(item, ctx);
     const leading = Math.max(0, ...analysis.tallies.filter((tally) => tally.valid).map((tally) => tally.votesFor));
     const ruling = item.testimonies.find((testimony) => testimony.id === analysis.rulingTestimonyId);
     const rulingVotes = analysis.tallies.find((tally) => tally.testimony.id === analysis.rulingTestimonyId)?.votesFor ?? 0;
-    const voted = Boolean(myUserId) && analysis.standingVotes.some((vote) => vote.voterUserId === myUserId);
     const dismissal = item.dismissals.find((row) => isValidDismissal(row, record, item.records.jurors, item.records.now));
     return (
         <a
@@ -216,11 +218,6 @@ function Clipping({ item, myUserId, onOpen }: { item: DocketCase; myUserId?: str
                 <>
                     <span className="flex flex-wrap justify-between gap-2 text-[14px]">
                         <span className="text-text">{t("cases.votesOf", { votes: leading, count: CONSENSUS_MIN_VOTES })}</span>
-                        {item.needsMyVote ? (
-                            <span className="font-semibold text-action-text">{t("cases.yourVote")}</span>
-                        ) : voted ? (
-                            <span className="text-text">{t("cases.youVoted")}</span>
-                        ) : null}
                     </span>
                     <VoteBar value={leading} max={CONSENSUS_MIN_VOTES} tone="review" />
                 </>
@@ -238,6 +235,9 @@ function Clipping({ item, myUserId, onOpen }: { item: DocketCase; myUserId?: str
                 </>
             )}
             {state === "dismissed" && <span className="text-[14px] text-text">{dismissal?.reason ?? t("cases.dismissedHelp")}</span>}
+            {state !== "dismissed" && (
+                <span className={cn("text-[14px]", step.yours ? "font-semibold text-action-text" : "text-text")}>{t(`nextStep.${step.key}`, { count: step.count })}</span>
+            )}
         </a>
     );
 }

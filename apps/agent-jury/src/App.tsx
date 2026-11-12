@@ -64,6 +64,9 @@ function App() {
     const [launched, setLaunched] = useState(false);
     const [introMarked, setIntroMarked] = useState(false);
     const [afterIntro, setAfterIntro] = useState<Route>();
+    // "Show example agents" (admins, Clerk's office): off by default; the TEST build turns it on with VITE_SHOW_EXAMPLE_AGENTS=1.
+    // Held in memory only: nothing about it is stored in the browser.
+    const [showExamples, setShowExamples] = useState(import.meta.env.VITE_SHOW_EXAMPLE_AGENTS === "1");
     // A failed lookup counts as seen: a hiccup must not trap anyone in the Intro.
     const introSeen = introMarked || introFlag.status !== "success" || introFlag.data;
     const introChecked = introFlag.status !== "loading";
@@ -76,7 +79,10 @@ function App() {
         [sessionUserId, sessionEmail, jury.data],
     );
     const isAdmin = viewer.isAdmin;
-    const activeAgents = useMemo(() => visibleAgents((agentList.data ?? []).filter((agent) => agent.active), isAdmin), [agentList.data, isAdmin]);
+    const activeAgents = useMemo(
+        () => visibleAgents((agentList.data ?? []).filter((agent) => agent.active), isAdmin && showExamples),
+        [agentList.data, isAdmin, showExamples],
+    );
 
     // D6: the agent lives in the URL; the default is the first real (non-example) active agent by name.
     const routeAgentId = route.page === "home" || route.page === "cases" || route.page === "hearings" ? route.agentId : undefined;
@@ -157,7 +163,18 @@ function App() {
     const intro = route.page === "intro" ? <IntroScreen onDone={leaveIntro} /> : undefined;
 
     if (!client) return layout(<Objection message={t("errors.load")} technicalDetails={String(connectError)} />);
-    if (page === "clerk") return layout(<ClerksOffice client={client} jury={jury} me={viewer.juror} onDirectoryChanged={agentList.reload} />);
+    if (page === "clerk") {
+        return layout(
+            <ClerksOffice
+                client={client}
+                jury={jury}
+                me={viewer.juror}
+                onDirectoryChanged={agentList.reload}
+                showExamples={showExamples}
+                onShowExamplesChange={setShowExamples}
+            />,
+        );
+    }
     // The guide needs no data: jurors read it here, never on an external site. Back returns to where they came from (the Intro or Home).
     if (route.page === "guide") {
         return layout(<GuideScreen onBack={() => (window.history.length > 1 ? window.history.back() : navigate({ page: "home", agentId: agent?.id }))} />);

@@ -21,6 +21,8 @@ import { AnswerForm } from "../docket/answer-form";
 import { CourtRecord } from "./court-record";
 import { DiffTable } from "./diff-table";
 import { TestimonyCard } from "./testimony-card";
+import { nextStep } from "../docket/next-step";
+import { leadingNeedsApprover } from "./vote-progress";
 
 interface CaseDetailProps {
     client: AppRayfinClient;
@@ -77,6 +79,7 @@ export function CaseDetail({ client, caseId, agents, jurors, viewer }: CaseDetai
 
     const { item, now } = view;
     const { record, analysis } = item;
+    const next = nextStep(item, { me: viewer.me, canAct: viewer.canAct, role: viewer.juror?.role });
     const agent = agents?.find((row) => row.id === record.agent_id);
     const letters = new Map(analysis.tallies.map((tally, index) => [tally.testimony.id, answerLetter(index)]));
     const testimonyById = new Map(item.testimonies.map((testimony) => [testimony.id, testimony]));
@@ -153,10 +156,16 @@ export function CaseDetail({ client, caseId, agents, jurors, viewer }: CaseDetai
                             {record.text}
                         </h1>
                         <p className="m-0 max-w-[760px] text-[17px] text-text">
-                            {t(`caseDetail.reason.${analysis.reason}`, { count: analysis.votesMissing, total: CONSENSUS_MIN_VOTES })}{" "}
+                            {t(`caseDetail.reason.${analysis.reason === "needsVotes" && leadingNeedsApprover(leading) ? "needsVotesApprover" : analysis.reason}`, {
+                                count: analysis.votesMissing,
+                                total: CONSENSUS_MIN_VOTES,
+                            })}{" "}
                             {open && analysis.state !== "ruled" && <b className="text-ink">{t("caseDetail.threshold", { count: CONSENSUS_MIN_VOTES })}</b>}
                         </p>
                         {dismissal && <p className="m-0 text-[15px] text-text">{t("caseDetail.dismissedBecause", { reason: dismissal.reason })}</p>}
+                        <p className="m-0 text-[16px] text-ink">
+                            <b>{t("nextStep.label")}:</b> <span className={next.yours ? "font-semibold text-action-text" : undefined}>{t(`nextStep.${next.key}`, { count: next.count })}</span>
+                        </p>
                         {analysis.reopened[0] && analysis.state !== "ruled" && analysis.state !== "dismissed" && (
                             <p className="m-0 max-w-[760px] border-l-4 border-action pl-3 text-[15px] text-text">
                                 {t("caseDetail.reopenedBy", {
@@ -199,6 +208,11 @@ export function CaseDetail({ client, caseId, agents, jurors, viewer }: CaseDetai
                 <h2 id="answers-title" className="m-0 font-serif text-[30px] font-bold text-ink">
                     {answersTitle}
                 </h2>
+                {viewer.canAct && open && analysis.tallies.length > 0 && (
+                    <p id="vote-guidance" className="m-0 max-w-[760px] border-l-4 border-ink pl-3 text-[16px] text-text">
+                        {t("vote.guidance")}
+                    </p>
+                )}
                 {analysis.tallies.length === 0 ? (
                     <EmptyState message={t("caseDetail.noAnswers")} />
                 ) : (
@@ -220,6 +234,7 @@ export function CaseDetail({ client, caseId, agents, jurors, viewer }: CaseDetai
                                     myVote={myVotes.get(testimony.id)}
                                     canVote={viewer.canAct && open && tally.valid && !isOwn}
                                     isOwn={isOwn && viewer.canAct}
+                                    open={open}
                                     busy={busy}
                                     onVote={vote(testimony.id, letter)}
                                 />

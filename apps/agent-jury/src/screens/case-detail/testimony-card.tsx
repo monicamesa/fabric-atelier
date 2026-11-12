@@ -8,6 +8,8 @@ import { VoteBar } from "@/components/docket/vote-bar";
 import type { TestimonyRow } from "@/data/cases.service";
 import type { TestimonyTally, VoteValue } from "@/rules/case-validity";
 import { cn } from "@/lib/utils";
+import { DIFF_ROWS } from "../docket/docket-views";
+import { stillNeeded } from "./vote-progress";
 
 interface TestimonyCardProps {
     letter: string;
@@ -22,19 +24,22 @@ interface TestimonyCardProps {
     /** Whether the voting buttons are shown at all (active juror, open case, not my answer). */
     canVote: boolean;
     isOwn: boolean;
+    /** False once the case is dismissed: nothing is "still needed" then. */
+    open?: boolean;
     busy: boolean;
     onVote: (value: VoteValue, comment?: string) => Promise<boolean>;
 }
 
 /** "ANSWER A · NAME, TEAM", the answer, its definition, the vote bar and the vote actions. */
-export function TestimonyCard({ letter, testimony, tally, author, team, minVotes, isRuling, myVote, canVote, isOwn, busy, onVote }: TestimonyCardProps) {
+export function TestimonyCard({ letter, testimony, tally, author, team, minVotes, isRuling, myVote, canVote, isOwn, open = true, busy, onVote }: TestimonyCardProps) {
     const { t } = useTranslation();
     const [against, setAgainst] = useState(false);
     const [comment, setComment] = useState("");
     const [commentError, setCommentError] = useState<string>();
     const short = testimony.answer.length <= 24;
-    // Ruling needs a valid approver vote in favour (R3); say so until one is in, unless an approver already voted against.
-    const needsApprover = !isRuling && tally.valid && tally.approverFor === 0 && tally.approverAgainst === 0;
+    // R3: ruling needs enough valid votes in favour and at least one from an approver; say what is still missing.
+    const needed = open && !isRuling ? stillNeeded(tally, minVotes) : undefined;
+    const details = DIFF_ROWS.filter((key) => testimony[key]?.trim());
 
     async function submitAgainst(event: FormEvent) {
         event.preventDefault();
@@ -73,10 +78,20 @@ export function TestimonyCard({ letter, testimony, tally, author, team, minVotes
                 {testimony.answer}
             </p>
             <p className="m-0 text-[16px] text-text">{testimony.definition}</p>
+            {details.length > 0 && (
+                <dl aria-label={t("answer.definitionDetails")} className="m-0 grid grid-cols-[auto_minmax(0,1fr)] gap-x-3 gap-y-1 border-t border-rule pt-3 text-[14px]">
+                    {DIFF_ROWS.map((key) => (
+                        <div key={key} className="contents">
+                            <dt className="font-semibold text-ink">{t(`diff.rows.${key}`)}</dt>
+                            <dd className={cn("m-0 break-words text-text", key === "source" && "font-mono text-[13px]")}>{testimony[key]?.trim() || "—"}</dd>
+                        </div>
+                    ))}
+                </dl>
+            )}
             <VoteBar value={tally.votesFor} max={minVotes} />
             <p className="m-0 text-[14px] text-text-muted">
                 {t("answer.progress", { votes: tally.votesFor, count: minVotes })}
-                {needsApprover && ` · ${t("answer.approverNeeded")}`}
+                {needed && ` · ${t(`answer.${needed.key}`, { count: needed.count })}`}
                 {tally.votesAgainst > 0 && ` · ${t("answer.against", { count: tally.votesAgainst })}`}
             </p>
             {isOwn && <p className="m-0 text-[14px] text-text-muted">{t("vote.ownAnswer")}</p>}

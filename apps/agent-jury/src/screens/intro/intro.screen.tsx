@@ -77,6 +77,9 @@ export function IntroScreen({ onDone }: IntroScreenProps) {
                             {t(`intro.${key}.titleStart`)} <span className="hero-highlight">{t(`intro.${key}.titleHighlight`)}</span>
                         </h1>
                         <p className="m-0 max-w-[680px] font-serif text-[20px] leading-snug text-text min-[900px]:text-[26px]">{t(`intro.${key}.body`)}</p>
+                        {key === "step3" && (
+                            <p className="m-0 max-w-[680px] border-l-4 border-ink pl-3 text-[17px] leading-normal text-text">{t("intro.step3.note")}</p>
+                        )}
                     </div>
 
                     <div className="flex flex-wrap items-center gap-3">

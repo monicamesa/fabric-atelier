@@ -1,9 +1,11 @@
-import { useState, type MouseEvent } from "react";
+import { useMemo, useState, type MouseEvent } from "react";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/docket/button";
 import { Deliberating } from "@/components/docket/gavel";
 import { Glossary } from "@/components/docket/glossary";
 import { ExampleAgentNote } from "@/components/docket/example-agent-note";
+import { ProgressStrip } from "@/components/docket/progress-strip";
+import { YourTurnPanel } from "@/components/docket/your-turn-panel";
 import { JudgeTrustLine, JudgeTrustPanel } from "@/components/docket/judge-trust";
 import { Objection } from "@/components/docket/objection";
 import { CaseNumber, StatusChip, UnverifiedChip } from "@/components/docket/status-chip";
@@ -16,6 +18,8 @@ import { formatRoute } from "@/lib/route";
 import { CONSENSUS_MIN_VOTES } from "@/rules/consensus";
 import { AgentTabs } from "../docket/agent-tabs";
 import { homeRows } from "../docket/docket-views";
+import { nextStep, type TurnContext } from "../docket/next-step";
+import { gameProgress, yourTurn } from "../docket/your-turn";
 import { ProposeCaseForm } from "../docket/propose-case-form";
 import type { DocketState } from "../docket/use-docket";
 import type { Viewer } from "../docket/viewer";
@@ -38,9 +42,31 @@ export function HomeScreen({ client, agents, agent, docket, viewer, onAgentChang
     const waiting = data?.cases.filter((item) => item.needsMyVote).length ?? 0;
     // Example agents never count in judge trust; it is also hidden when reviews could not be read.
     const showTrust = data?.reviewsAvailable !== false && !(agent && isExampleAgent(agent));
+    const ctx = useMemo(
+        () => ({ me: viewer.me, canAct: viewer.canAct, role: viewer.juror?.role, isAdmin: viewer.isAdmin }),
+        [viewer.me, viewer.canAct, viewer.juror?.role, viewer.isAdmin],
+    );
+    const turn = useMemo(
+        () => (data ? yourTurn(data.cases, ctx, { reviewsAvailable: data.reviewsAvailable, latestHearingAt: data.latestHearingAt, now: new Date() }) : undefined),
+        [data, ctx],
+    );
+    const progress = useMemo(() => (data ? gameProgress(data.cases, data.reviewsAvailable) : undefined), [data]);
 
     return (
         <div className="flex flex-col gap-8">
+            {agent && turn && <YourTurnPanel agentId={agent.id} agentName={agent.name} turn={turn} onPropose={() => setProposing(true)} />}
+            {agent && progress && data && data.cases.length > 0 && <ProgressStrip progress={progress} agentName={agent.name} />}
+
+            {proposing && agent && (
+                <ProposeCaseForm
+                    client={client}
+                    agentId={agent.id}
+                    agentName={agent.name}
+                    categories={data?.categories ?? []}
+                    onCancel={() => setProposing(false)}
+                    onSaved={onOpenCase}
+                />
+            )}
             <section className="grid gap-8 border-b-[6px] border-double border-ink pb-7 min-[900px]:grid-cols-[minmax(0,1fr)_340px] min-[900px]:items-center">
                 <div className="flex flex-col gap-5">
                     <span className="text-[13px] font-bold uppercase tracking-[0.14em] text-action-text">{t("home.kicker")}</span>
@@ -71,17 +97,6 @@ export function HomeScreen({ client, agents, agent, docket, viewer, onAgentChang
             </section>
 
             <ExampleAgentNote agent={agent} />
-
-            {proposing && agent && (
-                <ProposeCaseForm
-                    client={client}
-                    agentId={agent.id}
-                    agentName={agent.name}
-                    categories={data?.categories ?? []}
-                    onCancel={() => setProposing(false)}
-                    onSaved={onOpenCase}
-                />
-            )}
 
             <Glossary />
 
@@ -137,7 +152,7 @@ export function HomeScreen({ client, agents, agent, docket, viewer, onAgentChang
                                 </span>
                             </div>
                             {homeRows(data.cases).map((item) => (
-                                <DocketRow key={item.record.id} item={item} onOpen={() => onOpenCase(item.record.id)} />
+                                <DocketRow key={item.record.id} item={item} ctx={ctx} onOpen={() => onOpenCase(item.record.id)} />
                             ))}
                         </div>
                         <a href={formatRoute({ page: "cases", agentId: agent.id, filter: "all", query: "" })} className="w-fit text-[16px] font-bold text-ink underline">
@@ -153,11 +168,11 @@ export function HomeScreen({ client, agents, agent, docket, viewer, onAgentChang
     );
 }
 
-function DocketRow({ item, onOpen }: { item: DocketCase; onOpen: () => void }) {
+function DocketRow({ item, ctx, onOpen }: { item: DocketCase; ctx: TurnContext; onOpen: () => void }) {
     const { t } = useTranslation();
     const { record, analysis } = item;
+    const step = nextStep(item, ctx);
     const ruling = item.testimonies.find((testimony) => testimony.id === analysis.rulingTestimonyId);
-    const rulingVotes = analysis.tallies.find((tally) => tally.testimony.id === analysis.rulingTestimonyId)?.votesFor ?? 0;
     const leading = Math.max(0, ...analysis.tallies.filter((tally) => tally.valid).map((tally) => tally.votesFor));
     const helper =
         analysis.state === "ruled" && ruling
@@ -186,17 +201,18 @@ function DocketRow({ item, onOpen }: { item: DocketCase; onOpen: () => void }) {
                     {!analysis.verified && <UnverifiedChip />}
                     <StatusChip state={analysis.state} />
                 </span>
-                {analysis.state === "disputed" ? (
+                <span className={step.yours ? "text-[14px] font-semibold text-action-text min-[700px]:text-right" : "text-[14px] text-text min-[700px]:text-right"}>
+                    {t(`nextStep.${step.key}`, { count: step.count })}
+                </span>
+                {step.yours && (step.key === "disputedYourOpinion" ? (
                     <a href={href} onClick={go} className="inline-flex min-h-11 items-center bg-action px-4 text-[15px] font-bold text-ink-inverse no-underline dark:text-ink">
                         {t("docket.settle")}
                     </a>
-                ) : analysis.state === "ruled" ? (
-                    <span className="text-[14px] text-text">{t("cases.jurorsAgree", { count: rulingVotes })}</span>
-                ) : item.needsMyVote ? (
+                ) : step.key === "yourVote" || step.key === "yourApproverVote" ? (
                     <a href={href} onClick={go} className="inline-flex min-h-11 items-center border-2 border-ink px-4 text-[15px] font-bold text-ink no-underline hover:bg-paper-hover">
                         {t("docket.castVote")}
                     </a>
-                ) : null}
+                ) : null)}
             </span>
         </div>
     );

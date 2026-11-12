@@ -90,10 +90,47 @@ describe("CaseDetail", () => {
         expect(screen.getByRole("button", { name: "Dismiss: the question is ambiguous" })).toBeInTheDocument();
     });
 
-    it("says an approver vote is still needed until one is in", async () => {
+    it("says what is still needed, including an approver's vote, on the answer and in the case status", async () => {
         renderCase([ANSWER], { id: "sub-elena", email: "elena.expert@example.com" });
         const card = await screen.findByRole("article", { name: /Answer A/ });
-        expect(within(card).getByText(/0 of 2 votes in favour · at least one from an approver/)).toBeInTheDocument();
+        expect(within(card).getByText(/0 of 2 votes in favour · 2 more votes in favour needed, at least one from an approver/)).toBeInTheDocument();
+        expect(screen.getByText(/Needs 2 more votes in favour, at least one from an approver\./)).toBeInTheDocument();
+    });
+
+    it("tells jurors what they vote on, once, next to the answers", async () => {
+        renderCase([ANSWER], { id: "sub-elena", email: "elena.expert@example.com" });
+        await screen.findByRole("article", { name: /Answer A/ });
+        expect(screen.getByText(/Vote for the answer the agent SHOULD give\. You don't judge style or re-calculate/)).toBeInTheDocument();
+    });
+
+    it("shows the definition details on the answer card, so definitions can be compared at a glance", async () => {
+        const detailed = { ...ANSWER, criterion: "At least one order", timeWindow: "Last 90 days", population: "All customers", source: "FactSales" };
+        renderCase([detailed], { id: "sub-elena", email: "elena.expert@example.com" });
+        const card = await screen.findByRole("article", { name: /Answer A/ });
+        const details = within(card).getByLabelText("Definition details");
+        expect(within(details).getByText("What counts")).toBeInTheDocument();
+        expect(within(details).getByText("At least one order")).toBeInTheDocument();
+        expect(within(details).getByText("Last 90 days")).toBeInTheDocument();
+        expect(within(details).getByText("All customers")).toBeInTheDocument();
+        expect(within(details).getByText("FactSales")).toBeInTheDocument();
+    });
+
+    it("shows no details list when the answer has only its one-sentence definition", async () => {
+        renderCase([ANSWER], { id: "sub-elena", email: "elena.expert@example.com" });
+        const card = await screen.findByRole("article", { name: /Answer A/ });
+        expect(within(card).queryByLabelText("Definition details")).not.toBeInTheDocument();
+    });
+
+    it("says what happens next for this person, under the title", async () => {
+        renderCase([ANSWER], { id: "sub-elena", email: "elena.expert@example.com" });
+        await screen.findByRole("article", { name: /Answer A/ });
+        expect(screen.getByText("What happens next:").parentElement).toHaveTextContent("What happens next: Your vote needed");
+    });
+
+    it("tells the author they are waiting for others", async () => {
+        renderCase([ANSWER], { id: "sub-ana", email: "ana.expert@example.com" });
+        await screen.findByRole("article", { name: /Answer A/ });
+        expect(screen.getByText("What happens next:").parentElement).toHaveTextContent("You proposed it: waiting for others");
     });
 
     it("is read-only for someone who is not on the jury (D2)", async () => {

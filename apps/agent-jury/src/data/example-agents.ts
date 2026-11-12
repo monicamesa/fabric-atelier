@@ -15,18 +15,23 @@ export function isExampleAgent(agent: AgentIdentity): boolean {
     );
 }
 
+/** Example jurors are demo rows with a reserved example address (example.com, example.org, example.net or *.example). */
+export function isExampleJuror(juror: { email: string }): boolean {
+    return /@(?:[a-z0-9-]+\.)*example(?:\.(?:com|org|net))?$/i.test(juror.email.trim());
+}
+
 /** The agent's name without a trailing "(example)", so the localized "Example" label is not shown twice. */
 export function plainAgentName(agent: Pick<AgentRow, "name">): string {
     return agent.name.replace(EXAMPLE_SUFFIX, "");
 }
 
 /**
- * The agents a person can pick. Once a real agent exists, example agents are hidden from everyone but admins
- * (who see them labelled "Example"); while there are only examples, they stay so the app is not empty.
+ * The agents a person can pick. Example agents are hidden unless an admin turned on "Show example agents"; while there
+ * are only examples (no real agent yet) they stay so the app is not empty.
  */
-export function visibleAgents<T extends AgentIdentity>(active: readonly T[], isAdmin: boolean): T[] {
+export function visibleAgents<T extends AgentIdentity>(active: readonly T[], includeExamples: boolean): T[] {
     const real = active.filter((agent) => !isExampleAgent(agent));
-    return real.length === 0 || isAdmin ? [...active] : real;
+    return real.length === 0 || includeExamples ? [...active] : real;
 }
 
 /** The default agent: the requested one if visible, otherwise the first real agent, otherwise the first one. */

@@ -11,6 +11,8 @@ interface ImportMetaEnv {
   readonly VITE_FABRIC_ITEM_ID?: string;
   /** Fabric portal base URL (e.g. https://app.fabric.microsoft.com/). */
   readonly VITE_FABRIC_PORTAL_URL?: string;
+  /** "1" shows example agents by default (the TEST build); production leaves it unset. */
+  readonly VITE_SHOW_EXAMPLE_AGENTS?: string;
 }
 
 interface ImportMeta {

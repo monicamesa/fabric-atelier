@@ -1,6 +1,8 @@
+<!-- repo-only -->[English](user-guide.md) · Español<!-- /repo-only -->
+
 # Agent Jury · Guía de usuario
 
-Agent Jury pone a personas de negocio a decidir qué respuesta es la correcta antes de dejar que un juez de IA califique a un Fabric Data Agent. Esta guía explica cómo se juega y qué reglas hay.<!-- repo-only --> Para probar la app de principio a fin, usa el [guion de pruebas](manual-test.md). English version: [user-guide.md](user-guide.md).<!-- /repo-only -->
+Agent Jury pone a personas de negocio a decidir qué respuesta es la correcta antes de dejar que un juez de IA califique a un Fabric Data Agent. Esta guía explica cómo se juega y qué reglas hay.<!-- repo-only --> Para probar la app de principio a fin, usa el [guion de pruebas](manual-test.es.md). English version: [user-guide.md](user-guide.md).<!-- /repo-only -->
 
 ## Qué es y quién hace qué
 
@@ -30,9 +32,11 @@ Palabras del juego:
 
 Una partida va de una pregunta de negocio a una respuesta acordada, y de ahí a medir al agente y al juez.
 
-1. **Preparar la sala (admin).** En **Secretaría** añade a los jurados (email con el que entran en Fabric y rol) y registra el agente que se va a evaluar: nombre, **ID del workspace** e **ID del agente**, que se copian de la dirección del agente en Fabric.
+**¿No sabes qué hacer? Empieza en Home, en el panel "Tu turno".** Enumera, por orden de urgencia y con un botón cada una, lo que te necesita ahora: casos que esperan tu voto, disputas en las que puedes dar tu opinión, casos que necesitan el voto de una aprobadora (aprobadores), veredictos del juez por revisar y, para los admins, casos resueltos listos para una vista. Si no hay nada pendiente dice "Estás al día" y te ofrece proponer un caso nuevo. Debajo, una tira de progreso (Proponer · Votar · Resuelto · Vista · Revisar) muestra cuántos casos hay en cada paso y resalta dónde se acumula el trabajo. Cada caso de las listas indica además qué pasa ahora *para ti*.
+
+1. **Preparar la sala (admin).** En **Secretaría** añade a los jurados (email con el que entran en Fabric y rol) y registra el agente que se va a evaluar: nombre, **ID del workspace** e **ID del agente**, que se copian de la dirección del agente en Fabric. Los admins también pueden editar su propio nombre visible (Secretaría → pestaña **Jurados** → **Editar datos**) y, en la pestaña **Agentes**, activar o desactivar **Mostrar datos de ejemplo** (desactivado por defecto; no se borra nada).
 2. **Proponer un caso.** Cualquier jurado pulsa **+ Proponer un caso** en Casos, escribe la pregunta como la haría negocio ("¿Cuántos clientes tenemos en España?"), una categoría, etiquetas opcionales y **su respuesta** con una definición (una frase). Los detalles opcionales (criterio, ventana de tiempo, población, fuente) ayudan a ver en qué se diferencian dos respuestas. Proponer un caso **no cuenta como voto**: tu propia respuesta empieza sin votos y tu voto sobre ella nunca cuenta.
-3. **Votar.** El resto del jurado entra en el caso y pulsa **Votar la respuesta A**, o **Votar en contra** (con un motivo obligatorio), o propone otra con **Proponer otra respuesta** y su propia definición. Se puede cambiar de opinión: vale el último voto de cada persona.
+3. **Votar.** El resto del jurado entra en el caso y pulsa **Votar la respuesta A**, o **Votar en contra** (con un motivo obligatorio), o propone otra con **Proponer otra respuesta** y su propia definición. Se puede cambiar de opinión: vale el último voto de cada persona. **Sobre qué se vota:** la respuesta que *debería* dar el agente. No juzgas el estilo ni recalculas la cifra; compruebas que la definición es la correcta para esta pregunta (cada respuesta muestra qué cuenta, el periodo, a quién cuenta y la tabla de origen). Si la definirías de otra forma, propón otra respuesta.
 4. **Resolver o discutir.** Un caso queda *resuelto* cuando hay dos votos válidos a favor de la misma respuesta, al menos uno de ellos de un aprobador, y ningún aprobador en contra (detalle abajo). Si dos respuestas distintas tienen apoyo, el caso pasa a **disputa**, y ahí aparecen las definiciones que cada área usa sin saberlo (por ejemplo, país de facturación frente a país de envío).
 5. **Celebrar una vista (admin).** En **Vistas**, **Iniciar una vista**: se eligen las preguntas resueltas (hasta 5 por ahora), la versión del agente (publicada o borrador) y se ve una estimación de tiempo. Un notebook en Fabric hace las preguntas al agente y el juez de IA da un veredicto por caso. La pantalla de la vista muestra el progreso y los veredictos según llegan.
 6. **Revisar al juez.** Cada jurado revisa cada veredicto: **Sí, de acuerdo** o **No, recurrir** (en escritorio, teclas A y X; J/K para moverse). Un recurso necesita un comentario. Si la mayoría del jurado corrige al juez, el ticker lo anuncia como "Juez corregido".
@@ -41,6 +45,10 @@ Una partida va de una pregunta de negocio a una respuesta acordada, y de ahí a 
 9. **Exportar la jurisprudencia.** En Casos, **Exportar jurisprudencia** descarga un CSV (`question,expected_answer,category,tags`) con los casos resueltos del agente, para reutilizarlo en otras evaluaciones.
 
 La primera vez, la app enseña una Intro de tres pasos; se puede repetir desde Home con **Cómo funciona**.
+
+### Idioma de las preguntas
+
+Las preguntas, respuestas y definiciones **no se traducen nunca**: la pregunta se envía al agente tal cual está escrita, y traducirla cambiaría la prueba. Escribe cada pregunta en el idioma en el que quieras probar al agente; el idioma de las pantallas (EN | ES) solo cambia los textos de la propia app.
 
 ## Las reglas, con precisión
 
@@ -79,7 +87,7 @@ Cuando solo queda una respuesta con apoyo, se aplican las reglas de resolución 
 
 ### Reapertura (R9)
 
-Un aprobador activo, al revisar un veredicto de una vista, elige el motivo "La respuesta esperada es incorrecta". Da igual lo que dijera el juez. El caso vuelve a "En revisión": los votos antiguos quedan visibles como "antes de la revisión" pero no cuentan, y todos tienen que votar de nuevo. Si los votos nuevos se reparten entre respuestas, el caso pasa a disputa por las reglas normales. Un experto o un admin pueden revisar, pero **no reabren**. Como cada persona tiene un único rol, un admin no puede ser también aprobador: para reabrir hace falta una cuenta con rol de aprobador.
+Un aprobador activo, al revisar un veredicto de una vista, elige el motivo "La respuesta esperada es incorrecta". Da igual lo que dijera el juez. El caso vuelve a "Abierto a votación": los votos antiguos quedan visibles como "antes de la revisión" pero no cuentan, y todos tienen que votar de nuevo. Si los votos nuevos se reparten entre respuestas, el caso pasa a disputa por las reglas normales. Un experto o un admin pueden revisar, pero **no reabren**. Como cada persona tiene un único rol, un admin no puede ser también aprobador: para reabrir hace falta una cuenta con rol de aprobador.
 
 ### Confianza en el juez
 

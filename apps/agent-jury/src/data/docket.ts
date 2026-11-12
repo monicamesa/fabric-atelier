@@ -56,6 +56,8 @@ export interface Docket {
     trust?: JudgeTrust;
     /** False when verdicts and reviews could not be read: judge trust and the judge lines of the ticker are then hidden. */
     reviewsAvailable: boolean;
+    /** When the most recent hearing (of any agent) started: Home uses it to warn an admin that a hearing may still be busy. */
+    latestHearingAt?: string;
 }
 
 /** D8: trims and collapses spaces; categories compare without case. */
@@ -108,7 +110,18 @@ export function buildDocket(raw: DocketRecords, jurors: readonly JurorRecord[], 
             ? judgeTrust({ agentId, hearings: reviews.hearings, verdicts: reviews.verdicts, reviewRecords: reviews.reviewRecords, jurors, now })
             : undefined;
     const judge = available ? { hearings: reviews.hearings, verdicts: reviews.verdicts, overruled: trust?.overruled ?? [] } : undefined;
-    return { cases, categories: categories.sort((a, b) => a.localeCompare(b)), ticker: buildTicker(cases, judge), trust, reviewsAvailable: available };
+    const latestHearingAt = reviews.hearings.reduce<string | undefined>((latest, hearing) => {
+        const created = new Date(hearing.createdAt).toISOString();
+        return !latest || created > latest ? created : latest;
+    }, undefined);
+    return {
+        cases,
+        categories: categories.sort((a, b) => a.localeCompare(b)),
+        ticker: buildTicker(cases, judge),
+        trust,
+        reviewsAvailable: available,
+        latestHearingAt,
+    };
 }
 
 /** Keeps only the testimonies, votes and dismissals that belong to `cases`. */

@@ -116,6 +116,35 @@ describe("ClerksOffice", () => {
         expect(within(card).getByText("Sales agent")).toBeInTheDocument();
     });
 
+    it("hides example agents and jurors until an admin switches example data on, counts included, and says nothing is deleted", async () => {
+        const { client } = fakeClient({});
+        const onShowExamplesChange = vi.fn();
+        const REAL: JurorRow = { id: "00000000-0000-4000-8000-000000000015", email: "real.person", displayName: "Real P.", role: "admin", team: null, active: true };
+        render(<ClerksOffice client={client} jury={jury([ANA, DARIO, REAL])} me={REAL} showExamples={false} onShowExamplesChange={onShowExamplesChange} />);
+        const toggle = await screen.findByRole("checkbox", { name: /Show example data/ });
+        expect(toggle).not.toBeChecked();
+        expect(screen.getByText(/nothing is deleted/)).toBeInTheDocument();
+        expect(screen.getByRole("tab", { name: /Jurors · 1/ })).toBeInTheDocument();
+        expect(await screen.findByRole("tab", { name: /Agents · 0/ })).toBeInTheDocument();
+        fireEvent.click(toggle);
+        expect(onShowExamplesChange).toHaveBeenCalledWith(true);
+    });
+
+    it("shows example jurors and agents, and counts them, when example data is on", async () => {
+        const { client } = fakeClient({});
+        render(<ClerksOffice client={client} jury={jury([ANA, DARIO])} me={DARIO} showExamples onShowExamplesChange={vi.fn()} />);
+        expect(await screen.findByRole("tab", { name: /Jurors · 2/ })).toBeInTheDocument();
+        expect(await screen.findByRole("tab", { name: /Agents · 1/ })).toBeInTheDocument();
+    });
+
+    it("never hides the admin's own row, even when it is an example", async () => {
+        const { client } = fakeClient({});
+        render(<ClerksOffice client={client} jury={jury([ANA, DARIO])} me={DARIO} showExamples={false} onShowExamplesChange={vi.fn()} />);
+        const table = await screen.findByRole("table", { name: "Jurors" });
+        expect(within(table).getByText(/dario\.admin \(you\)/)).toBeInTheDocument();
+        expect(within(table).queryByText("Ana E.")).not.toBeInTheDocument();
+    });
+
     it("filters agents into Active and Retired, Active first", async () => {
         const { client } = fakeClient({});
         render(<ClerksOffice client={client} jury={jury([ANA, DARIO])} me={DARIO} />);
@@ -147,10 +176,22 @@ describe("ClerksOffice", () => {
         );
     });
 
+    it("keeps the actions of a table row on one line, with their full labels", async () => {
+        const { client } = fakeClient({});
+        render(<ClerksOffice client={client} jury={jury([ANA, DARIO])} me={DARIO} />);
+        const table = await screen.findByRole("table", { name: "Jurors" });
+        const anaRow = within(table).getByText("Ana E.").closest("tr")!;
+        const edit = within(anaRow).getByRole("button", { name: "Edit the details of Ana E." });
+        expect(edit).toHaveTextContent("Edit details");
+        expect(within(anaRow).getByRole("button", { name: "Change the role of Ana E." })).toHaveTextContent("Change role");
+        expect(within(anaRow).getByRole("button", { name: "Deactivate Ana E." })).toHaveTextContent("Deactivate");
+        expect(edit.parentElement).toHaveClass("flex-nowrap");
+    });
+
     it("stacks jurors as cards with full-width actions on phones, without a table", async () => {
         const original = window.matchMedia;
         window.matchMedia = ((query: string) => ({
-            matches: query === "(max-width: 639px)",
+            matches: query === "(max-width: 899px)",
             media: query,
             addEventListener: () => {},
             removeEventListener: () => {},

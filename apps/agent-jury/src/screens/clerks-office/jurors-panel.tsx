@@ -24,10 +24,11 @@ interface JurorsPanelProps {
 }
 
 type Filter = "active" | "inactive";
-// Secondary columns give way first on narrow screens, so the row actions stay visible.
-const TEAM_COLUMN = "hidden min-[768px]:table-cell";
-const ACTIVITY_COLUMN = "hidden min-[1024px]:table-cell";
-const PHONE_QUERY = "(max-width: 639px)";
+// Secondary columns give way first on narrower screens, so the row actions always fit on one line.
+const TEAM_COLUMN = "hidden min-[1024px]:table-cell";
+const ACTIVITY_COLUMN = "hidden min-[1280px]:max-[1439px]:table-cell min-[1600px]:table-cell";
+// The table needs room for its one-line actions: below 900 px the jurors are stacked cards, not a table.
+const PHONE_QUERY = "(max-width: 899px)";
 
 export function JurorsPanel({ jurors, me, activity, clerk, onNotice }: JurorsPanelProps) {
     const { t } = useTranslation();
@@ -74,7 +75,7 @@ export function JurorsPanel({ jurors, me, activity, clerk, onNotice }: JurorsPan
                             header: t("clerk.jurors.columns.actions"),
                             hiddenHeader: true,
                             align: "right",
-                            className: "w-[300px]",
+                            className: "w-[340px]",
                         },
                     ]}
                 >
@@ -121,6 +122,8 @@ function JurorActions({ juror, me, clerk, onNotice, stacked = false }: RowProps 
     const allowed = jurorActionsFor(juror.id, me.id);
     const full = stacked ? "w-full" : undefined;
     const layout = cn("flex gap-2", stacked ? "flex-col" : "flex-wrap items-center justify-end");
+    // The idle actions of a table row stay on one line (never clipped, never stacked); the edit forms may wrap.
+    const idleLayout = cn("flex gap-2", stacked ? "flex-col" : "flex-nowrap items-center justify-end whitespace-nowrap");
 
     async function saveRole() {
         if (await clerk.run("setJurorRole", { jurorId: juror.id, role })) {
@@ -208,7 +211,7 @@ function JurorActions({ juror, me, clerk, onNotice, stacked = false }: RowProps 
 
     const textAction = cn(full, !stacked && "text-ink");
     return (
-        <div className={layout}>
+        <div className={idleLayout}>
             <Button
                 variant={stacked ? "quiet" : "link"}
                 compact={!stacked}

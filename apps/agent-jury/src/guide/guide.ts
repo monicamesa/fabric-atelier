@@ -26,13 +26,16 @@ const markdown = new Marked({
     },
 });
 
+/** Sentences for people reading the repository on GitHub (links to other files, the language switcher) are left out of the in-app guide. */
+function withoutRepoOnly(source: string): string {
+    return source.replace(/<!-- repo-only -->[\s\S]*?<!-- \/repo-only -->/g, "");
+}
+
 export function renderMarkdown(source: string): string {
-    // Sentences for people reading the repository on GitHub (links to other files) are left out of the in-app guide.
-    const inApp = source.replace(/<!-- repo-only -->[\s\S]*?<!-- \/repo-only -->/g, "");
-    return markdown.parse(inApp, { async: false });
+    return markdown.parse(withoutRepoOnly(source), { async: false });
 }
 
 /** The user guide as HTML in the given language, without its first heading (the page has its own title). */
 export function guideHtml(language: AppLanguage): string {
-    return renderMarkdown(SOURCES[language].replace(/^# .*\r?\n/, ""));
+    return renderMarkdown(withoutRepoOnly(SOURCES[language]).replace(/^\s*# .*\r?\n/, ""));
 }

@@ -25,7 +25,7 @@
         }
     },
     "caseState": {
-        "under_review": "Under review",
+        "under_review": "Open for votes",
         "ruled": "Ruled",
         "disputed": "Disputed",
         "dismissed": "Dismissed"
@@ -139,7 +139,7 @@
         "kicker_one": "{{agent}} · {{count}} case",
         "kicker_other": "{{agent}} · {{count}} cases",
         "title": "The full docket",
-        "help": "Every case moves left to right: the jury reviews it, settles any dispute, and rules. Ruled cases become case law, the test the agent has to pass.",
+        "help": "Every case moves left to right: the jury votes on it, settles any dispute, and rules. Ruled cases become case law, the test the agent has to pass.",
         "search": "Search questions",
         "searchPlaceholder": "Search questions",
         "filter": "Show cases",
@@ -180,6 +180,8 @@
             "ruled": "The jury agreed on the answer. This case is now case law.",
             "needsVotes_one": "Needs {{count}} more vote in favour.",
             "needsVotes_other": "Needs {{count}} more votes in favour.",
+            "needsVotesApprover_one": "Needs {{count}} more vote in favour, at least one from an approver.",
+            "needsVotesApprover_other": "Needs {{count}} more votes in favour, at least one from an approver.",
             "needsApprover": "Enough votes, but no approver has confirmed the answer yet.",
             "approverAgainst": "An approver voted against the leading answer.",
             "reopened": "Reopened: an approver challenged the expected answer after a hearing. The jury votes again."
@@ -215,13 +217,19 @@
         "votes_one": "{{count}} vote",
         "votes_other": "{{count}} votes",
         "ruling": "Ruling",
-                "approverNeeded": "at least one from an approver",
+                "needsMore_one": "{{count}} more vote in favour needed",
+        "needsMore_other": "{{count}} more votes in favour needed",
+        "needsMoreApprover_one": "{{count}} more vote in favour needed, at least one from an approver",
+        "needsMoreApprover_other": "{{count}} more votes in favour needed, at least one from an approver",
+        "enoughNeedsApprover": "enough votes, but at least one must be from an approver",
+        "definitionDetails": "Definition details",
                 "progress_one": "{{votes}} of {{count}} vote in favour",
         "progress_other": "{{votes}} of {{count}} votes in favour",
         "against_one": "{{count}} against",
         "against_other": "{{count}} against"
     },
     "vote": {
+        "guidance": "Vote for the answer the agent SHOULD give. You don't judge style or re-calculate: check that the definition is right for this question. If you'd define it differently, propose another answer.",
         "for": "Vote for answer {{letter}}",
         "against": "Vote against",
         "changeToFor": "Change to a vote for {{letter}}",
@@ -298,7 +306,7 @@
         "title": "Propose a case for {{agent}}",
         "help": "A good case has one right answer that a business expert can check.",
         "question": "Question",
-        "questionHint": "Ask it the way a business user would ask the agent.",
+        "questionHint":"Write the question as business would ask it. It is sent to the agent exactly as written, in this language.",
         "questionRequired": "Enter the question.",
         "category": "Category",
         "categoryHint": "Pick an existing one or type a new one.",
@@ -371,6 +379,8 @@
         "protectedTitle": "How this is protected.",
         "protectedBody": "The server checks that you are an active admin before saving anything. If it can't confirm it, nothing changes.",
         "notAdmin": "Only active admins can use the clerk's office. Ask an admin if you need access.",
+        "showExamples": "Show example data",
+        "showExamplesHelp": "Off by default. Example agents and jurors (example addresses) are demo data: they never count in hearings, judge trust or the case-law export, and nothing is deleted. The choice resets when the page reloads.",
         "loading": "The clerk is fetching the records…",
         "tabs": {
             "label": "Clerk's office sections",
@@ -738,6 +748,81 @@
             "unknown": "Something went wrong while opening the court. Your cases are safe."
         }
     },
+    "turn": {
+        "title": "Your turn",
+        "help": "What needs you right now on {{agent}}. Start here.",
+        "lines": {
+            "approverVote_one": "{{count}} case needs an approver vote",
+            "approverVote_other": "{{count}} cases need an approver vote",
+            "vote_one": "{{count}} case waiting for your vote",
+            "vote_other": "{{count}} cases waiting for your vote",
+            "disputed_one": "{{count}} disputed case: give your opinion",
+            "disputed_other": "{{count}} disputed cases: give your opinion",
+            "review_one": "{{count}} judge verdict to review",
+            "review_other": "{{count}} judge verdicts to review",
+            "hearing_one": "{{count}} ruled case ready for a hearing",
+            "hearing_other": "{{count}} ruled cases ready for a hearing"
+        },
+        "actions": {
+            "approverVote": "Cast your vote",
+            "vote": "Vote",
+            "disputed": "Give your opinion",
+            "review": "Review the verdict",
+            "hearing": "Go to Hearings"
+        },
+        "upToDate": "You're up to date.",
+        "propose": "Propose a new case",
+        "hearingBusy": "A hearing started recently: it may still be in session, or resting (ten minutes between hearings). Hearings shows the exact state."
+    },
+    "progress": {
+        "title": "How the game is going",
+        "label": "Game progress for {{agent}}",
+        "stages": {
+            "propose": "Propose",
+            "vote": "Vote",
+            "ruled": "Ruled",
+            "hearing": "Hearing",
+            "review": "Review"
+        },
+        "captions": {
+            "propose": "cases",
+            "vote": "open",
+            "ruled": "ruled",
+            "hearing": "judged",
+            "review": "reviewed"
+        },
+        "reviewOf": "of {{total}} reviewed",
+        "bottleneck": {
+            "vote_one": "{{count}} case waiting for votes",
+            "vote_other": "{{count}} cases waiting for votes",
+            "hearing_one": "{{count}} ruled case waiting for a hearing",
+            "hearing_other": "{{count}} ruled cases waiting for a hearing",
+            "review_one": "{{count}} judge verdict waiting for review",
+            "review_other": "{{count}} judge verdicts waiting for review"
+        },
+        "allClear": "Nothing is waiting: the docket is moving."
+    },
+    "nextStep": {
+        "label": "What happens next",
+        "dismissed": "Dismissed: nothing more to do",
+        "noAnswers": "No answer yet: add the first one",
+        "yourVote": "Your vote needed",
+        "yourApproverVote": "Your vote needed, as an approver",
+        "proposedWaiting": "You proposed it: waiting for others",
+        "waitingApprover": "Waiting for an approver",
+        "waitingVotes_one": "Waiting for {{count}} more vote",
+        "waitingVotes_other": "Waiting for {{count}} more votes",
+        "waitingVotesApprover_one": "Waiting for {{count}} more vote, at least one from an approver",
+        "waitingVotesApprover_other": "Waiting for {{count}} more votes, at least one from an approver",
+        "approverAgainst": "An approver voted against: waiting for the jury",
+        "reopened": "Reopened after a hearing: waiting for new votes",
+        "disputedYourOpinion": "Disputed: give your opinion",
+        "disputedWaiting": "Disputed: waiting for the jury to agree",
+        "readyForHearing": "Ready for a hearing",
+        "reviewVerdict_one": "Review the judge's verdict",
+        "reviewVerdict_other": "Review the judge's {{count}} verdicts",
+        "judged": "Judged: nothing left for you"
+    },
     "guide": {
         "kicker": "Help",
         "title": "User guide",
@@ -774,7 +859,8 @@
             "kicker": "The jury",
             "titleStart": "You are",
             "titleHighlight": "the jury",
-            "body": "Business experts agree on the right answers, settle disputes about definitions, and appeal when the judge gets it wrong."
+            "body": "Business experts agree on the right answers, settle disputes about definitions, and appeal when the judge gets it wrong.",
+            "note": "When you vote, pick the answer the agent should give. You don't judge style or re-calculate: you check that the definition is right for the question. Not sure what to do next? Start at Home, in “Your turn”."
         }
     },
     "errors": {

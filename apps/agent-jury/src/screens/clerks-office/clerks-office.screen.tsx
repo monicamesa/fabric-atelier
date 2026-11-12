@@ -8,6 +8,7 @@ import { Tabs } from "@/components/docket/tabs";
 import { readAdminLog } from "@/data/clerk.service";
 import { describeClerkError } from "@/data/clerk-errors";
 import { listAgents, readAuthorActivity, type JurorRow } from "@/data/directory.service";
+import { isExampleAgent, isExampleJuror } from "@/data/example-agents";
 import { useAsync, type AsyncState } from "@/hooks/use-async";
 import { useClerkAction } from "@/hooks/use-clerk-action";
 import { useMediaQuery } from "@/hooks/use-media-query";
@@ -28,13 +29,16 @@ interface ClerksOfficeProps {
     me: JurorRow | undefined;
     /** Called after any clerk action, so lists kept by the app (agent switchers, Home) refresh without a reload. */
     onDirectoryChanged?: () => void;
+    /** "Show example data": admin-only, held by the app for the session. Shown when omitted, so the screen can be used on its own. */
+    showExamples?: boolean;
+    onShowExamplesChange?: (value: boolean) => void;
 }
 
 function technical(error: unknown): string | undefined {
     return error === undefined ? undefined : describeClerkError(error).technicalDetails;
 }
 
-export function ClerksOffice({ client, jury, me, onDirectoryChanged }: ClerksOfficeProps) {
+export function ClerksOffice({ client, jury, me, onDirectoryChanged, showExamples = true, onShowExamplesChange }: ClerksOfficeProps) {
     const { t } = useTranslation();
     const isAdmin = me?.active === true && me.role === "admin";
 
@@ -86,7 +90,15 @@ export function ClerksOffice({ client, jury, me, onDirectoryChanged }: ClerksOff
     return (
         <div className="flex flex-col gap-6">
             {header}
-            <AdminDesk client={client} jury={jury} jurors={jury.data} me={me} onDirectoryChanged={onDirectoryChanged} />
+            <AdminDesk
+                client={client}
+                jury={jury}
+                jurors={jury.data}
+                me={me}
+                onDirectoryChanged={onDirectoryChanged}
+                showExamples={showExamples}
+                onShowExamplesChange={onShowExamplesChange}
+            />
         </div>
     );
 }
@@ -98,12 +110,16 @@ function AdminDesk({
     jurors,
     me,
     onDirectoryChanged,
+    showExamples,
+    onShowExamplesChange,
 }: {
     client: AppRayfinClient;
     jury: { reload: () => void };
     jurors: JurorRow[];
     me: JurorRow;
     onDirectoryChanged?: () => void;
+    showExamples: boolean;
+    onShowExamplesChange?: (value: boolean) => void;
 }) {
     const { t } = useTranslation();
     const [tab, setTab] = useState<Tab>("jurors");
@@ -144,8 +160,33 @@ function AdminDesk({
 
     const showNotice = (message: string) => setNotice(message);
 
+    // Example rows (demo data) are hidden unless "Show example data" is on. Nothing is deleted, and you always see yourself.
+    const visibleJurors = useMemo(
+        () => (showExamples ? jurors : jurors.filter((juror) => !isExampleJuror(juror) || juror.id === me.id)),
+        [jurors, showExamples, me.id],
+    );
+    const visibleAgentRows = useMemo(
+        () => (showExamples ? agents.data : agents.data?.filter((agent) => !isExampleAgent(agent))),
+        [agents.data, showExamples],
+    );
+    const hasExamples = jurors.some(isExampleJuror) || Boolean(agents.data?.some(isExampleAgent));
+
     return (
         <div className="flex flex-col gap-3">
+            {hasExamples && onShowExamplesChange && (
+                <label className="flex items-start gap-3 border border-ink bg-paper-raised p-3 text-[15px] text-text">
+                    <input
+                        type="checkbox"
+                        checked={showExamples}
+                        onChange={(event) => onShowExamplesChange(event.target.checked)}
+                        className="mt-1 size-5 shrink-0 accent-[var(--ink)]"
+                    />
+                    <span className="flex flex-col gap-0.5">
+                        <b className="text-ink">{t("clerk.showExamples")}</b>
+                        <span className="text-text-muted">{t("clerk.showExamplesHelp")}</span>
+                    </span>
+                </label>
+            )}
             <Tabs<Tab>
                 label={t("clerk.tabs.label")}
                 idPrefix="clerk"
@@ -155,8 +196,8 @@ function AdminDesk({
                     setNotice(null);
                 }}
                 tabs={[
-                    { id: "jurors", label: t("clerk.tabs.jurors", { count: jurors.length }) },
-                    { id: "agents", label: agents.data ? t("clerk.tabs.agents", { count: agents.data.length }) : t("clerk.tabs.agentsPlain") },
+                    { id: "jurors", label: t("clerk.tabs.jurors", { count: visibleJurors.length }) },
+                    { id: "agents", label: visibleAgentRows ? t("clerk.tabs.agents", { count: visibleAgentRows.length }) : t("clerk.tabs.agentsPlain") },
                     { id: "log", label: t(isPhone ? "clerk.tabs.logShort" : "clerk.tabs.log") },
                 ]}
             />
@@ -164,10 +205,10 @@ function AdminDesk({
 
             <div id={`clerk-panel-${tab}`} role="tabpanel" aria-labelledby={`clerk-tab-${tab}`} tabIndex={0}>
                 {tab === "jurors" && (
-                    <div className="grid grid-cols-[minmax(0,1fr)] items-start gap-10 min-[900px]:grid-cols-[minmax(0,1fr)_380px]">
+                    <div className="grid grid-cols-[minmax(0,1fr)] items-start gap-10 min-[1440px]:grid-cols-[minmax(0,1fr)_380px]">
                         <div className="flex flex-col gap-3">
                             <ClerkError view={rowClerk.error} />
-                            <JurorsPanel jurors={jurors} me={me} activity={activity.data} clerk={rowClerk} onNotice={showNotice} />
+                            <JurorsPanel jurors={visibleJurors} me={me} activity={activity.data} clerk={rowClerk} onNotice={showNotice} />
                         </div>
                         <aside className="flex flex-col gap-6">
                             <SwearInForm clerk={swearInClerk} onNotice={showNotice} />
@@ -176,9 +217,9 @@ function AdminDesk({
                     </div>
                 )}
                 {tab === "agents" &&
-                    (agents.data ? (
+                    (visibleAgentRows ? (
                         <AgentsPanel
-                            agents={agents.data}
+                            agents={visibleAgentRows}
                             activity={activity.data}
                             clerk={agentClerk}
                             registerClerk={registerClerk}

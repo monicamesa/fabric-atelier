@@ -1,6 +1,8 @@
+<!-- repo-only -->English · [Español](user-guide.es.md)<!-- /repo-only -->
+
 # Agent Jury · User guide
 
-Agent Jury has business people decide which answer is the right one before an AI judge scores a Fabric Data Agent. This guide explains how to play and what the rules are.<!-- repo-only --> To test the app end to end, use the [test script](manual-test.md) (in Spanish). Versión en español: [user-guide.es.md](user-guide.es.md).<!-- /repo-only -->
+Agent Jury has business people decide which answer is the right one before an AI judge scores a Fabric Data Agent. This guide explains how to play and what the rules are.<!-- repo-only --> To test the app end to end, use the [test script](manual-test.md). Versión en español: [user-guide.es.md](user-guide.es.md).<!-- /repo-only -->
 
 ## What it is and who does what
 
@@ -30,9 +32,11 @@ Words of the game:
 
 A game goes from a business question to an agreed answer, and from there to measuring the agent and the judge.
 
-1. **Set up the courtroom (admin).** In the **Clerk's office**, add the jurors (the email they use to sign in to Fabric, and a role) and register the agent to evaluate: its name, the **Workspace ID** and the **Agent ID**, copied from the agent's address in Fabric.
+**Not sure what to do? Start at Home, in the "Your turn" panel.** It lists, in order of urgency and with one button each, what needs you right now: cases waiting for your vote, disputes where you can give your opinion, cases that need an approver's vote (approvers), judge verdicts to review and, for admins, ruled cases ready for a hearing. When nothing is pending it says "You're up to date" and offers to propose a new case. Below it, a progress strip (Propose · Vote · Ruled · Hearing · Review) shows how many cases are at each step and highlights where work is piling up. Every case in the lists also says what happens next *for you*.
+
+1. **Set up the courtroom (admin).** In the **Clerk's office**, add the jurors (the email they use to sign in to Fabric, and a role) and register the agent to evaluate: its name, the **Workspace ID** and the **Agent ID**, copied from the agent's address in Fabric. Admins can also edit their own display name (Clerk's office → **Jurors** tab → **Edit details**) and, on the **Agents** tab, switch **Show example data** on or off (off by default; nothing is deleted).
 2. **Propose a case.** Any juror presses **+ Propose a case** on Cases, writes the question the way a business user would ask it ("How many customers do we have in Spain?"), a category, optional tags and **their answer** with a one-sentence definition. The optional details (criterion, time window, population, source) help show where two answers differ. Proposing a case **does not count as a vote**: your own answer starts with no votes, and your vote on it never counts.
-3. **Vote.** The rest of the jury opens the case and presses **Vote for answer A**, or **Vote against** (a reason is required), or proposes another answer with **Propose another answer** and its own definition. You can change your mind: the latest vote of each person stands.
+3. **Vote.** The rest of the jury opens the case and presses **Vote for answer A**, or **Vote against** (a reason is required), or proposes another answer with **Propose another answer** and its own definition. You can change your mind: the latest vote of each person stands. **What you vote on:** the answer the agent *should* give. You don't judge style or re-calculate the number; you check that the definition is the right one for this question (each answer shows what counts, the time window, who counts and the source table). If you'd define it differently, propose another answer.
 4. **Rule or dispute.** A case is *ruled* when one answer has two valid votes in favour, at least one from an approver, and no approver against (details below). If two different answers have support, the case becomes a **dispute**, which is where the definitions each team uses without knowing show up (for example billing country versus shipping country).
 5. **Hold a hearing (admin).** On **Hearings**, **Start a hearing**: choose the ruled questions (up to 5 for now) and the version of the agent (published or draft), and see a time estimate. A notebook in Fabric asks the agent the questions and the AI judge gives one verdict per case. The hearing page shows progress and the verdicts as they arrive.
 6. **Review the judge.** Each juror reviews each verdict: **Yes, agree** or **No, appeal** (on desktop, keys A and X; J/K to move). An appeal needs a comment. When the jury's majority corrects the judge, the ticker announces it as "Judge overruled".
@@ -41,6 +45,10 @@ A game goes from a business question to an agreed answer, and from there to meas
 9. **Export the case law.** On Cases, **Export case law** downloads a CSV (`question,expected_answer,category,tags`) of the agent's ruled cases, to reuse in other evaluations.
 
 The first time, the app shows a three-step Intro; you can replay it from Home with **How it works**.
+
+### Language of the questions
+
+Questions, answers and definitions are **never translated**: the question is sent to the agent exactly as written, so translating it would change the test. Write each question in the language you want the agent tested in; the language of the screens (EN | ES) only changes the app's own texts.
 
 ## The rules, precisely
 
@@ -79,7 +87,7 @@ Once only one answer has support, the ruling rules above apply.
 
 ### Reopening (R9)
 
-An active approver, while reviewing a hearing verdict, picks the reason "The expected answer is wrong". It does not matter what the judge said. The case goes back to "Under review": the old votes stay visible as "before the review" but do not count, and everyone has to vote again. If the new votes split between answers, the case becomes a dispute under the normal rules. An expert or an admin can review but **cannot reopen**. Since each person has a single role, an admin cannot also be an approver: reopening needs an account with the approver role.
+An active approver, while reviewing a hearing verdict, picks the reason "The expected answer is wrong". It does not matter what the judge said. The case goes back to "Open for votes": the old votes stay visible as "before the review" but do not count, and everyone has to vote again. If the new votes split between answers, the case becomes a dispute under the normal rules. An expert or an admin can review but **cannot reopen**. Since each person has a single role, an admin cannot also be an approver: reopening needs an account with the approver role.
 
 ### Trust in the judge
 

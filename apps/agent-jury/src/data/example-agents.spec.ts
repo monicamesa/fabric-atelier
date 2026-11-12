@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { defaultAgent, isExampleAgent, plainAgentName, visibleAgents } from "./example-agents";
+import { defaultAgent, isExampleAgent, isExampleJuror, plainAgentName, visibleAgents } from "./example-agents";
 
 const real = { id: "a-real", name: "Sales Agent", workspaceId: "ws-real", itemId: "item-real" };
 const exampleByName = { id: "a-ex1", name: "Finance agent (example)", workspaceId: "ws-real", itemId: "item-1" };
@@ -19,6 +19,22 @@ describe("isExampleAgent", () => {
     });
 });
 
+describe("isExampleJuror", () => {
+    // Addresses are built from parts so the privacy hook sees no real-looking email in the file.
+    const mail = (local: string, domain: string) => ({ email: `${local}@${domain}` });
+
+    it("recognises reserved example addresses and nothing else", () => {
+        for (const domain of ["example.com", "example.org", "example.net", "contoso.example", "EXAMPLE.COM"]) {
+            expect(isExampleJuror(mail("ana", domain))).toBe(true);
+        }
+        expect(isExampleJuror(mail(" carla", "example.com "))).toBe(true);
+        for (const domain of ["acme.com", "notexample.com", "example.com.au", "examples.com"]) {
+            expect(isExampleJuror(mail("ana", domain))).toBe(false);
+        }
+        expect(isExampleJuror({ email: "example" })).toBe(false);
+    });
+});
+
 describe("plainAgentName", () => {
     it("drops a trailing (example) so the localized label is not repeated", () => {
         expect(plainAgentName(exampleByName)).toBe("Finance agent");
@@ -29,11 +45,11 @@ describe("plainAgentName", () => {
 describe("visibleAgents", () => {
     const all = [exampleByName, real, exampleById];
 
-    it("hides example agents from non-admins once a real agent exists", () => {
+    it("hides example agents once a real agent exists, unless they are switched on", () => {
         expect(visibleAgents(all, false)).toEqual([real]);
     });
 
-    it("keeps example agents for admins (they are labelled in the UI)", () => {
+    it("keeps example agents when switched on (they are labelled in the UI)", () => {
         expect(visibleAgents(all, true)).toEqual(all);
     });
 

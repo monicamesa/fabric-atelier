@@ -7,10 +7,10 @@ describe("i18n", () => {
         window.localStorage.clear();
         initI18n();
         expect(i18n.language).toBe("en");
-        expect(i18n.t("caseState.under_review")).toBe("Under review");
+        expect(i18n.t("caseState.under_review")).toBe("Open for votes");
 
         await changeLanguage("es");
-        expect(i18n.t("caseState.under_review")).toBe("En revisión");
+        expect(i18n.t("caseState.under_review")).toBe("Abierto a votación");
         expect(window.localStorage.getItem(LANGUAGE_STORAGE_KEY)).toBe("es");
         expect(document.documentElement.lang).toBe("es");
 

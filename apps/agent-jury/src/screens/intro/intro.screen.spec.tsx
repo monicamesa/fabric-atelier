@@ -44,6 +44,14 @@ describe("IntroScreen", () => {
         }
     });
 
+    it("tells jurors in the voting step what they vote on", () => {
+        render(<IntroScreen onDone={vi.fn()} />);
+        expect(screen.queryByText(/You don't judge style or re-calculate/)).not.toBeInTheDocument();
+        fireEvent.click(screen.getByRole("button", { name: /Begin/ }));
+        fireEvent.click(screen.getByRole("button", { name: /Next/ }));
+        expect(screen.getByText(/pick the answer the agent should give\. You don't judge style or re-calculate/)).toBeInTheDocument();
+    });
+
     it("can go back", () => {
         render(<IntroScreen onDone={vi.fn()} />);
         fireEvent.click(screen.getByRole("button", { name: /Begin/ }));
