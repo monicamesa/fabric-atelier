@@ -9,6 +9,7 @@ No escribas en este documento (ni en capturas que compartas) nombres, emails ni 
 - La app en el entorno que vayas a probar, abierta en tu navegador, con la capacidad de Fabric encendida.
 - Un admin (tú) y, para la Prueba B, **otras dos cuentas** del tenant (invitado o usuario nuevo): una aprobadora y una experta. **Con dos personas no se puede resolver un caso**: cada respuesta solo puede recibir el voto de la otra persona, y hacen falta dos votos válidos. Con tres sí.
 - Tu cuenta es admin, y un admin no puede ser también aprobador. Para reabrir un caso hace falta una cuenta con rol de aprobador.
+- **Con un solo aprobador, los casos que proponga ese aprobador no se pueden resolver nunca**: su propio voto no cuenta y para resolver hace falta el voto de un aprobador. Para una sesión de juego, **recomendamos al menos 2 aprobadores**, de modo que cada caso tenga un aprobador que no sea su autor.
 - Una hora de capacidad: las vistas usan la capacidad compartida; solo se celebra una a la vez y hay 10 minutos de descanso entre vistas.
 
 ## Prueba A: tú sola (unos 15 minutos)
