@@ -54,7 +54,7 @@ Una respuesta resuelve el caso cuando se cumplen las tres cosas a la vez:
 
 Un voto es válido si lo emite un jurado activo y **no es el autor de esa respuesta**. Un voto en contra necesita un motivo; sin él no cuenta. Un admin vota como un experto, nunca con el peso de un aprobador.
 
-Importante: con el umbral actual hacen falta **al menos dos personas que voten una respuesta ajena**, y una de ellas aprobadora. Con solo dos jurados nada puede resolverse (cada respuesta solo puede recibir el voto de la otra persona), así que para probar la app hacen falta **tres jurados**.
+Importante: con el umbral actual hacen falta **al menos dos personas que voten una respuesta ajena**, y una de ellas aprobadora. Con solo dos jurados nada puede resolverse (cada respuesta solo puede recibir el voto de la otra persona), así que para probar la app hacen falta **tres jurados**. Con un solo aprobador, los casos que proponga ese aprobador no se pueden resolver nunca (su propio voto no cuenta y resolver exige el voto de un aprobador), así que una sesión de juego debería tener **al menos 2 aprobadores**.
 
 ### Disputa y cómo se resuelve
 

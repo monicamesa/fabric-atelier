@@ -54,7 +54,7 @@ An answer rules the case when all three hold:
 
 A vote is valid when an active juror casts it and they are **not the author of that answer**. A vote against needs a reason; without one it does not count. An admin votes as an expert, never with an approver's weight.
 
-Note: with the current threshold you need **at least two people voting on someone else's answer**, one of them an approver. With only two jurors nothing can be ruled (each answer can only get the other person's vote), so testing the app needs **three jurors**.
+Note: with the current threshold you need **at least two people voting on someone else's answer**, one of them an approver. With only two jurors nothing can be ruled (each answer can only get the other person's vote), so testing the app needs **three jurors**. With a single approver, the cases that approver proposes can never be ruled (their own vote doesn't count and ruling needs an approver's vote), so a play session should have **at least 2 approvers**.
 
 ### Dispute and how it resolves
 

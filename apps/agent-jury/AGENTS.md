@@ -211,6 +211,7 @@ Facts confirmed in earlier sessions (Rayfin CLI 1.36.2, Windows, PowerShell 5.1)
 - Where to verify a change (decided 2026-11-12):
   - UI-only changes: verify locally (port 5180) with tests, `tsc` and lint. No TEST deploy; go straight to production in one batch.
   - Schema, Functions or notebook changes: TEST first, then production.
+  - **Schema first in production:** new entities or columns (`UserFlag`, `VerdictReview`, `Hearing.criticPromptVersion`) must be applied before, or in the same deploy as, the code that reads them. Checklist: [README](README.md) ("Production deploy checklist").
   - One production deploy per finished block of work, not per fix.
   - **Production deploys only from a committed, clean tree whose HEAD is pushed.** The chain is always: tests → commit (the pre-commit hooks run) → push → deploy. `scripts/deploy-production.mjs` refuses unless `git status --porcelain` is empty and `HEAD` equals `origin/main`; never chain a deploy after a commit in the same command, because a hook failure would still deploy uncommitted code (it happened once, 2026-11-12).
   - Screenshots: only the states that changed, at most 4, and no composite unless asked.
