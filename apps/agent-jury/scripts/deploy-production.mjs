@@ -1,14 +1,18 @@
 // Deploys the app to the PRODUCTION workspace (the active deployment) and sets its secrets.
 //   node scripts/deploy-production.mjs --allow-production [--set-secrets]
+// 0. refuses unless `git status --porcelain` is empty and HEAD == origin/main
 // 1. `rayfin up` against the active deployment (production), then `git restore rayfin/rayfin.yml`
 // 2. --set-secrets: APP_SQL_SERVER / APP_SQL_DATABASE / HEARING_WORKSPACE_ID / HEARING_NOTEBOOK_ID from .private/values.env
 // Ids come from .private/values.env and are never printed.
 import { spawnSync } from "node:child_process";
 import { appRoot, loadPrivateValues } from "./lib/deployment-target.mjs";
+import { assertDeployableHead } from "./lib/deploy-guard.mjs";
 
 if (!process.argv.includes("--allow-production")) {
     throw new Error("Production needs --allow-production.");
 }
+// Only a committed, clean tree whose HEAD is pushed to origin/main may go to production (tests -> commit -> push -> deploy).
+assertDeployableHead(appRoot);
 const values = loadPrivateValues();
 const production = values.WORKSPACE_ID_AGENT_JURY;
 if (!production) throw new Error("WORKSPACE_ID_AGENT_JURY is needed in .private/values.env.");

@@ -111,7 +111,7 @@ The check scripts target the test deployment by default and refuse production un
 
 One production deploy per finished block of work. UI-only changes are verified locally (tests, `tsc`, lint, port 5180) and then go straight to production; schema, Functions or notebook changes go to the test deployment first.
 
-1. Tests, `tsc` and lint pass; the working tree is committed.
+1. Tests, `tsc` and lint pass; the work is committed (hooks pass) and pushed to `main`. `deploy-production.mjs` refuses unless the tree is clean and `HEAD` is `origin/main`.
 2. **Schema first, or together with the code:** the `UserFlag` entity (per-user flags such as `intro_seen`) must exist in production before, or in the same deploy as, the code that reads it. The app tolerates a missing entity (the Intro counts as seen), but it would never show the Intro or remember it. The same goes for **`VerdictReview`** (and the `Hearing.criticPromptVersion` column) with the I3b code: apply the schema (`npx rayfin up db apply`) before or with that deploy. Home tolerates a missing review/verdict query (the judge-trust line and the judge items of the ticker hide), but appeals, R9 and judge trust do nothing without it.
 3. `node scripts/deploy-production.mjs --allow-production` (add `--set-secrets` only when secrets change). It runs the full `rayfin up` (schema included) and then restores `rayfin/rayfin.yml`.
 4. Minimal check: launch, Intro the first time and Home on reload, Hearings loads, no console errors. No hearings are launched and nothing polls.
