@@ -1,5 +1,4 @@
 import { useTranslation } from "react-i18next";
-import { Button } from "@/components/docket/button";
 import { formatRoute } from "@/lib/route";
 import { cn } from "@/lib/utils";
 import type { TurnLine, YourTurn } from "@/screens/docket/your-turn";
@@ -18,42 +17,48 @@ function hrefFor(line: TurnLine, agentId: string): string {
     return formatRoute({ page: "case", caseId: line.caseId ?? "" });
 }
 
-/** "Your turn": the few things that need this person now, each one plain sentence and one action. */
+const LINK = "font-bold text-action-text underline underline-offset-2 hover:text-ink";
+
+/**
+ * "Your turn": an editorial sidebar, not a card. Small-caps heading with the agent on the right, a 1 px rule, then plain
+ * lines of text with one link each (at most four, most urgent first).
+ */
 export function YourTurnPanel({ agentId, agentName, turn, onPropose, className }: YourTurnPanelProps) {
     const { t } = useTranslation();
     if (turn.lines.length === 0 && !turn.upToDate) return null;
     return (
-        <section aria-labelledby="your-turn-title" className={cn("flex flex-col gap-3 border-2 border-ink bg-paper-raised p-5", className)}>
-            <div className="flex flex-col gap-1">
-                <h2 id="your-turn-title" className="m-0 font-serif text-[30px] font-bold leading-none text-ink">
+        <section aria-labelledby="your-turn-title" className={cn("flex flex-col gap-3", className)}>
+            <div className="flex items-baseline justify-between gap-3 border-b border-ink pb-2">
+                <h2 id="your-turn-title" className="m-0 text-[13px] font-bold uppercase tracking-[0.14em] text-ink">
                     {t("turn.title")}
                 </h2>
-                <p className="m-0 text-[15px] text-text">{t("turn.help", { agent: agentName })}</p>
+                <span className="min-w-0 truncate text-[14px] text-text-muted">{agentName}</span>
             </div>
             {turn.upToDate ? (
-                <div className="flex flex-wrap items-center gap-4">
-                    <p className="m-0 font-serif text-[20px] text-ink">{t("turn.upToDate")}</p>
-                    <Button variant="primary" onClick={onPropose}>
-                        {t("turn.propose")}
-                    </Button>
+                <div className="flex flex-col gap-2">
+                    <p className="m-0 font-serif text-[26px] leading-tight text-ink">{t("turn.upToDate")}</p>
+                    <p className="m-0 text-[15px] leading-normal text-text">
+                        {t("turn.nobodyWaiting")}
+                        {turn.othersWaiting > 0 && ` ${t("turn.othersWaiting", { count: turn.othersWaiting })}`}
+                    </p>
+                    <button type="button" onClick={onPropose} className={cn(LINK, "min-h-11 w-fit cursor-pointer border-0 bg-transparent p-0 text-left text-[15px]")}>
+                        {t("turn.propose")} →
+                    </button>
                 </div>
             ) : (
-                <ul className="m-0 flex list-none flex-col p-0">
+                <ul className="m-0 flex list-none flex-col gap-3 p-0">
                     {turn.lines.map((line) => (
-                        <li key={line.key} className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2 border-t border-rule py-3 first:border-t-0 first:pt-0">
-                            <span className="font-serif text-[20px] leading-snug text-ink">{t(`turn.lines.${line.key}`, { count: line.count })}</span>
-                            <a
-                                href={hrefFor(line, agentId)}
-                                className="inline-flex min-h-11 items-center border-2 border-ink px-4 text-[15px] font-bold text-ink no-underline hover:bg-paper-hover"
-                            >
-                                {t(`turn.actions.${line.key}`)}
+                        <li key={line.key} className="flex flex-col gap-0.5 text-[16px] leading-snug text-ink">
+                            <span>{t(`turn.lines.${line.key}`, { count: line.count })}</span>
+                            <a href={hrefFor(line, agentId)} className={cn(LINK, "inline-flex min-h-8 w-fit items-center text-[15px]")}>
+                                {t(`turn.actions.${line.key}`)} →
                             </a>
                         </li>
                     ))}
                 </ul>
             )}
             {turn.hearingMayBeBusy && (
-                <p role="note" className="m-0 border-l-4 border-review pl-3 text-[14px] text-text">
+                <p role="note" className="m-0 border-l-2 border-review pl-3 text-[14px] text-text">
                     {t("turn.hearingBusy")}
                 </p>
             )}

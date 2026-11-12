@@ -29,7 +29,7 @@ La app usa una metáfora de juicio. Cada término también se explica dentro de 
 
 - [Guía de usuario](docs/user-guide.es.md) (ES) / [User guide](docs/user-guide.md) (EN): cómo se juega, roles y reglas (cuándo queda resuelto un caso, disputas, vistas, reapertura, confianza en el juez). El último paso de la Intro y Home enlazan a la copia dentro de la app (`#guide`, generada a partir de estos archivos al compilar con `marked`), porque los jurados pueden no tener acceso al repositorio.
 - Guion de pruebas manuales: [Español](docs/manual-test.es.md) / [English](docs/manual-test.md): lista de comprobación de principio a fin para una persona (Prueba A) y para un admin y dos jurados (Prueba B).
-- **Empieza en Home, en "Tu turno":** enumera lo que necesita ahora la persona con sesión iniciada (votos, disputas, votos de aprobadores, veredictos del juez por revisar y, para los admins, casos resueltos listos para una vista), calculado con datos ya cargados. Debajo, una tira de progreso (Proponer · Votar · Resuelto · Vista · Revisar) muestra el cuello de botella. Las listas y la página del caso indican qué pasa ahora para esa persona (`src/screens/docket/next-step.ts`, `your-turn.ts`, con pruebas).
+- **Empieza en Home, en "Tu turno":** una columna editorial junto al titular, sobre la confianza en el juez. Enumera lo que necesita ahora la persona con sesión iniciada (votos, disputas, votos de aprobadores, veredictos del juez por revisar y, para los admins, casos resueltos listos para una vista), calculado con datos ya cargados. Bajo el titular, la línea "La partida" (propuestos · abiertos a votación · resueltos · en vista · revisados) muestra el cuello de botella. Las listas y la página del caso indican qué pasa ahora para esa persona (`src/screens/docket/next-step.ts`, `your-turn.ts`, con pruebas).
 - **Idioma del contenido:** las preguntas, respuestas y definiciones no se traducen nunca, porque la pregunta se envía al agente tal cual está escrita. La insignia de idioma requiere un cambio de esquema y espera aprobación ([backlog](docs/iteraciones/backlog.md), en inglés).
 
 ## Estado
@@ -39,7 +39,7 @@ En desarrollo y en uso por un primer grupo de jurados. El progreso y los siguien
 **Funciona hoy**
 - Jurados, agentes, casos, respuestas (testimonios), votos, desestimaciones y las reglas R1–R9 (resolución, disputas, reapertura).
 - La Secretaría (admins): jurados, agentes, registro de admin y el interruptor de datos de ejemplo.
-- Home ("Tu turno", tira de progreso, ticker), el tablero de casos y la página del caso con votación.
+- Home ("Tu turno", línea "La partida", ticker), el tablero de casos y la página del caso con votación.
 - Vistas: un admin lanza una evaluación del agente; el juez de IA da un veredicto por caso y los jurados lo revisan.
 - Confianza en el juez por agente y por versión del prompt crítico, y la exportación de jurisprudencia en CSV.
 - Español e inglés, temas claro y oscuro, una pantalla de lanzamiento, una Intro de tres pasos y la guía de usuario dentro de la app. Consulta [Pantalla de lanzamiento e Intro](#pantalla-de-lanzamiento-e-intro).

@@ -148,7 +148,12 @@ describe("yourTurn", () => {
 
     it("gives nothing to someone who cannot act", () => {
         const visitor = { me: { userId: "sub-visitor", email: "visitor@example.com" }, canAct: false, isAdmin: false };
-        expect(yourTurn(docketFor("ana", records).cases, visitor, options)).toEqual({ lines: [], upToDate: false, hearingMayBeBusy: false });
+        expect(yourTurn(docketFor("ana", records).cases, visitor, options)).toEqual({ lines: [], upToDate: false, othersWaiting: 0, hearingMayBeBusy: false });
+    });
+
+    it("counts the open cases that wait for other jurors, as context for 'up to date'", () => {
+        const proposedByAna = { cases: [caseRow("c1", "ana")], testimonies: [answer("t1", "c1", "ana")] };
+        expect(yourTurn(docketFor("ana", proposedByAna).cases, ctxFor("ana"), options)).toMatchObject({ upToDate: true, othersWaiting: 1 });
     });
 });
 

@@ -19,6 +19,8 @@ export interface YourTurn {
     lines: TurnLine[];
     /** True when nothing is pending for this person (and they can act). */
     upToDate: boolean;
+    /** Open cases that wait for other jurors, not for this person: context for the "up to date" line. */
+    othersWaiting: number;
     /** Admins only: a hearing started recently, so the next one may have to wait. */
     hearingMayBeBusy: boolean;
 }
@@ -40,7 +42,7 @@ export function yourTurn(
     ctx: TurnContext & { isAdmin: boolean },
     options: { reviewsAvailable: boolean; latestHearingAt?: Date | string; now: Date },
 ): YourTurn {
-    if (!ctx.canAct) return { lines: [], upToDate: false, hearingMayBeBusy: false };
+    if (!ctx.canAct) return { lines: [], upToDate: false, othersWaiting: 0, hearingMayBeBusy: false };
 
     const lines: TurnLine[] = [];
     const add = (key: TurnLineKey, matches: DocketCase[], extra?: (first: DocketCase) => Partial<TurnLine>) => {
@@ -68,6 +70,7 @@ export function yourTurn(
     return {
         lines: shown,
         upToDate: lines.length === 0,
+        othersWaiting: cases.filter((item) => (item.analysis.state === "under_review" || item.analysis.state === "disputed") && !item.needsMyVote).length,
         hearingMayBeBusy: ctx.isAdmin && shown.some((line) => line.key === "hearing") && hearingMayBeBusy(options.latestHearingAt, options.now),
     };
 }

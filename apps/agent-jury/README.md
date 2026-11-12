@@ -29,7 +29,7 @@ The app uses a trial metaphor. Each term is also explained in the app.
 
 - [User guide](docs/user-guide.md) (EN) / [Guía de usuario](docs/user-guide.es.md) (ES): how to play, roles and the rules (when a case is ruled, disputes, hearings, reopening, judge trust). The Intro's last step and Home link to the in-app copy (`#guide`, rendered from these files at build time with `marked`), because jurors may not have access to the repository.
 - Manual test script: [English](docs/manual-test.md) / [Español](docs/manual-test.es.md): end-to-end checklist for one person (Test A) and for an admin plus two jurors (Test B).
-- **Start at Home, in "Your turn":** it lists what needs the signed-in person now (votes, disputes, approver votes, judge verdicts to review and, for admins, ruled cases ready for a hearing), computed from data already loaded. Below it, a progress strip (Propose · Vote · Ruled · Hearing · Review) shows the bottleneck. Lists and the case page say what happens next for that person (`src/screens/docket/next-step.ts`, `your-turn.ts`, with tests).
+- **Start at Home, in "Your turn":** an editorial sidebar next to the headline, above Judge trust. It lists what needs the signed-in person now (votes, disputes, approver votes, judge verdicts to review and, for admins, ruled cases ready for a hearing), computed from data already loaded. Under the hero, "The game" index line (proposed · open for votes · ruled · in a hearing · reviewed) shows the bottleneck. Lists and the case page say what happens next for that person (`src/screens/docket/next-step.ts`, `your-turn.ts`, with tests).
 - **Language of the content:** questions, answers and definitions are never translated, because the question is sent to the agent exactly as written. The language badge needs a schema change and waits for approval ([backlog](docs/iteraciones/backlog.md)).
 
 ## Status
@@ -39,7 +39,7 @@ In development, in use by a first group of jurors. Progress and next steps are t
 **Works today**
 - Jurors, agents, cases, answers (testimonies), votes, dismissals and the rules R1–R9 (ruling, disputes, reopening).
 - The Clerk's office (admins): jurors, agents, admin log, example-data toggle.
-- Home ("Your turn", progress strip, ticker), the cases board and the case page with voting.
+- Home ("Your turn", "The game" line, ticker), the cases board and the case page with voting.
 - Hearings: an admin launches an evaluation of the agent; the AI judge gives a verdict per case and jurors review it.
 - Judge trust per agent and per critic-prompt version, and the case law CSV export.
 - English and Spanish, light and dark themes, a launch screen, a three-step Intro and the in-app user guide. See [Launch screen and Intro](#launch-screen-and-intro).

@@ -750,7 +750,6 @@
     },
     "turn": {
         "title": "Your turn",
-        "help": "What needs you right now on {{agent}}. Start here.",
         "lines": {
             "approverVote_one": "{{count}} case needs an approver vote",
             "approverVote_other": "{{count}} cases need an approver vote",
@@ -771,36 +770,41 @@
             "hearing": "Go to Hearings"
         },
         "upToDate": "You're up to date.",
+        "nobodyWaiting": "Nobody is waiting for your vote.",
+        "othersWaiting_one": "{{count}} case is waiting for other jurors.",
+        "othersWaiting_other": "{{count}} cases are waiting for other jurors.",
         "propose": "Propose a new case",
         "hearingBusy": "A hearing started recently: it may still be in session, or resting (ten minutes between hearings). Hearings shows the exact state."
     },
     "progress": {
-        "title": "How the game is going",
+        "title": "The game",
         "label": "Game progress for {{agent}}",
         "stages": {
-            "propose": "Propose",
-            "vote": "Vote",
-            "ruled": "Ruled",
-            "hearing": "Hearing",
-            "review": "Review"
+            "propose_one": "proposed",
+            "propose_other": "proposed",
+            "vote_one": "open for votes",
+            "vote_other": "open for votes",
+            "ruled_one": "ruled",
+            "ruled_other": "ruled",
+            "hearing_one": "in a hearing",
+            "hearing_other": "in a hearing",
+            "review_one": "reviewed",
+            "review_other": "reviewed"
         },
-        "captions": {
-            "propose": "cases",
-            "vote": "open",
-            "ruled": "ruled",
-            "hearing": "judged",
-            "review": "reviewed"
+        "now": {
+            "vote": "Now: votes needed",
+            "hearing": "Now: a hearing needed",
+            "review": "Now: verdicts to review"
         },
-        "reviewOf": "of {{total}} reviewed",
-        "bottleneck": {
-            "vote_one": "{{count}} case waiting for votes",
-            "vote_other": "{{count}} cases waiting for votes",
-            "hearing_one": "{{count}} ruled case waiting for a hearing",
-            "hearing_other": "{{count}} ruled cases waiting for a hearing",
-            "review_one": "{{count}} judge verdict waiting for review",
-            "review_other": "{{count}} judge verdicts waiting for review"
+        "nowCount": {
+            "vote_one": "{{count}} case",
+            "vote_other": "{{count}} cases",
+            "hearing_one": "{{count}} case",
+            "hearing_other": "{{count}} cases",
+            "review_one": "{{count}} verdict",
+            "review_other": "{{count}} verdicts"
         },
-        "allClear": "Nothing is waiting: the docket is moving."
+        "allClear": "Now: nothing is waiting"
     },
     "nextStep": {
         "label": "What happens next",

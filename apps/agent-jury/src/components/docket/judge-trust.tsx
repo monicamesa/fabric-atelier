@@ -2,7 +2,6 @@ import { useTranslation } from "react-i18next";
 import type { TFunction } from "i18next";
 import { cn } from "@/lib/utils";
 import type { JudgeTrust, TrustCounts, VersionTrust } from "@/rules/judge-trust";
-import { Gavel } from "./gavel";
 
 /** The big number: a percentage once there are enough decided verdicts, "n of m" before that, never an invented value. */
 function headline(counts: TrustCounts, t: TFunction): string {
@@ -47,18 +46,19 @@ export function JudgeTrustPanel({ trust, className }: { trust?: JudgeTrust; clas
     const { t } = useTranslation();
     const current = trust?.current;
     return (
-        <aside aria-labelledby="judge-trust-title" className={cn("flex flex-col gap-2 border-l border-ink pl-7", className)}>
-            <Gavel className="size-16" />
-            <h2 id="judge-trust-title" className="m-0 text-[13px] font-bold uppercase tracking-[0.14em] text-ink">
-                {t("vocabulary.judgeTrust")}
-            </h2>
-            {current && <p className="m-0 font-mono text-[13px] text-text-muted">{t("home.trustPrompt", { version: current.version })}</p>}
-            <p className="m-0 font-serif text-[64px] font-black leading-none text-ink" data-testid="trust-headline">
+        <section aria-labelledby="judge-trust-title" className={cn("flex flex-col gap-3", className)}>
+            <div className="flex items-baseline justify-between gap-3 border-b border-ink pb-2">
+                <h2 id="judge-trust-title" className="m-0 text-[13px] font-bold uppercase tracking-[0.14em] text-ink">
+                    {t("vocabulary.judgeTrust")}
+                </h2>
+                {current && <span className="font-mono text-[13px] text-text-muted">{t("home.trustPrompt", { version: current.version })}</span>}
+            </div>
+            <p className="m-0 font-serif text-[48px] font-black leading-none text-ink" data-testid="trust-headline">
                 {current ? headline(current, t) : "—"}
             </p>
-            <p className="m-0 max-w-[320px] text-[15px] leading-normal text-text">{current ? <Caption counts={current} /> : t("home.trustPending")}</p>
+            <p className="m-0 max-w-[340px] text-[15px] leading-normal text-text">{current ? <Caption counts={current} /> : t("home.trustPending")}</p>
             {trust && <History history={trust.history} />}
-        </aside>
+        </section>
     );
 }
 

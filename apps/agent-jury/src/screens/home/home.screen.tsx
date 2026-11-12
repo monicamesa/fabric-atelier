@@ -6,7 +6,7 @@ import { Glossary } from "@/components/docket/glossary";
 import { ExampleAgentNote } from "@/components/docket/example-agent-note";
 import { ProgressStrip } from "@/components/docket/progress-strip";
 import { YourTurnPanel } from "@/components/docket/your-turn-panel";
-import { JudgeTrustLine, JudgeTrustPanel } from "@/components/docket/judge-trust";
+import { JudgeTrustPanel } from "@/components/docket/judge-trust";
 import { Objection } from "@/components/docket/objection";
 import { CaseNumber, StatusChip, UnverifiedChip } from "@/components/docket/status-chip";
 import { EmptyState, Skeleton } from "@/components/docket/states";
@@ -15,6 +15,7 @@ import type { DocketCase } from "@/data/docket";
 import { isExampleAgent } from "@/data/example-agents";
 import type { AppRayfinClient } from "@/lib/rayfin-client";
 import { formatRoute } from "@/lib/route";
+import { cn } from "@/lib/utils";
 import { CONSENSUS_MIN_VOTES } from "@/rules/consensus";
 import { AgentTabs } from "../docket/agent-tabs";
 import { homeRows } from "../docket/docket-views";
@@ -51,24 +52,18 @@ export function HomeScreen({ client, agents, agent, docket, viewer, onAgentChang
         [data, ctx],
     );
     const progress = useMemo(() => (data ? gameProgress(data.cases, data.reviewsAvailable) : undefined), [data]);
+    const showTurn = Boolean(agent && turn && (turn.lines.length > 0 || turn.upToDate));
+    const hasSidebar = showTurn || showTrust;
 
     return (
         <div className="flex flex-col gap-8">
-            {agent && turn && <YourTurnPanel agentId={agent.id} agentName={agent.name} turn={turn} onPropose={() => setProposing(true)} />}
-            {agent && progress && data && data.cases.length > 0 && <ProgressStrip progress={progress} agentName={agent.name} />}
-
-            {proposing && agent && (
-                <ProposeCaseForm
-                    client={client}
-                    agentId={agent.id}
-                    agentName={agent.name}
-                    categories={data?.categories ?? []}
-                    onCancel={() => setProposing(false)}
-                    onSaved={onOpenCase}
-                />
-            )}
-            <section className="grid gap-8 border-b-[6px] border-double border-ink pb-7 min-[900px]:grid-cols-[minmax(0,1fr)_340px] min-[900px]:items-center">
-                <div className="flex flex-col gap-5">
+            <section
+                className={cn(
+                    "grid gap-8 border-b-[6px] border-double border-ink pb-7",
+                    hasSidebar && "min-[900px]:grid-cols-[minmax(0,1fr)_340px] min-[900px]:gap-0",
+                )}
+            >
+                <div className={cn("flex flex-col gap-5", hasSidebar && "min-[900px]:pr-10")}>
                     <span className="text-[13px] font-bold uppercase tracking-[0.14em] text-action-text">{t("home.kicker")}</span>
                     <h1 className="m-0 max-w-[700px] font-serif text-[56px] font-black leading-[0.9] tracking-[-0.04em] text-ink min-[900px]:text-[104px]">
                         {t("home.title")}
@@ -93,8 +88,26 @@ export function HomeScreen({ client, agents, agent, docket, viewer, onAgentChang
                         </a>
                     </div>
                 </div>
-                {showTrust && <JudgeTrustPanel trust={data?.trust} className="hidden min-[900px]:flex" />}
+                {hasSidebar && (
+                    <aside className="flex flex-col gap-8 border-t border-rule pt-6 min-[900px]:border-l min-[900px]:border-t-0 min-[900px]:border-ink min-[900px]:pl-7 min-[900px]:pt-0">
+                        {showTurn && agent && turn && <YourTurnPanel agentId={agent.id} agentName={agent.name} turn={turn} onPropose={() => setProposing(true)} />}
+                        {showTrust && <JudgeTrustPanel trust={data?.trust} />}
+                    </aside>
+                )}
             </section>
+
+            {agent && progress && data && data.cases.length > 0 && <ProgressStrip progress={progress} agentName={agent.name} className="-mt-4" />}
+
+            {proposing && agent && (
+                <ProposeCaseForm
+                    client={client}
+                    agentId={agent.id}
+                    agentName={agent.name}
+                    categories={data?.categories ?? []}
+                    onCancel={() => setProposing(false)}
+                    onSaved={onOpenCase}
+                />
+            )}
 
             <ExampleAgentNote agent={agent} />
 
@@ -162,8 +175,6 @@ export function HomeScreen({ client, agents, agent, docket, viewer, onAgentChang
                 ) : null}
             </section>
 
-            {/* Until there are hearings, phones get judge trust as one line below the docket. */}
-            {showTrust && <JudgeTrustLine trust={data?.trust} className="min-[900px]:hidden" />}
         </div>
     );
 }

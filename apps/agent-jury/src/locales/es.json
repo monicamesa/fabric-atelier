@@ -750,7 +750,6 @@
     },
     "turn": {
         "title": "Tu turno",
-        "help": "Lo que te necesita ahora en {{agent}}. Empieza aquí.",
         "lines": {
             "approverVote_one": "{{count}} caso necesita el voto de una aprobadora",
             "approverVote_other": "{{count}} casos necesitan el voto de una aprobadora",
@@ -771,36 +770,41 @@
             "hearing": "Ir a Vistas"
         },
         "upToDate": "Estás al día.",
+        "nobodyWaiting": "Nadie espera tu voto ahora mismo.",
+        "othersWaiting_one": "{{count}} caso espera los votos del resto del jurado.",
+        "othersWaiting_other": "{{count}} casos esperan los votos del resto del jurado.",
         "propose": "Proponer un caso nuevo",
         "hearingBusy": "Una vista empezó hace poco: puede seguir en curso o estar en el descanso (diez minutos entre vistas). En Vistas ves el estado exacto."
     },
     "progress": {
-        "title": "Cómo va la partida",
+        "title": "La partida",
         "label": "Progreso de la partida de {{agent}}",
         "stages": {
-            "propose": "Proponer",
-            "vote": "Votar",
-            "ruled": "Resuelto",
-            "hearing": "Vista",
-            "review": "Revisar"
+            "propose_one": "propuesto",
+            "propose_other": "propuestos",
+            "vote_one": "abierto a votación",
+            "vote_other": "abiertos a votación",
+            "ruled_one": "resuelto",
+            "ruled_other": "resueltos",
+            "hearing_one": "en vista",
+            "hearing_other": "en vista",
+            "review_one": "revisado",
+            "review_other": "revisados"
         },
-        "captions": {
-            "propose": "casos",
-            "vote": "abiertos",
-            "ruled": "resueltos",
-            "hearing": "juzgados",
-            "review": "revisados"
+        "now": {
+            "vote": "Ahora: faltan votos",
+            "hearing": "Ahora: falta una vista",
+            "review": "Ahora: faltan revisiones"
         },
-        "reviewOf": "de {{total}} revisados",
-        "bottleneck": {
-            "vote_one": "{{count}} caso esperando votos",
-            "vote_other": "{{count}} casos esperando votos",
-            "hearing_one": "{{count}} caso resuelto esperando una vista",
-            "hearing_other": "{{count}} casos resueltos esperando una vista",
-            "review_one": "{{count}} veredicto del juez esperando revisión",
-            "review_other": "{{count}} veredictos del juez esperando revisión"
+        "nowCount": {
+            "vote_one": "{{count}} caso",
+            "vote_other": "{{count}} casos",
+            "hearing_one": "{{count}} caso",
+            "hearing_other": "{{count}} casos",
+            "review_one": "{{count}} veredicto",
+            "review_other": "{{count}} veredictos"
         },
-        "allClear": "No hay nada en espera: los casos avanzan."
+        "allClear": "Ahora: no hay nada en espera"
     },
     "nextStep": {
         "label": "Qué pasa ahora",

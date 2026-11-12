@@ -27,7 +27,7 @@ With one person a case cannot be ruled, so this part tests everything else.
 - [ ] Clerk's office: **Show example data** is off in production; turning it on shows the example jurors and agents (labelled "Example") and the tab counters change. After a reload it is off again.
 - [ ] Clerk's office → Jurors → your row → **Edit details**: change your display name and see it reflected in the list.
 - [ ] **Cases** → **+ Propose a case**: propose 3 cases with an answer and a complete definition, using questions whose answer you know (see the table). The form says the question is sent to the agent exactly as written, in this language. Each case is "Open for votes" with 0 votes: proposing is not voting.
-- [ ] Home → **Your turn**: after proposing your cases it says "You're up to date" (you are only waiting for others); the progress strip (Propose · Vote · Ruled · Hearing · Review) counts your cases and highlights "N cases waiting for votes".
+- [ ] Home → **Your turn** (right-hand column): after proposing your cases it says "You're up to date" (you are only waiting for others) with a link to propose a case; "The game" line (proposed · open for votes · ruled · in a hearing · reviewed) counts your cases and marks "Now: votes needed" with "N cases".
 - [ ] The lists say what happens next for you: on your cases, "You proposed it: waiting for others".
 - [ ] Ticker ("Latest on the docket"): it appears on Home when there are at least 2 lines, it moves, it stops on hover or with the pause button, and each line opens its case.
 - [ ] On one of your cases, **Vote for answer A** is not available to you: "Your own answer: your vote on it wouldn't count". Each answer shows what counts, the time window, who counts and the source table.
