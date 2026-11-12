@@ -58,7 +58,6 @@ describe("LaunchScreen", () => {
     it.each([
         ["busy", "Fabric is busy right now"],
         ["unknown", "Something went wrong while opening the court"],
-        ["notJuror", "You are not on this jury yet. Ask an admin to add you."],
     ] as const)("shows a %s error as an alert with one primary action and collapsible details", (kind, message) => {
         const onRetry = vi.fn();
         show({ phase: "error", slow: false, error: { kind, details: "Error 503: details" } }, { onRetry });
@@ -72,6 +71,32 @@ describe("LaunchScreen", () => {
         expect(screen.getAllByRole("button")).toHaveLength(1);
         fireEvent.click(screen.getByRole("button", { name: "Try again" }));
         expect(onRetry).toHaveBeenCalledTimes(1);
+    });
+
+    it("not on the jury: offers to copy the user's own sign-in name, with no Try again", async () => {
+        const writeText = vi.fn().mockResolvedValue(undefined);
+        Object.defineProperty(navigator, "clipboard", { value: { writeText }, configurable: true });
+        const log = vi.spyOn(console, "log").mockImplementation(() => {});
+        const view: LaunchView = { phase: "error", slow: false, error: { kind: "notJuror", details: "no juror record" } };
+        render(<LaunchScreen view={view} onRetry={vi.fn()} signInName="someone@example.com" />);
+
+        const alert = screen.getByRole("alert");
+        expect(alert).toHaveTextContent("You are not on this jury yet. Ask an admin to add you.");
+        expect(alert).toHaveTextContent("Send it to an admin so they can add you.");
+        expect(screen.queryByRole("button", { name: "Try again" })).not.toBeInTheDocument();
+        expect(alert).not.toHaveTextContent("someone@example.com");
+
+        fireEvent.click(screen.getByRole("button", { name: "Copy my sign-in name" }));
+        await screen.findByRole("button", { name: "Copied" });
+        expect(writeText).toHaveBeenCalledExactlyOnceWith("someone@example.com");
+        expect(log).not.toHaveBeenCalled();
+        log.mockRestore();
+    });
+
+    it("not on the jury: without a sign-in name there is nothing to copy, only the hint", () => {
+        render(<LaunchScreen view={{ phase: "error", slow: false, error: { kind: "notJuror", details: "x" } }} onRetry={vi.fn()} />);
+        expect(screen.queryAllByRole("button")).toHaveLength(0);
+        expect(screen.getByRole("alert")).toHaveTextContent("Send it to an admin");
     });
 
     it("asks to sign in again when the session expired", () => {

@@ -45,5 +45,13 @@ export function LaunchGate({ session, docket, onRetry, onReady }: LaunchGateProp
         }
     }, [signingIn, signedIn, retry]);
 
-    return <LaunchScreen view={view} onRetry={retry} onSignIn={signIn ? handleSignIn : undefined} signingIn={signingIn} />;
+    return (
+        <LaunchScreen
+            view={view}
+            onRetry={retry}
+            onSignIn={signIn ? handleSignIn : undefined}
+            signingIn={signingIn}
+            signInName={auth?.session?.user?.email ?? undefined}
+        />
+    );
 }

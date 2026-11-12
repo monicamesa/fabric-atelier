@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/docket/button";
 import { LaunchGavel, type LaunchGavelMode } from "@/components/docket/launch-gavel";
@@ -9,6 +10,8 @@ interface LaunchScreenProps {
     onRetry: () => void;
     onSignIn?: () => void;
     signingIn?: boolean;
+    /** The signed-in user's own name from the token claims. Only ever copied to the clipboard on a click. */
+    signInName?: string;
 }
 
 const STEPS = ["launch.step1", "launch.step2", "launch.step3"] as const;
@@ -31,9 +34,20 @@ function currentStep(phase: LaunchPhase): number {
 }
 
 /** The full-screen launch (design guide, section 6b). Shown once per app load, before anything else. */
-export function LaunchScreen({ view, onRetry, onSignIn, signingIn = false }: LaunchScreenProps) {
+export function LaunchScreen({ view, onRetry, onSignIn, signingIn = false, signInName }: LaunchScreenProps) {
     const { t } = useTranslation();
+    const [copied, setCopied] = useState(false);
     const { phase, error } = view;
+
+    async function copySignInName() {
+        if (!signInName) return;
+        try {
+            await navigator.clipboard.writeText(signInName);
+            setCopied(true);
+        } catch {
+            setCopied(false);
+        }
+    }
     const step = currentStep(phase);
     const statusLine = phase === "error" ? undefined : STATUS_LINE[phase];
     const mode: LaunchGavelMode = phase === "ready" || phase === "done" ? "strike" : phase === "error" ? "still" : "breathe";
@@ -58,11 +72,22 @@ export function LaunchScreen({ view, onRetry, onSignIn, signingIn = false }: Lau
                                 <summary className="min-h-9 cursor-pointer py-1 font-semibold">{t("states.technicalDetails")}</summary>
                                 <code className="block whitespace-pre-wrap break-words font-mono text-[13px]">{error.details}</code>
                             </details>
-                            <div>
+                            <div className="flex flex-col gap-2">
                                 {(error.kind === "session" || error.kind === "signIn") && onSignIn ? (
                                     <Button variant="primary" onClick={onSignIn} disabled={signingIn} aria-busy={signingIn}>
                                         {signingIn ? t("launch.signingIn") : t("launch.signIn")}
                                     </Button>
+                                ) : error.kind === "notJuror" ? (
+                                    <>
+                                        {signInName && (
+                                            <div>
+                                                <Button variant="primary" onClick={() => void copySignInName()}>
+                                                    {copied ? t("states.copied") : t("launch.copySignInName")}
+                                                </Button>
+                                            </div>
+                                        )}
+                                        <p className="m-0 text-[15px]">{t("launch.sendToAdmin")}</p>
+                                    </>
                                 ) : (
                                     <Button variant="primary" onClick={onRetry}>
                                         {t("common.retry")}

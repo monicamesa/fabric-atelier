@@ -636,6 +636,8 @@
         "footer": "Una app comunitaria y de código abierto para Microsoft Fabric",
         "signIn": "Iniciar sesión con Fabric",
         "signingIn": "Iniciando sesión…",
+        "copySignInName": "Copiar mi nombre de inicio de sesión",
+        "sendToAdmin": "Envíaselo a un admin para que te añada.",
         "errors": {
             "session": "Tu sesión de Fabric ha caducado. Vuelve a iniciar sesión para ocupar tu asiento en el jurado.",
             "signIn": "No hemos podido iniciar tu sesión. Permite las ventanas emergentes de este sitio y vuelve a intentarlo.",

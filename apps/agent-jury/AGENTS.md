@@ -208,6 +208,11 @@ Facts confirmed in earlier sessions (Rayfin CLI 1.36.2, Windows, PowerShell 5.1)
 - Never print full logs or full test output into the chat: show only failures.
 - When waiting is unavoidable, stop and tell the user instead of waiting.
 - Keep answers short: what changed, results, decisions needed.
+- Where to verify a change (decided 2026-11-12):
+  - UI-only changes: verify locally (port 5180) with tests, `tsc` and lint. No TEST deploy; go straight to production in one batch.
+  - Schema, Functions or notebook changes: TEST first, then production.
+  - One production deploy per finished block of work, not per fix.
+  - Screenshots: only the states that changed, at most 4, and no composite unless asked.
 
 ### Terminal
 

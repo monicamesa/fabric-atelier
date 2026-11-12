@@ -636,6 +636,8 @@
         "footer": "An open-source community app for Microsoft Fabric",
         "signIn": "Sign in with Fabric",
         "signingIn": "Signing in…",
+        "copySignInName": "Copy my sign-in name",
+        "sendToAdmin": "Send it to an admin so they can add you.",
         "errors": {
             "session": "Your Fabric session has expired. Sign in again to take your seat on the jury.",
             "signIn": "We couldn't sign you in. Allow pop-ups for this site and try again.",

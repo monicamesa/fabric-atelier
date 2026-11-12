@@ -26,7 +26,7 @@ describe("translation files", () => {
         const required = [
             "launch.kicker", "launch.headlineStart", "launch.headlineEnd", "launch.gavelLabel",
             "launch.session", "launch.docket", "launch.ready", "launch.step1", "launch.step2", "launch.step3",
-            "launch.slow", "launch.footer", "launch.signIn", "launch.signingIn",
+            "launch.slow", "launch.footer", "launch.signIn", "launch.signingIn", "launch.copySignInName", "launch.sendToAdmin",
             "launch.errors.session", "launch.errors.signIn", "launch.errors.notJuror", "launch.errors.busy", "launch.errors.unknown",
             "intro.pageLabel", "intro.gavelLabel", "intro.stepsLabel", "intro.skip", "intro.back", "intro.begin", "intro.next", "intro.enter", "intro.footer",
             ...["step1", "step2", "step3"].flatMap((step) => ["nav", "kicker", "titleStart", "titleHighlight", "body"].map((part) => `intro.${step}.${part}`)),

@@ -107,9 +107,19 @@ node scripts/i1c-checks.mjs
 
 The check scripts target the test deployment by default and refuse production unless called with `--target=production --allow-production`. SQL files marked `-- target: test-only` refuse to run without `--target=test`.
 
+### Production deploy checklist
+
+One production deploy per finished block of work. UI-only changes are verified locally (tests, `tsc`, lint, port 5180) and then go straight to production; schema, Functions or notebook changes go to the test deployment first.
+
+1. Tests, `tsc` and lint pass; the working tree is committed.
+2. **Schema first, or together with the code:** the `UserFlag` entity (per-user flags such as `intro_seen`) must exist in production before, or in the same deploy as, the code that reads it. The app tolerates a missing entity (the Intro counts as seen), but it would never show the Intro or remember it.
+3. `node scripts/deploy-production.mjs --allow-production` (add `--set-secrets` only when secrets change). It runs the full `rayfin up` (schema included) and then restores `rayfin/rayfin.yml`.
+4. Minimal check: launch, Intro the first time and Home on reload, Hearings loads, no console errors. No hearings are launched and nothing polls.
+5. Never commit tenant, workspace or item ids, emails or app URLs (they live in `.private/values.env`).
+
 ## Launch screen and Intro
 
-- **The launch screen** ([design guide 6b](docs/design/design-guide.md)) is the first thing rendered and stays until the session and the initial data load are done. Its three steps are real work, not timers: **Session** (Fabric sign-in and the juror record), **Docket** (the parallel initial load) and **All rise**. It stays at least about 800 ms (no flash), holds "All rise" for about 600 ms, and after about 8 s shows "taking longer than usual" with Try again. Nothing retries by itself: a retry happens only when the user clicks. Errors appear inside it as an "Objection!" alert: expired session (sign in again), not on the jury, or throttling / 5xx / anything else (Try again). The small "The jury is deliberating…" loader stays for page changes and refreshes. The logic is in `src/launch/`: `launch-machine.ts` (pure state machine) and `launch-stages.ts` (stages and routing), with tests.
+- **The launch screen** ([design guide 6b](docs/design/design-guide.md)) is the first thing rendered and stays until the session and the initial data load are done. Its three steps are real work, not timers: **Session** (Fabric sign-in and the juror record), **Docket** (the parallel initial load) and **All rise**. It stays at least about 800 ms (no flash), holds "All rise" for about 600 ms, and after about 8 s shows "taking longer than usual" with Try again. Nothing retries by itself: a retry happens only when the user clicks. Errors appear inside it as an "Objection!" alert: expired session (sign in again), not on the jury (copy my sign-in name to send to an admin; it is only copied to the clipboard on a click, never logged or stored), or throttling / 5xx / anything else (Try again). The small "The jury is deliberating…" loader stays for page changes and refreshes. The logic is in `src/launch/`: `launch-machine.ts` (pure state machine) and `launch-stages.ts` (stages and routing), with tests.
 - **Language and theme before the profile loads:** the saved EN/ES choice if there is one, otherwise the browser language; the theme follows `prefers-color-scheme`.
 - **The Intro** has three steps, can be skipped at any time and is shown once per user: a first-time user goes to the Intro after the launch screen and then to the page they asked for (Home, or the deep link). It can be replayed from Home ("How it works", `#intro`), which writes nothing.
 - **"Intro seen" is stored per user in app data**, in the `UserFlag` entity, so it follows the user across devices. It is insert-only (a flag is set when a row exists for `userId` and `flag`; duplicates are harmless), each user can create and read only their own rows, and it stores no email or name. Current flags (constants in `src/data/user-flags.service.ts`, never user input):
