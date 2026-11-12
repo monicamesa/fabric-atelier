@@ -197,6 +197,10 @@ These rules come from [docs/especificacion-general.md](docs/especificacion-gener
 32. The pre-commit hook also blocks GUIDs that are not of the form `00000000-0000-4000-8000-0000000000NN`, and emails that are not on `example.com`. This applies to tests, fixtures and locale hints too. For a non-GUID test id, use a plain string.
 33. Whenever you hit a new gotcha, add a lesson (symptom, cause, what we did, link) to [../../docs/lessons-learned.md](../../docs/lessons-learned.md) in the same commit as the fix. No private data.
 
+### Public documentation
+
+34. The public docs are bilingual, EN and ES, like the app: the root and app READMEs, `docs/user-guide*` and `docs/manual-test*`. **Any change to a public doc must update both languages in the same commit.** Each pair has a language switcher on its first line ("English · [Español](…)" / "[English](…) · Español") and the same structure and sections. Spanish uses the app's vocabulary (caso, resolución/resuelto, vista, veredicto only for the AI judge, recurso, jurisprudencia, Secretaría) and never "fallo/fallado". Developer docs (`docs/iteraciones/`, the design guide, lessons learned, conventions, this file) stay English only. The in-app guide is rendered from `docs/user-guide*.md`, so keep the `repo-only` comments around repository-only links.
+
 ## Verified working notes
 
 Facts confirmed in earlier sessions (Rayfin CLI 1.36.2, Windows, PowerShell 5.1). Project status and next steps are in [docs/iteraciones/estado.md](docs/iteraciones/estado.md).

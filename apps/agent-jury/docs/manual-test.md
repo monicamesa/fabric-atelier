@@ -1,70 +1,78 @@
-# Agent Jury · Guion de pruebas manuales
+English · [Español](manual-test.es.md)
 
-Guion para probar la app de principio a fin. Las reglas están en la [guía de usuario](user-guide.es.md) ([English](user-guide.md)). Los nombres de pantallas y botones van en español, con el inglés entre paréntesis cuando cambia.
+# Agent Jury · Manual test script
 
-No escribas en este documento (ni en capturas que compartas) nombres, emails ni IDs reales.
+A script to test the app end to end. The rules are in the [user guide](user-guide.md) ([Español](user-guide.es.md)). Screen and button names are the English ones from the app.
 
-## Antes de empezar
+Do not write real names, emails or IDs in this document (or in screenshots you share).
 
-- La app en el entorno que vayas a probar, abierta en tu navegador, con la capacidad de Fabric encendida.
-- Un admin (tú) y, para la Prueba B, **otras dos cuentas** del tenant (invitado o usuario nuevo): una aprobadora y una experta. **Con dos personas no se puede resolver un caso**: cada respuesta solo puede recibir el voto de la otra persona, y hacen falta dos votos válidos. Con tres sí.
-- Tu cuenta es admin, y un admin no puede ser también aprobador. Para reabrir un caso hace falta una cuenta con rol de aprobador.
-- **Con un solo aprobador, los casos que proponga ese aprobador no se pueden resolver nunca**: su propio voto no cuenta y para resolver hace falta el voto de un aprobador. Para una sesión de juego, **recomendamos al menos 2 aprobadores**, de modo que cada caso tenga un aprobador que no sea su autor.
-- Una hora de capacidad: las vistas usan la capacidad compartida; solo se celebra una a la vez y hay 10 minutos de descanso entre vistas.
+## Before you start
 
-## Prueba A: tú sola (unos 15 minutos)
+- The app in the environment you are testing, open in your browser, with the Fabric capacity switched on.
+- An admin (you) and, for Test B, **two more accounts** in the tenant (a guest or a new user): an approver and an expert. **With two people a case cannot be ruled**: each answer can only get the other person's vote, and two valid votes are needed. With three it can.
+- Your account is an admin, and an admin cannot also be an approver. Reopening a case needs an account with the approver role.
+- **With a single approver, the cases that approver proposes can never be ruled**: their own vote does not count and ruling needs an approver's vote. For a play session we **recommend at least 2 approvers**, so every case has an approver who is not its author.
+- An hour of capacity: hearings use the shared capacity; only one runs at a time, with 10 minutes of rest between hearings.
+- When you don't know what to do, look at **Your turn** at the top of Home: it tells you what needs your attention now.
 
-Con una sola persona no se puede resolver un caso, así que esta parte prueba todo lo demás.
+## Test A: on your own (about 15 minutes)
 
-- [ ] Recarga con Ctrl+Shift+R: sale la pantalla de lanzamiento (Sesión → Casos → En pie) y luego Home (Inicio).
-- [ ] Home: **Cómo funciona** (How it works) abre la Intro; se puede saltar (**Saltar la introducción**) y vuelve a Home. En el último paso, **Leer la guía completa** abre la guía en una pestaña nueva.
-- [ ] Cambia EN/ES: todos los textos cambian, sin "fallo" ni "fallado" en ningún sitio.
-- [ ] Cambia el tema de Windows a oscuro y recarga: todo se lee bien.
-- [ ] **Secretaría** (Clerk's office) → Agentes (Agents) → **Registrar el agente** (Register the agent): nombre, **ID del workspace** e **ID del agente**, copiados de la dirección del agente en Fabric. Un ID mal escrito se rechaza con un aviso.
-- [ ] **Casos** (Cases) → **+ Proponer un caso**: propón 3 casos con respuesta y definición completa, con preguntas cuya respuesta conozcas (ver tabla). Cada caso queda "en revisión" con 0 votos: proponer no es votar.
-- [ ] Ticker ("Último en el jurado"): aparece en Home cuando hay al menos 2 líneas, se mueve, se para al pasar el ratón o con el botón de pausa, y cada línea abre su caso.
-- [ ] En uno de tus casos, **Votar la respuesta A** no está disponible para ti: "Es tu propia respuesta: tu voto no contaría".
-- [ ] **Exportar jurisprudencia** (Export case law) está desactivado y el aviso explica por qué (aún no hay casos resueltos).
-- [ ] Móvil (390 px): abre la app en el teléfono y recorre Home, Casos y un caso; nada se sale de la pantalla.
+With one person a case cannot be ruled, so this part tests everything else.
 
-| Pregunta para proponer | Respuesta verificada | Definición |
+- [ ] Reload with Ctrl+Shift+R: the launch screen appears (Session → Docket → All rise) and then Home.
+- [ ] Home: **How it works** opens the Intro; you can skip it (**Skip intro**) and you return to Home. On the last step, **Read the full guide** opens the guide inside the app and **Back** brings you back.
+- [ ] Switch EN/ES: every text changes, and nowhere do the Spanish texts use "fallo" or "fallado".
+- [ ] Switch Windows to the dark theme and reload: everything is readable.
+- [ ] **Clerk's office** → Agents → **+ Register an agent**: name, **Workspace ID** and **Agent ID**, copied from the agent's address in Fabric. A badly typed ID is rejected with a message. The new agent shows up right away, also in the Home and Cases switchers, without a reload.
+- [ ] Clerk's office: **Show example data** is off in production; turning it on shows the example jurors and agents (labelled "Example") and the tab counters change. After a reload it is off again.
+- [ ] Clerk's office → Jurors → your row → **Edit details**: change your display name and see it reflected in the list.
+- [ ] **Cases** → **+ Propose a case**: propose 3 cases with an answer and a complete definition, using questions whose answer you know (see the table). The form says the question is sent to the agent exactly as written, in this language. Each case is "Open for votes" with 0 votes: proposing is not voting.
+- [ ] Home → **Your turn**: after proposing your cases it says "You're up to date" (you are only waiting for others); the progress strip (Propose · Vote · Ruled · Hearing · Review) counts your cases and highlights "N cases waiting for votes".
+- [ ] The lists say what happens next for you: on your cases, "You proposed it: waiting for others".
+- [ ] Ticker ("Latest on the docket"): it appears on Home when there are at least 2 lines, it moves, it stops on hover or with the pause button, and each line opens its case.
+- [ ] On one of your cases, **Vote for answer A** is not available to you: "Your own answer: your vote on it wouldn't count". Each answer shows what counts, the time window, who counts and the source table.
+- [ ] **Export case law** is disabled and its tooltip says why (there are no ruled cases yet).
+- [ ] Phone (390 px): open the app on your phone and go through Home, Cases and a case; nothing runs off the screen. In the Clerk's office the jurors appear as cards, with nothing clipped.
+
+| Question to propose | Verified answer | Definition |
 | --- | --- | --- |
-| ¿Cuántos clientes tenemos en España? | 141 | País de facturación (alternativas: 265 por país de envío, 292 cualquiera de los dos) |
-| ¿Cuánto vendimos (neto) en el año fiscal 2026? | 2.183.973,48 | Neto sin impuestos ni portes, julio 2025 a junio 2026 |
-| ¿Cuál es el valor medio de un pedido? | 2.226,97 | Neto; el agente suele dar 2.460,80 (bruto), un error seguro para la demo |
+| How many customers do we have in Spain? | 141 | Billing country (alternatives: 265 by shipping country, 292 either one) |
+| What was our net revenue in fiscal year 2026? | 2,183,973.48 | Net of tax and freight, July 2025 to June 2026 |
+| What is the average order value? | 2,226.97 | Net; the agent usually gives 2,460.80 (gross), a sure error for the demo |
 
-## Prueba B: con otras dos personas (unos 45 minutos)
+## Test B: with two other people (about 45 minutes)
 
-Mejor en la misma llamada, cada una en su ordenador. Llamamos **Ana** a tu cuenta admin, **Beto** a la aprobadora y **Carla** a la experta.
+Best on the same call, each on their own computer. We call your admin account **Ana**, the approver **Beto** and the expert **Carla**.
 
-**Acceso**
+**Access**
 
-- [ ] Antes de añadirlas: Beto entra con su cuenta y ve "¡Protesto!" con "Todavía no estás en este jurado. Pide a un admin que te añada." y el botón **Copiar mi nombre de inicio de sesión**, más la línea "Envíaselo a un admin para que te añada." No hay botón de reintentar.
-- [ ] Ana las añade en Secretaría → **Incorporar a un jurado**: Beto con rol Aprobador y Carla con rol Experto.
-- [ ] Al recargar, cada una ve la Intro (su primera vez) y luego Home; al volver a recargar, va directa a Home.
+- [ ] Before adding them: Beto signs in with his account and sees "Objection!" with "You are not on this jury yet. Ask an admin to add you." and the **Copy my sign-in name** button, plus the line "Send it to an admin so they can add you." There is no retry button.
+- [ ] Ana adds them in Clerk's office → **Swear in a juror**: Beto with the Approver role and Carla with the Expert role.
+- [ ] On reload, each sees the Intro (their first time) and then Home; reloading again goes straight to Home.
 
-**Resolver un caso**
+**Ruling a case**
 
-- [ ] Ana propone el caso de España con la respuesta 141 (país de facturación). Beto y Carla votan **Votar la respuesta A**: con el voto de Beto (aprobador) y el de Carla, el caso queda **resuelto** y el ticker lo anuncia.
-- [ ] Ana propone otro caso (por ejemplo, el del año fiscal 2026) y solo Carla vota a favor: **no** se resuelve (falta un aprobador). Cuando Beto también vota, queda resuelto.
+- [ ] Beto and Carla see "1 case waiting for your vote" in **Your turn** (with a **Vote** button); Beto, as an approver, also sees "1 case needs an approver vote".
+- [ ] Ana proposes the Spain case with the answer 141 (billing country). Beto and Carla press **Vote for answer A**: with Beto's (approver) vote and Carla's, the case is **ruled** and the ticker announces it. Meanwhile the answer said "N more votes in favour needed, at least one from an approver".
+- [ ] Ana proposes another case (for example the fiscal 2026 one) and only Carla votes in favour: it is **not** ruled; the list says "Waiting for an approver". When Beto votes too, it is ruled.
 
-**Disputa**
+**Dispute**
 
-- [ ] Un caso nuevo: Ana propone 141 y Beto propone **otra respuesta** (265, país de envío) con su definición. Carla vota 141 y Ana vota 265: el caso pasa a **disputa** y se ven las dos definiciones.
-- [ ] Beto vota 141. Sigue en disputa mientras alguien apoye 265. Ana vota **en contra** de 265 con un motivo: queda solo 141 con apoyo y el caso se **resuelve**. (No hay desempate por mayoría: la disputa solo se acaba cuando se retira el apoyo.)
-- [ ] Alternativa: otro caso ambiguo; Ana usa **Desestimar: la pregunta es ambigua** con un motivo y el caso queda desestimado, sin entrar nunca en una vista.
+- [ ] A new case: Ana proposes 141 and Beto proposes **another answer** (265, shipping country) with its definition. Carla votes 141 and Ana votes 265: the case becomes **disputed** and both definitions are shown.
+- [ ] Beto votes 141. It stays disputed while anyone backs 265. Ana votes **against** 265 with a reason: only 141 keeps support and the case is **ruled**. (There is no majority tie-break: a dispute only ends when support is withdrawn.)
+- [ ] Alternative: another ambiguous case; Ana uses **Dismiss: the question is ambiguous** with a reason and the case is dismissed and never enters a hearing.
 
-**Exportar**
+**Export**
 
-- [ ] Ana pulsa **Exportar jurisprudencia** y abre el CSV en Excel: salen solo los casos resueltos, con acentos bien, sin nombres ni emails. El nombre del archivo lleva el agente y la fecha.
+- [ ] Ana presses **Export case law** and opens the CSV in Excel: only ruled cases appear, accents are right, no names or emails. The file name carries the agent and the date.
 
-**Vista y revisión del juez**
+**Hearing and reviewing the judge**
 
-- [ ] Ana, en **Vistas** (Hearings) → **Iniciar una vista** (Start a hearing): elige 1 a 3 casos resueltos (máximo 5), mira la estimación y la versión del agente (publicada o borrador), e inicia. Beto y Carla no ven el formulario: "Solo los admins pueden iniciar una vista."
-- [ ] Mientras corre: se ve el progreso; no se puede iniciar otra. Si parece atascada, **Consultar a Fabric** (Check with Fabric) hace una sola pregunta; **Cancelar la vista** la detiene.
-- [ ] Al acabar, hay un veredicto por caso (Correcta / Incorrecta / Dudosa).
-- [ ] Ana, Beto y Carla revisan cada veredicto: **Sí, de acuerdo** o **No, recurrir** (con comentario). Si la mayoría corrige al juez, el ticker dice "Juez corregido". Home muestra la confianza como "n de m" (el porcentaje solo aparece a partir de 5 veredictos decididos).
-- [ ] Beto (aprobador), al revisar el veredicto del caso de España, marca el motivo "La respuesta esperada es incorrecta": el caso se reabre, los votos antiguos salen como "antes de la revisión" en el acta y ya no cuentan, y Ana y Carla tienen que votar de nuevo. Una nueva vista ya no lo incluye. Carla (experta) puede revisar, pero ese motivo no reabre el caso.
-- [ ] Al terminar: baja la capacidad o páusala.
+- [ ] Ana sees "N ruled cases ready for a hearing" in **Your turn**. In **Hearings** → **Start a hearing**: choose 1 to 3 ruled cases (maximum 5), look at the estimate and the agent version (published or draft), and start. Beto and Carla don't see the form: "Only admins can start a hearing."
+- [ ] While it runs: progress is visible and another one cannot be started. If it seems stuck, **Check with Fabric** asks one question; **Cancel the hearing** stops it.
+- [ ] When it finishes there is one verdict per case (Correct / Incorrect / Unclear). In **Your turn**, each juror sees "N judge verdicts to review".
+- [ ] Ana, Beto and Carla review each verdict: **Yes, agree** or **No, appeal** (with a comment). If the majority corrects the judge, the ticker says "Judge overruled". Home shows trust as "n of m" (the percentage only appears from 5 decided verdicts).
+- [ ] Beto (approver), reviewing the verdict of the Spain case, picks the reason "The expected answer is wrong": the case reopens, the old votes appear as "before the review" in the court record and no longer count, and Ana and Carla have to vote again. A new hearing no longer includes it. Carla (expert) can review, but that reason does not reopen the case.
+- [ ] When you finish: lower the capacity or pause it.
 
-Si algo falla, apunta la pantalla, la hora y una captura sin datos personales, y pásaselo a Copilot.
+If something fails, note the screen, the time and a screenshot with no personal data, and send it to Copilot.

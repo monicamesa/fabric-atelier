@@ -1,8 +1,12 @@
+English · [Español](README.es.md)
+
 # Agent Jury
 
 > **Who judges the judge?**
 
 Agent Jury is a Microsoft Fabric App where business experts agree on the answers a Fabric Data Agent should give, and then check whether the LLM judge that evaluates the agent agrees with them. Experts propose test questions with the answer they expect, vote until they reach consensus, and correct the judge when it gets a verdict wrong. The agreed answers become reusable ground truth for the agent.
+
+Developer docs (specification, iteration plans, design guide, conventions) are in English. The user-facing docs (this README, the user guide and the manual test script) are in English and Spanish.
 
 ![Home mockup](docs/design/images/mockup-home.png)
 
@@ -13,6 +17,7 @@ The app uses a trial metaphor. Each term is also explained in the app.
 | Term | Meaning |
 |---|---|
 | **Case** | A test question for an agent. |
+| **Open for votes** | A case that is neither ruled nor disputed yet: jurors are still voting. |
 | **Testimony** | An expected answer to a case, with the definition its author used. |
 | **Ruling** | The jury agrees on one testimony: the case is *ruled*. |
 | **Dispute** | Jurors back different answers, so the case is *disputed* until it is settled. |
@@ -23,23 +28,23 @@ The app uses a trial metaphor. Each term is also explained in the app.
 ## User guide
 
 - [User guide](docs/user-guide.md) (EN) / [Guía de usuario](docs/user-guide.es.md) (ES): how to play, roles and the rules (when a case is ruled, disputes, hearings, reopening, judge trust). The Intro's last step and Home link to the in-app copy (`#guide`, rendered from these files at build time with `marked`), because jurors may not have access to the repository.
-- [Manual test script](docs/manual-test.md) (ES): end-to-end checklist for one person (Prueba A) and for an admin plus two jurors (Prueba B).
+- Manual test script: [English](docs/manual-test.md) / [Español](docs/manual-test.es.md): end-to-end checklist for one person (Test A) and for an admin plus two jurors (Test B).
+- **Start at Home, in "Your turn":** it lists what needs the signed-in person now (votes, disputes, approver votes, judge verdicts to review and, for admins, ruled cases ready for a hearing), computed from data already loaded. Below it, a progress strip (Propose · Vote · Ruled · Hearing · Review) shows the bottleneck. Lists and the case page say what happens next for that person (`src/screens/docket/next-step.ts`, `your-turn.ts`, with tests).
+- **Language of the content:** questions, answers and definitions are never translated, because the question is sent to the agent exactly as written. The language badge needs a schema change and waits for approval ([backlog](docs/iteraciones/backlog.md)).
 
 ## Status
 
-In development. Progress and next steps are tracked in [docs/iteraciones/estado.md](docs/iteraciones/estado.md) (Spanish); the full specification is in [docs/especificacion-general.md](docs/especificacion-general.md).
+In development, in use by a first group of jurors. Progress and next steps are tracked in [docs/iteraciones/estado.md](docs/iteraciones/estado.md) (Spanish, developer doc); the full specification is in [docs/especificacion-general.md](docs/especificacion-general.md).
 
 **Works today**
-- Data model and security rules for jurors, agents, cases, testimonies and dismissals.
-- Admin flow through the `clerkExecute` Function, with an admin log that includes rejected attempts.
-- The Clerk's office screen to manage jurors and agents.
-- English and Spanish, light and dark themes.
-- A launch screen shown once per app load (steps follow the real work: session, docket, all rise; slow and error states) and a three-step Intro for first-time users, replayable from Home ("How it works"). See [Launch screen and Intro](#launch-screen-and-intro).
+- Jurors, agents, cases, answers (testimonies), votes, dismissals and the rules R1–R9 (ruling, disputes, reopening).
+- The Clerk's office (admins): jurors, agents, admin log, example-data toggle.
+- Home ("Your turn", progress strip, ticker), the cases board and the case page with voting.
+- Hearings: an admin launches an evaluation of the agent; the AI judge gives a verdict per case and jurors review it.
+- Judge trust per agent and per critic-prompt version, and the case law CSV export.
+- English and Spanish, light and dark themes, a launch screen, a three-step Intro and the in-app user guide. See [Launch screen and Intro](#launch-screen-and-intro).
 
-**Next**
-- Screens 1–3: home docket, cases board and case detail, with voting.
-- Hearings: launching agent evaluations and reviewing the judge's verdicts.
-- Case law export.
+**Next:** see the backlog and iteration plans in `docs/iteraciones/` (for example, showing how the agent reached its answer: [I4 trace spike](docs/iteraciones/I4-trace-spike.md)).
 
 ## Requirements
 
@@ -110,7 +115,7 @@ node scripts/i1b-checks.mjs
 node scripts/i1c-checks.mjs
 ```
 
-The check scripts target the test deployment by default and refuse production unless called with `--target=production --allow-production`. SQL files marked `-- target: test-only` refuse to run without `--target=test`.
+The check scripts target the test deployment by default and refuse production unless called with `--target=production --allow-production`. SQL files marked `-- target: test-only` refuse to run without `--target=test`. The test build shows example agents and jurors by default (`VITE_SHOW_EXAMPLE_AGENTS=1`, set by `deploy-test.mjs`); in production they are hidden unless an admin turns on "Show example data" in the Clerk's office (nothing is deleted, and the choice resets on reload).
 
 ### Production deploy checklist
 
@@ -135,7 +140,7 @@ One production deploy per finished block of work. UI-only changes are verified l
 
   If the lookup fails (for example on a deployment that does not have the entity yet), the app treats the Intro as seen instead of blocking the user. Deploy the schema (`rayfin up`) before the code that writes flags.
 
-## Appeals and judge trust (I3b, on `feature/i3b`)
+## Appeals and judge trust (I3b)
 
 - **Reviewing verdicts.** On a hearing, any active juror answers "Yes, agree" or "No, appeal" under each verdict (keys A · X · J/K · ?). A review is an insert-only `VerdictReview`; the latest one per juror and verdict counts. An appeal (a review that differs from the judge) needs a comment.
 - **R9.** A ruled case is reopened by a valid `expected_answer_wrong` review from an active approver. Votes cast before the review stay visible in the court record ("before the review") but stop counting; jurors vote again.

@@ -1,8 +1,12 @@
+English · [Español](README.es.md)
+
 # Fabric Atelier
 
 A collection of Fabric Apps built with [Rayfin](https://learn.microsoft.com/fabric/apps/overview), the CLI and SDK for Microsoft Fabric Apps.
 
 Each app lives in its own folder under `apps/` and is an independent npm project.
+
+Developer docs (conventions, iteration plans, design guide, lessons learned) are in English. The user-facing docs (READMEs, user guide, manual test script) are in English and Spanish.
 
 ## Apps
 
