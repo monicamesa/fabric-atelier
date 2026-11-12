@@ -742,6 +742,9 @@
         "begin": "Empezar",
         "next": "Siguiente",
         "enter": "Entrar en la sala",
+        "guide": "Leer la guía completa",
+        "guideUrl": "https://github.com/monicamesa/fabric-atelier/blob/main/apps/agent-jury/docs/user-guide.es.md",
+        "guideNewTab": "(se abre en una pestaña nueva)",
         "footer": "Se muestra una sola vez. Puedes volver a verla cuando quieras desde Cómo funciona.",
         "step1": {
             "nav": "1 · Se abre la sesión",

@@ -20,6 +20,11 @@ The app uses a trial metaphor. Each term is also explained in the app.
 | **Appeal** | A juror confirms or corrects the LLM judge's verdict on one case. |
 | **Case law** | The ruled cases, exported as ground truth. |
 
+## User guide
+
+- [User guide](docs/user-guide.md) (EN) / [Guía de usuario](docs/user-guide.es.md) (ES): how to play, roles and the rules (when a case is ruled, disputes, hearings, reopening, judge trust). The Intro's last step links to it.
+- [Manual test script](docs/manual-test.md) (ES): end-to-end checklist for one person (Prueba A) and for an admin plus two jurors (Prueba B).
+
 ## Status
 
 In development. Progress and next steps are tracked in [docs/iteraciones/estado.md](docs/iteraciones/estado.md) (Spanish); the full specification is in [docs/especificacion-general.md](docs/especificacion-general.md).

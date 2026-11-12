@@ -93,6 +93,17 @@ export function IntroScreen({ onDone }: IntroScreenProps) {
                                 {step === 0 ? t("intro.begin") : t("intro.next")} →
                             </Button>
                         )}
+                        {last && (
+                            <a
+                                href={t("intro.guideUrl")}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="inline-flex min-h-[54px] items-center px-2 text-[16px] font-bold text-action-text underline underline-offset-4 hover:text-ink"
+                            >
+                                {t("intro.guide")}
+                                <span className="sr-only"> {t("intro.guideNewTab")}</span>
+                            </a>
+                        )}
                     </div>
                 </div>
             </main>

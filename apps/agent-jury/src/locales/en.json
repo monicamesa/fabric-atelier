@@ -742,6 +742,9 @@
         "begin": "Begin",
         "next": "Next",
         "enter": "Enter the courtroom",
+        "guide": "Read the full guide",
+        "guideUrl": "https://github.com/monicamesa/fabric-atelier/blob/main/apps/agent-jury/docs/user-guide.md",
+        "guideNewTab": "(opens in a new tab)",
         "footer": "Shown once. You can replay it any time from How it works.",
         "step1": {
             "nav": "1 · Court is in session",
