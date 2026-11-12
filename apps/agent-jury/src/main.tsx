@@ -18,7 +18,9 @@ import { AuthProvider } from './hooks/use-auth';
 import { bootstrapAuth, type IAuthService } from './services/rayfin-auth.service';
 import { bootstrapLanguage } from './services/language.service';
 import { AuthGate } from './components/auth-gate.component';
+import { LaunchClockProvider } from './launch/launch-clock';
 import { initI18n } from './i18n/i18n';
+import { applyThemeAtStart } from './hooks/initial-theme';
 
 // Bundled fonts (design guide, section 3); no runtime requests to Google Fonts.
 import '@fontsource-variable/fraunces/opsz.css';
@@ -28,6 +30,7 @@ import "./global.css"
 import "./styles/docket-tokens.css"
 
 initI18n();
+applyThemeAtStart();
 const rayfinAuthService: IAuthService = bootstrapAuth();
 
 function Root(): ReactElement {
@@ -37,11 +40,13 @@ function Root(): ReactElement {
     return (
         <ThemeContext.Provider value={{ isDark, toggleTheme, theme }}>
             <ErrorBoundary FallbackComponent={ErrorFallback}>
-                <AuthProvider rayfinAuthService={rayfinAuthService}>
-                    <AuthGate>
-                        <App />
-                    </AuthGate>
-                </AuthProvider>
+                <LaunchClockProvider>
+                    <AuthProvider rayfinAuthService={rayfinAuthService}>
+                        <AuthGate>
+                            <App />
+                        </AuthGate>
+                    </AuthProvider>
+                </LaunchClockProvider>
             </ErrorBoundary>
         </ThemeContext.Provider>
     );

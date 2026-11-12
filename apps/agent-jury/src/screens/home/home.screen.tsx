@@ -55,6 +55,9 @@ export function HomeScreen({ client, agents, agent, docket, viewer, onAgentChang
                                 {t("home.needYourVote", { count: waiting })}
                             </a>
                         )}
+                        <a href={formatRoute({ page: "intro" })} className="inline-flex min-h-11 items-center text-[16px] font-bold text-action-text underline">
+                            {t("home.howItWorks")}
+                        </a>
                     </div>
                 </div>
                 <JudgeTrustPlaceholder className="hidden min-[900px]:flex" />

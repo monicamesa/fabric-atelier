@@ -11,6 +11,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { AuthGate } from "@/components/auth-gate.component";
 import { AuthProvider } from "@/hooks/use-auth";
+import { initI18n } from "@/i18n/i18n";
 import type { IAuthService } from "@/services/rayfin-auth.service";
 
 const authenticatedSession: OpaqueSession = {
@@ -44,7 +45,25 @@ function renderAuthGate(authService: IAuthService) {
 
 describe("AuthGate", () => {
     beforeEach(() => {
+        initI18n("en");
         vi.clearAllMocks();
+    });
+
+    it("shows the launch screen, not a small loader, while the session is being resolved", async () => {
+        renderAuthGate(createAuthService({ initEmbeddedAuth: vi.fn().mockReturnValue(new Promise(() => {})) }));
+
+        expect(screen.getByRole("status")).toHaveTextContent("Checking your seat on the jury…");
+        expect(screen.getByRole("img", { name: "Gavel" })).toBeInTheDocument();
+        expect(screen.queryByText("Authenticated app")).not.toBeInTheDocument();
+    });
+
+    it("asks to sign in inside the launch screen when there is no session", async () => {
+        renderAuthGate(createAuthService());
+
+        const alert = await screen.findByRole("alert");
+        expect(alert).toHaveTextContent("Objection!");
+        expect(alert).toHaveTextContent("Your Fabric session has expired");
+        expect(screen.getByRole("button", { name: "Sign in with Fabric" })).toBeInTheDocument();
     });
 
     it("signs in from the standalone action and renders the app", async () => {
@@ -72,7 +91,7 @@ describe("AuthGate", () => {
 
         const alert = await screen.findByRole("alert");
         expect(alert).toHaveTextContent("The broker tab was blocked.");
-        expect(alert).toHaveTextContent("allow pop-ups for this site");
+        expect(alert).toHaveTextContent("Allow pop-ups for this site");
         expect(screen.getByRole("button", {
             name: "Sign in with Fabric",
         })).toBeEnabled();

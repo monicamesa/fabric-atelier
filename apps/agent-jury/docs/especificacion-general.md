@@ -132,6 +132,13 @@ Convenciones de Rayfin a respetar:
 | `VerdictReview` | `verdict_id`, `humanVerdict` (`correct` · `incorrect` · `ambiguous`), `reason`, `comment` (max 1000), `reviewerUserId`, `reviewerEmail`, `createdAt`. Guarda también los acuerdos; un "recurso" es una revisión cuyo `humanVerdict` difiere del veredicto del juez | Crear: `claims.sub.eq(item.reviewerUserId)`. Leer: autenticados. Sin actualizar ni borrar |
 | `AdminRequest` | `requesterEmail`, `action` (max 50), `payload` (JSON, max 4000), `createdAt` | Crear y leer: solo con `claims.email.eq(item.requesterEmail)`. Sin actualizar ni borrar |
 | `AdminRequestResult` | `requestId` (único), `requesterEmail`, `outcome` (`done` · `rejected`), `detail` (max 500), `processedAt` | Leer: solo el autor de la petición. Escritura: solo `clerkExecute` con T-SQL |
+| `UserFlag` | `userId` (texto, max 255, de `claims.sub`), `flag` (texto, max 64), `at` | Crear y leer: solo con `claims.sub.eq(item.userId)`. Sin actualizar ni borrar. No guarda email ni nombre |
+
+**Marcas por usuario (`UserFlag`):** sirven para avisos de una sola vez que deben seguir al usuario entre dispositivos. Una marca está puesta si existe una fila para (`userId`, `flag`); las filas duplicadas son inofensivas y no se añade lógica para ellas. Los valores de `flag` son constantes del código (`src/data/user-flags.service.ts`), nunca texto del usuario. Marcas actuales:
+
+| `flag` | Significado |
+|---|---|
+| `intro_seen` | La persona terminó o saltó la Intro |
 
 **Nota sobre la escritura de admin:** las políticas no permiten comprobar pertenencia a una lista, y `ctx.getDataClient()` escribe con los permisos de quien llama. Por eso:
 - El cliente solo tiene `read` sobre `Juror` y `Agent`; ningún rol tiene `create`, `update` ni `delete`.
@@ -183,10 +190,12 @@ Decisiones:
 7. **Calidad del juez:** matriz juez frente a humano, % de acuerdo por agente y categoría, motivos de desacuerdo más frecuentes.
 8. **Administración:** solo para admins. Alta, cambio de rol y desactivación de jurors; alta y desactivación de agentes. Todo pasa por la Function de admin.
 
+Además de las pantallas: la **pantalla de arranque** (una vez por carga de la app, guía de diseño 6b) y la **Intro** (3 pasos, saltable, una vez por usuario, rejugable desde Home con "Cómo funciona"). La pantalla de arranque se muestra desde el primer pintado hasta que hay sesión y datos iniciales; sus pasos son trabajo real (Sesión: autenticación y registro de juror; Casos: la carga inicial en paralelo; En pie: listo), con mínimo de unos 800 ms, aviso de lentitud a los 8 s y reintento solo con un clic. Los errores salen dentro de ella como "¡Protesto!": sesión caducada, persona que no está en el jurado, o limitación/5xx. Tras ella, la primera vez se muestra la Intro y después Home (o el enlace profundo); la marca `intro_seen` se guarda en `UserFlag`.
+
 Requisitos visuales: estados vacíos y de error útiles; sin datos simulados si falla una consulta.
 
 Requisitos de idioma:
-- Selector **EN | ES** en la cabecera, visible en todas las pantallas. Inglés por defecto; la elección se recuerda por usuario en el navegador.
+- Selector **EN | ES** en la cabecera, visible en todas las pantallas. Inglés por defecto; la elección se recuerda por usuario en el navegador. Antes de que haya una elección guardada se usa el idioma del navegador (español si es `es*`, si no inglés).
 - Ningún texto visible escrito directamente en los componentes: todo sale de ficheros de traducción (`locales/en.json`, `locales/es.json`) mediante una librería de i18n.
 - Los formatos de fecha y número siguen el idioma elegido (`en-GB` y `es-ES`).
 - El contenido que escriben los usuarios (preguntas, respuestas, comentarios) no se traduce: se muestra tal cual.

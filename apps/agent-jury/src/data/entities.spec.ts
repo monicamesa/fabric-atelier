@@ -23,6 +23,7 @@ describe("entity definitions", () => {
             "HearingEvent.ts",
             "Juror.ts",
             "Testimony.ts",
+            "UserFlag.ts",
             "Verdict.ts",
             "Vote.ts",
         ]);
@@ -43,6 +44,15 @@ describe("entity definitions", () => {
         expect(actions.sort()).toEqual(["create", "read"]);
         expect(source.match(/claims\.email\.eq\(item\.requesterEmail\)/g)).toHaveLength(2);
         expect(source).not.toMatch(/@(anonymous|role)\(/);
+    });
+
+    it("UserFlag is insert-only and visible only to its owner, with no email or name", () => {
+        const source = sources["UserFlag.ts"];
+        const actions = [...source.matchAll(/@authenticated\('([^']+)'/g)].map((match) => match[1]);
+        expect(actions.sort()).toEqual(["create", "read"]);
+        expect(source.match(/claims\.sub\.eq\(item\.userId\)/g)).toHaveLength(2);
+        expect(source).not.toMatch(/@(anonymous|role|email)\(/);
+        expect(source).not.toMatch(/@\w+\([^)]*\)\s+\w*(email|name)!/i);
     });
 
     it.each(entityFiles)("%s gives every text and email field an explicit max", (name) => {

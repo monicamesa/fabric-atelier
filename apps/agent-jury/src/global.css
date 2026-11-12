@@ -159,6 +159,7 @@
   --color-ticker-text: var(--ticker-text);
   --color-overruled: var(--overruled);
   --color-overruled-text: var(--overruled-text);
+  --color-highlight: var(--highlight);
 }
 
 /* Verdict ticker: 48 s per loop over a duplicated list, paused on hover and focus (design guide, section 7). */
@@ -200,6 +201,90 @@
 
 .docket-stamp {
   animation: docket-stamp 0.5s ease-out;
+}
+
+/* Launch screen and Intro (design guide, sections 6b and 7). Reduced motion turns all of these off:
+   the gavel stays still, nothing strikes and the underline is simply there. */
+@keyframes launch-strike {
+  0%, 100% { transform: rotate(0); }
+  35% { transform: rotate(-34deg); }
+  55% { transform: rotate(9deg); }
+  70% { transform: rotate(0); }
+}
+
+@keyframes launch-ring {
+  0% { opacity: 0; transform: scale(0.4); }
+  30% { opacity: 1; }
+  100% { opacity: 0; transform: scale(1.9); }
+}
+
+@keyframes launch-breathe {
+  0%, 100% { transform: rotate(0); }
+  50% { transform: rotate(-8deg); }
+}
+
+@keyframes launch-rise {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: none; }
+}
+
+@keyframes launch-underline {
+  from { background-size: 0 0.16em; }
+  to { background-size: 100% 0.16em; }
+}
+
+@keyframes intro-strike {
+  0%, 58%, 100% { transform: rotate(0); }
+  70% { transform: rotate(-34deg); }
+  80% { transform: rotate(9deg); }
+  88% { transform: rotate(0); }
+}
+
+@keyframes intro-press {
+  from { opacity: 0; transform: translateY(24px) scale(0.98); }
+  to { opacity: 1; transform: none; }
+}
+
+.launch-gavel-head {
+  transform-box: view-box;
+  transform-origin: 52px 52px;
+}
+
+.launch-gavel-impact {
+  transform-box: view-box;
+  transform-origin: 20px 54px;
+}
+
+.launch-gavel-breathe .launch-gavel-head { animation: launch-breathe 2.4s ease-in-out infinite; }
+.launch-gavel-strike .launch-gavel-head { animation: launch-strike 0.9s ease-in-out 1 both; }
+.launch-gavel-strike .launch-gavel-impact { animation: launch-ring 0.9s 0.3s ease-out 1 both; }
+.launch-gavel-loop .launch-gavel-head { animation: intro-strike 2.8s ease-in-out infinite; }
+.launch-rise { animation: launch-rise 0.45s ease-out both; }
+.intro-press { animation: intro-press 0.55s cubic-bezier(0.2, 0.8, 0.2, 1) both; }
+
+.hero-highlight {
+  background-image: linear-gradient(var(--highlight), var(--highlight));
+  background-repeat: no-repeat;
+  background-position: 0 88%;
+  background-size: 100% 0.16em;
+  animation: launch-underline 1s 0.2s ease-out both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .launch-gavel-breathe .launch-gavel-head,
+  .launch-gavel-strike .launch-gavel-head,
+  .launch-gavel-strike .launch-gavel-impact,
+  .launch-gavel-loop .launch-gavel-head,
+  .launch-rise,
+  .intro-press,
+  .hero-highlight {
+    animation: none !important;
+  }
+
+  /* Without the strike there is no impact mark either. */
+  .launch-gavel-impact {
+    display: none;
+  }
 }
 
 @utility icon-size-* {

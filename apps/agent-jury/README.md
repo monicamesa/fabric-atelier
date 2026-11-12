@@ -29,6 +29,7 @@ In development. Progress and next steps are tracked in [docs/iteraciones/estado.
 - Admin flow through the `clerkExecute` Function, with an admin log that includes rejected attempts.
 - The Clerk's office screen to manage jurors and agents.
 - English and Spanish, light and dark themes.
+- A launch screen shown once per app load (steps follow the real work: session, docket, all rise; slow and error states) and a three-step Intro for first-time users, replayable from Home ("How it works"). See [Launch screen and Intro](#launch-screen-and-intro).
 
 **Next**
 - Screens 1–3: home docket, cases board and case detail, with voting.
@@ -106,9 +107,22 @@ node scripts/i1c-checks.mjs
 
 The check scripts target the test deployment by default and refuse production unless called with `--target=production --allow-production`. SQL files marked `-- target: test-only` refuse to run without `--target=test`.
 
+## Launch screen and Intro
+
+- **The launch screen** ([design guide 6b](docs/design/design-guide.md)) is the first thing rendered and stays until the session and the initial data load are done. Its three steps are real work, not timers: **Session** (Fabric sign-in and the juror record), **Docket** (the parallel initial load) and **All rise**. It stays at least about 800 ms (no flash), holds "All rise" for about 600 ms, and after about 8 s shows "taking longer than usual" with Try again. Nothing retries by itself: a retry happens only when the user clicks. Errors appear inside it as an "Objection!" alert: expired session (sign in again), not on the jury, or throttling / 5xx / anything else (Try again). The small "The jury is deliberating…" loader stays for page changes and refreshes. The logic is in `src/launch/`: `launch-machine.ts` (pure state machine) and `launch-stages.ts` (stages and routing), with tests.
+- **Language and theme before the profile loads:** the saved EN/ES choice if there is one, otherwise the browser language; the theme follows `prefers-color-scheme`.
+- **The Intro** has three steps, can be skipped at any time and is shown once per user: a first-time user goes to the Intro after the launch screen and then to the page they asked for (Home, or the deep link). It can be replayed from Home ("How it works", `#intro`), which writes nothing.
+- **"Intro seen" is stored per user in app data**, in the `UserFlag` entity, so it follows the user across devices. It is insert-only (a flag is set when a row exists for `userId` and `flag`; duplicates are harmless), each user can create and read only their own rows, and it stores no email or name. Current flags (constants in `src/data/user-flags.service.ts`, never user input):
+
+  | Flag | Meaning |
+  |---|---|
+  | `intro_seen` | The user finished or skipped the Intro. |
+
+  If the lookup fails (for example on a deployment that does not have the entity yet), the app treats the Intro as seen instead of blocking the user. Deploy the schema (`rayfin up`) before the code that writes flags.
+
 ## Security model
 
-- **Records are insert-only.** Cases, testimonies, dismissals, votes and verdict reviews are never updated or deleted; every entry keeps its author and date.
+- **Records are insert-only.** Cases, testimonies, dismissals, votes, verdict reviews and per-user flags are never updated or deleted; every entry keeps its author and date.
 - **Read and insert rules live in the data model.** Reading requires sign-in (admin requests and their results are visible only to their author), and inserts must carry the caller's own identity (`claims.sub` / `claims.email`), so nobody writes on someone else's behalf.
 - **Jurors and agents are written only through `clerkExecute`.** The browser inserts an `AdminRequest` (its insert policy proves who asks) and calls the Function with the request id only. The Function reads the request with T-SQL as the app identity and enforces the safeguards:
   - it runs only the stored action and payload;

@@ -310,7 +310,8 @@
         "seeAll_one": "See the case →",
         "seeAll_other": "See all {{count}} cases →",
         "noAgents": "No agents on trial yet. An admin registers them in the clerk's office.",
-        "openClerk": "Go to the clerk's office"
+        "openClerk": "Go to the clerk's office",
+        "howItWorks": "How it works"
     },
     "clerk": {
         "kicker": "Only visible to admins",
@@ -619,6 +620,61 @@
             "startedBy": "Started by {{who}}"
         },
         "back": "Back to Hearings"
+    },
+    "launch": {
+        "kicker": "Quality control for Fabric Data Agents",
+        "headlineStart": "Who judges the",
+        "headlineEnd": "judge?",
+        "gavelLabel": "Gavel",
+        "session": "Checking your seat on the jury…",
+        "docket": "Calling the docket…",
+        "ready": "All rise.",
+        "step1": "1 · Session",
+        "step2": "2 · Docket",
+        "step3": "3 · All rise",
+        "slow": "Taking longer than usual. Fabric may be busy; your cases are safe.",
+        "footer": "An open-source community app for Microsoft Fabric",
+        "signIn": "Sign in with Fabric",
+        "signingIn": "Signing in…",
+        "errors": {
+            "session": "Your Fabric session has expired. Sign in again to take your seat on the jury.",
+            "signIn": "We couldn't sign you in. Allow pop-ups for this site and try again.",
+            "notJuror": "You are not on this jury yet. Ask an admin to add you.",
+            "busy": "Fabric is busy right now. Your cases are safe; try again in a moment.",
+            "unknown": "Something went wrong while opening the court. Your cases are safe."
+        }
+    },
+    "intro": {
+        "pageLabel": "Special edition · Page {{step}} of 3",
+        "gavelLabel": "A gavel striking its block",
+        "stepsLabel": "Intro steps",
+        "skip": "Skip intro",
+        "back": "Back",
+        "begin": "Begin",
+        "next": "Next",
+        "enter": "Enter the courtroom",
+        "footer": "Shown once. You can replay it any time from How it works.",
+        "step1": {
+            "nav": "1 · Court is in session",
+            "kicker": "All rise",
+            "titleStart": "Court is in",
+            "titleHighlight": "session",
+            "body": "Your Data Agents answer business questions all day. But who checks that the answers are right?"
+        },
+        "step2": {
+            "nav": "2 · The judge",
+            "kicker": "The judge",
+            "titleStart": "The judge is",
+            "titleHighlight": "an AI",
+            "body": "Fabric compares each answer from your agent with the expected one and gives its verdict: correct or not. Fast, tireless, and sometimes wrong."
+        },
+        "step3": {
+            "nav": "3 · The jury",
+            "kicker": "The jury",
+            "titleStart": "You are",
+            "titleHighlight": "the jury",
+            "body": "Business experts agree on the right answers, settle disputes about definitions, and appeal when the judge gets it wrong."
+        }
     },
     "errors": {
         "load": "The data could not be loaded.",

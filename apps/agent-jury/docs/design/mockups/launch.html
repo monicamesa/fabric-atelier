@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Agent Jury – Launch screen (Docket mockup)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,700;9..144,900&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+:root{--paper:#F3EEE4;--ink:#14110D;--muted:#4A4235;--faint:#8C8273;--ruled:#0F6E5C;--action:#C8502B;--action-text:#A8401F;--hl:#FF8A62;--dispute-bg:#FFF4EC;--dispute-ink:#8A3414;--dispute-text:#5C3A2C}
+[data-theme=dark]{--paper:#14110D;--ink:#E6DED0;--muted:#BDB3A2;--faint:#8C8273;--ruled:#7FE0C4;--action:#FF8A62;--action-text:#FF8A62;--hl:#C8502B;--dispute-bg:#2A1A12;--dispute-ink:#FF8A62;--dispute-text:#E6DED0}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:Inter,system-ui,sans-serif}
+.screen{min-height:100vh;display:flex;flex-direction:column}
+main{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:40px 16px;gap:22px}
+.kicker{font-size:13px;letter-spacing:.18em;text-transform:uppercase;color:var(--action-text);font-weight:700}
+.word{font-family:Fraunces,serif;font-weight:900;font-size:30px}
+h1{margin:0;font-family:Fraunces,serif;font-weight:900;font-size:clamp(44px,7vw,88px);line-height:.92;letter-spacing:-.045em}
+.hl{background-image:linear-gradient(var(--hl),var(--hl));background-repeat:no-repeat;background-position:0 88%;background-size:100% 14px;animation:underline 1s .2s ease-out both}
+.panel{width:min(520px,100%);border-top:6px double var(--ink);padding-top:18px;display:flex;flex-direction:column;gap:14px;align-items:center}
+.status{font-family:Fraunces,serif;font-size:24px;font-weight:700}
+ol{margin:0;padding:0;list-style:none;display:flex;gap:18px;flex-wrap:wrap;justify-content:center;font-size:13px;letter-spacing:.08em;text-transform:uppercase;font-weight:700}
+li.done{color:var(--ruled)} li.now{border-bottom:2px solid var(--action);padding-bottom:2px} li.next{color:var(--faint)}
+.btn{min-height:46px;padding:0 18px;border:2px solid var(--ink);background:transparent;color:var(--ink);font:700 15px Inter,sans-serif;cursor:pointer}
+.btn.primary{border:0;background:var(--ink);color:var(--paper);box-shadow:4px 4px 0 var(--action)}
+.alert{width:100%;text-align:left;border:2px solid var(--action);background:var(--dispute-bg);padding:18px;display:flex;flex-direction:column;gap:10px}
+.alert b{font-family:Fraunces,serif;font-weight:900;font-size:32px;line-height:1;color:var(--dispute-ink)}
+.alert p,.alert details{margin:0;color:var(--dispute-text);line-height:1.5}
+.mono{font-family:'JetBrains Mono',monospace;font-size:13px}
+footer{padding:14px 16px;text-align:center;font-size:13px;color:var(--muted)}
+.mock{position:fixed;right:16px;bottom:16px;display:flex;flex-wrap:wrap;gap:4px;padding:6px;border:1px dashed var(--faint);background:var(--paper);font:600 12px Inter,sans-serif}
+.mock button{min-height:30px;padding:0 10px;border:1px solid var(--ink);background:transparent;color:var(--ink);font:inherit;cursor:pointer}
+.mock button[aria-pressed=true]{background:var(--ink);color:var(--paper)}
+button:focus-visible{outline:3px solid var(--ruled);outline-offset:3px}
+[hidden]{display:none!important}
+@keyframes strike{0%,100%{transform:rotate(0)}35%{transform:rotate(-34deg)}55%{transform:rotate(9deg)}70%{transform:rotate(0)}}
+@keyframes ring{0%{opacity:0;transform:scale(.4)}30%{opacity:1}100%{opacity:0;transform:scale(1.9)}}
+@keyframes breathe{0%,100%{transform:rotate(0)}50%{transform:rotate(-8deg)}}
+@keyframes rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+@keyframes underline{from{background-size:0 14px}to{background-size:100% 14px}}
+.idle{transform-origin:52px 52px;animation:breathe 2.4s ease-in-out infinite}
+.strike{transform-origin:52px 52px;animation:strike .9s ease-in-out 1 both}
+.impact{transform-origin:20px 54px;animation:ring .9s .3s ease-out 1 both}
+.rise{animation:rise .45s ease-out both}
+@media (prefers-reduced-motion:reduce){.idle,.strike,.impact,.rise,.hl{animation:none}}
+</style>
+</head>
+<body>
+<div class="screen">
+<main>
+  <span class="kicker" data-t="kicker"></span>
+  <svg width="168" height="168" viewBox="0 0 64 64" fill="none" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="Gavel">
+    <g id="gavel" class="idle" stroke="currentColor" stroke-width="2.2"><rect x="9" y="15" width="26" height="13" rx="3" transform="rotate(-45 22 21.5)"/><line x1="27" y1="27" x2="52" y2="52"/></g>
+    <g id="impact" class="impact" stroke="var(--action)" stroke-width="1.8" hidden><line x1="20" y1="46" x2="20" y2="41"/><line x1="11" y1="48" x2="7" y2="44"/><line x1="29" y1="48" x2="33" y2="44"/></g>
+    <rect x="6" y="52" width="28" height="6" rx="2" stroke="var(--action)" stroke-width="2.2"/>
+  </svg>
+  <div style="display:flex;flex-direction:column;gap:6px;align-items:center">
+    <span class="word">Agent Jury</span>
+    <h1><span data-t="h1a"></span> <span class="hl" data-t="h1b"></span></h1>
+  </div>
+  <div class="panel">
+    <div id="error" class="alert rise" role="alert" hidden>
+      <b data-t="objection"></b>
+      <p data-t="errMsg"></p>
+      <details><summary style="cursor:pointer;font-weight:600" data-t="details"></summary><span class="mono">auth · 401 · session refresh failed</span></details>
+      <div style="display:flex;gap:10px;flex-wrap:wrap"><button class="btn primary" type="button" data-t="signin"></button><button class="btn" type="button" data-t="retry"></button></div>
+    </div>
+    <div id="working" role="status" aria-live="polite" style="display:flex;flex-direction:column;gap:12px;align-items:center">
+      <span id="line" class="status rise"></span>
+      <ol aria-hidden="true"><li id="st1" data-t="st1"></li><li id="st2" data-t="st2"></li><li id="st3" data-t="st3"></li></ol>
+      <div id="slow" class="rise" hidden style="display:flex;flex-direction:column;gap:10px;align-items:center">
+        <span style="font-size:15px;color:var(--muted)" data-t="slowMsg"></span>
+        <button class="btn" type="button" data-t="retry"></button>
+      </div>
+    </div>
+  </div>
+</main>
+<footer data-t="footer"></footer>
+</div>
+
+<!-- Mockup-only control: NOT part of the design, do not build it -->
+<div class="mock" aria-label="Mockup controls (not part of the design)">
+  <button type="button" data-s="session">Session</button><button type="button" data-s="docket">Docket</button><button type="button" data-s="ready">Ready</button><button type="button" data-s="slow">Slow</button><button type="button" data-s="error">Error</button>
+  <button type="button" id="lang">EN/ES</button><button type="button" id="theme">Light/Dark</button>
+</div>
+
+<script>
+const T={en:{kicker:'Quality control for Fabric Data Agents',h1a:'Who judges the',h1b:'judge?',session:'Checking your seat on the jury…',docket:'Calling the docket…',ready:'All rise.',st1:'1 · Session',st2:'2 · Docket',st3:'3 · All rise',slowMsg:'Taking longer than usual. Fabric may be busy; your cases are safe.',retry:'Try again',objection:'Objection!',errMsg:'Your Fabric session has expired. Sign in again to take your seat on the jury.',details:'Technical details',signin:'Sign in with Fabric',footer:'An open-source community app for Microsoft Fabric'},
+es:{kicker:'Control de calidad para Fabric Data Agents',h1a:'¿Quién juzga al',h1b:'juez?',session:'Comprobando tu asiento en el jurado…',docket:'Llamando a la lista de casos…',ready:'En pie, se abre la sesión.',st1:'1 · Sesión',st2:'2 · Casos',st3:'3 · En pie',slowMsg:'Está tardando más de lo normal. Puede que Fabric esté ocupado; tus casos están a salvo.',retry:'Reintentar',objection:'¡Protesto!',errMsg:'Tu sesión de Fabric ha caducado. Vuelve a iniciar sesión para ocupar tu asiento en el jurado.',details:'Detalles técnicos',signin:'Iniciar sesión con Fabric',footer:'Una app comunitaria y de código abierto para Microsoft Fabric'}};
+let s='session',lang='en';const $=id=>document.getElementById(id);
+function render(){const t=T[lang];document.documentElement.lang=lang;
+document.querySelectorAll('[data-t]').forEach(e=>e.textContent=t[e.dataset.t]);
+const step=s==='session'?1:(s==='docket'||s==='slow')?2:3;
+[1,2,3].forEach(i=>$('st'+i).className=i<step?'done':i===step?'now':'next');
+$('line').textContent=t[s==='slow'?'docket':s]||'';
+$('error').hidden=s!=='error';$('working').hidden=s==='error';$('slow').hidden=s!=='slow';
+$('impact').hidden=s!=='ready';$('gavel').setAttribute('class',s==='ready'?'strike':s==='error'?'':'idle');
+document.querySelectorAll('.mock [data-s]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.s===s));}
+document.querySelectorAll('.mock [data-s]').forEach(b=>b.onclick=()=>{s=b.dataset.s;render()});
+$('lang').onclick=()=>{lang=lang==='en'?'es':'en';render()};
+$('theme').onclick=()=>{const r=document.documentElement;r.dataset.theme=r.dataset.theme==='dark'?'light':'dark'};
+const q=new URLSearchParams(location.search);if(q.get('state'))s=q.get('state');if(q.get('lang'))lang=q.get('lang');if(q.get('theme'))document.documentElement.dataset.theme=q.get('theme');
+render();
+</script>
+</body>
+</html>

@@ -310,7 +310,8 @@
         "seeAll_one": "Ver el caso →",
         "seeAll_other": "Ver los {{count}} casos →",
         "noAgents": "Todavía no hay agentes a juicio. Un admin los registra en la secretaría.",
-        "openClerk": "Ir a la secretaría"
+        "openClerk": "Ir a la secretaría",
+        "howItWorks": "Cómo funciona"
     },
     "clerk": {
         "kicker": "Solo la ven los admins",
@@ -619,6 +620,61 @@
             "startedBy": "Iniciada por {{who}}"
         },
         "back": "Volver a Vistas"
+    },
+    "launch": {
+        "kicker": "Control de calidad para Fabric Data Agents",
+        "headlineStart": "¿Quién juzga al",
+        "headlineEnd": "juez?",
+        "gavelLabel": "Mazo",
+        "session": "Comprobando tu asiento en el jurado…",
+        "docket": "Llamando a la lista de casos…",
+        "ready": "En pie, se abre la sesión.",
+        "step1": "1 · Sesión",
+        "step2": "2 · Casos",
+        "step3": "3 · En pie",
+        "slow": "Está tardando más de lo normal. Puede que Fabric esté ocupado; tus casos están a salvo.",
+        "footer": "Una app comunitaria y de código abierto para Microsoft Fabric",
+        "signIn": "Iniciar sesión con Fabric",
+        "signingIn": "Iniciando sesión…",
+        "errors": {
+            "session": "Tu sesión de Fabric ha caducado. Vuelve a iniciar sesión para ocupar tu asiento en el jurado.",
+            "signIn": "No hemos podido iniciar tu sesión. Permite las ventanas emergentes de este sitio y vuelve a intentarlo.",
+            "notJuror": "Todavía no estás en este jurado. Pide a un admin que te añada.",
+            "busy": "Fabric está ocupado ahora mismo. Tus casos están a salvo; inténtalo de nuevo en un momento.",
+            "unknown": "Algo ha ido mal al abrir la sala. Tus casos están a salvo."
+        }
+    },
+    "intro": {
+        "pageLabel": "Edición especial · Página {{step}} de 3",
+        "gavelLabel": "Un mazo golpeando su base",
+        "stepsLabel": "Pasos de la introducción",
+        "skip": "Saltar la introducción",
+        "back": "Atrás",
+        "begin": "Empezar",
+        "next": "Siguiente",
+        "enter": "Entrar en la sala",
+        "footer": "Se muestra una sola vez. Puedes volver a verla cuando quieras desde Cómo funciona.",
+        "step1": {
+            "nav": "1 · Se abre la sesión",
+            "kicker": "En pie",
+            "titleStart": "Se abre la",
+            "titleHighlight": "sesión",
+            "body": "Tus Data Agents responden preguntas de negocio todo el día. Pero ¿quién comprueba que las respuestas son correctas?"
+        },
+        "step2": {
+            "nav": "2 · El juez",
+            "kicker": "El juez",
+            "titleStart": "El juez es",
+            "titleHighlight": "una IA",
+            "body": "Fabric compara cada respuesta de tu agente con la esperada y emite su veredicto: correcta o no. Rápido, incansable y, a veces, equivocado."
+        },
+        "step3": {
+            "nav": "3 · El jurado",
+            "kicker": "El jurado",
+            "titleStart": "Tú eres",
+            "titleHighlight": "el jurado",
+            "body": "Los expertos de negocio acuerdan las respuestas correctas, resuelven las disputas sobre definiciones y recurren cuando el juez se equivoca."
+        }
     },
     "errors": {
         "load": "No se han podido cargar los datos.",

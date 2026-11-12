@@ -31,15 +31,18 @@ describe("App", () => {
         initI18n("en");
     });
 
-    it("renders the masthead with the language and theme toggles", () => {
+    it("starts with the launch screen, not the masthead or the small page loader", () => {
         renderApp();
-        expect(screen.getByRole("group", { name: "Language" })).toBeInTheDocument();
-        expect(screen.getByRole("button", { name: "Switch to dark mode" })).toBeInTheDocument();
-        expect(screen.getByRole("link", { name: "Home" })).toHaveAttribute("aria-current", "page");
+        expect(screen.getByRole("img", { name: "Gavel" })).toBeInTheDocument();
+        expect(screen.queryByRole("link", { name: "Home" })).not.toBeInTheDocument();
+        expect(screen.queryByText("The jury is deliberating…")).not.toBeInTheDocument();
     });
 
-    it("shows an Objection instead of data when the app can't connect", () => {
+    it("shows an Objection inside the launch screen, with Try again, when the app can't connect", () => {
         renderApp();
-        expect(screen.getByRole("alert")).toHaveTextContent("Objection!");
+        const alert = screen.getByRole("alert");
+        expect(alert).toHaveTextContent("Objection!");
+        expect(alert).toHaveTextContent("Missing required env vars");
+        expect(screen.getByRole("button", { name: "Try again" })).toBeInTheDocument();
     });
 });

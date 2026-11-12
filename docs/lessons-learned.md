@@ -278,6 +278,21 @@ Paths below are relative to this file. `I1a`, `I1b`, `I1c` and `I3` are the iter
 - **What we did:** all visible text from locale files (a test asserts both files have the same keys), dates and numbers by language, user-written content never translated, and a glossary check when a word changes (the Spanish "archivar" became "desestimar" everywhere).
 - **More:** I1c section 11, AGENTS.md rules 6-9.
 
+### A new design package can overwrite earlier decisions
+- **Symptom:** after dropping a new design guide into `docs/design/`, the token test failed (`--dispute-bg`, `--ticker-text` and some notes had gone back to older values) and the package had landed in a different folder, so the README images were missing.
+- **Cause:** the guide was edited from an older copy, so it lost changes made during review.
+- **What we did:** kept the new sections and put back the changed lines, then let `docket-tokens.spec.ts` (guide vs CSS) prove they agree. Compare a new package with `git diff` before building on it.
+
+### Tailwind: don't mix `sm:` and `min-[900px]:` for the same property
+- **Symptom:** a headline stayed at its mid size on a wide screen.
+- **Cause:** Tailwind v4 can order the `sm:` rule after an arbitrary `min-[…]` one, so `sm:` wins above both.
+- **What we did:** use arbitrary `min-[640px]:` and `min-[900px]:` together (or neither).
+
+### A launch screen with real steps, and how to screenshot a transient state
+- **What we did:** the steps are the real loads (juror record, parallel initial load); time only moves the view at its thresholds (a single timer to the next one, no polling), and a retry happens only on a click. Screenshots of transient states use the Playwright clock (`clock.install`, `pauseAt`, `runFor`) and `page.route` to hold or fail the real requests; parse the request body as JSON to tell the queries apart.
+- **A bug worth remembering:** a sign-in that finishes while the screen is mounting must not count as the user's retry (it reloaded everything twice). Only a click on this screen's own sign-in button does.
+- **More:** [README](../apps/agent-jury/README.md) ("Launch screen and Intro").
+
 ---
 
 ## 7. Working with a coding agent

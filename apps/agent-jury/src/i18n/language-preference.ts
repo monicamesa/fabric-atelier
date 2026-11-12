@@ -25,12 +25,30 @@ function browserStorage(): PreferenceStorage | undefined {
     }
 }
 
-export function readLanguagePreference(storage: PreferenceStorage | undefined = browserStorage()): AppLanguage {
+function browserLanguages(): readonly string[] {
+    if (typeof navigator === "undefined") return [];
+    return navigator.languages?.length ? navigator.languages : [navigator.language];
+}
+
+/** The first browser language the app supports (es-ES → es), else English. */
+export function languageFromBrowser(languages: readonly string[] = browserLanguages()): AppLanguage {
+    for (const tag of languages) {
+        const primary = tag?.toLowerCase().split("-")[0];
+        if (isAppLanguage(primary)) return primary;
+    }
+    return DEFAULT_LANGUAGE;
+}
+
+/** The saved choice when there is one; before the user has chosen, the browser language. */
+export function readLanguagePreference(
+    storage: PreferenceStorage | undefined = browserStorage(),
+    languages: readonly string[] = browserLanguages(),
+): AppLanguage {
     try {
         const stored = storage?.getItem(LANGUAGE_STORAGE_KEY);
-        return isAppLanguage(stored) ? stored : DEFAULT_LANGUAGE;
+        return isAppLanguage(stored) ? stored : languageFromBrowser(languages);
     } catch {
-        return DEFAULT_LANGUAGE;
+        return languageFromBrowser(languages);
     }
 }
 

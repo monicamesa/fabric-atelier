@@ -4,6 +4,7 @@
 
 ## Dónde estamos (2026-11-10)
 
+- **Pasada de UX: pantalla de arranque + Intro (2026-11-12), desplegada solo en pruebas.** Código en `src/launch/` y `src/screens/intro/`; entidad nueva `UserFlag` (marca `intro_seen`, aprobada por la propietaria; ver especificación, sección 7). **Producción sin tocar**: antes de desplegarla hay que desplegar el esquema (`UserFlag`) junto con el código; si la entidad faltara, la app trata la Intro como vista y no bloquea. Pendiente: revisión visual con las capturas y decidir el despliegue a producción.
 - **I1a, I1b e I1c están terminadas y desplegadas en producción** (`FabricApp-AgentJury`). Última revisión: I1c, aprobada con correcciones (commit "agent-jury: I1c review fixes, production deploy").
 - **Despliegue de pruebas** en su propio workspace, en la misma capacidad. Es el destino por defecto de las comprobaciones. Con la versión de producción: I1a 46/46, I1b 23/23 e I1c 19/19.
 - **Pendiente al final del proyecto:** la prueba manual con dos personas (aprobador y experto). Preparación y tres escenarios en la sección I1c de "Qué queda pendiente".

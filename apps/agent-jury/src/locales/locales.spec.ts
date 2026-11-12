@@ -22,6 +22,22 @@ describe("translation files", () => {
         expect(offenders).toEqual([]);
     });
 
+    it("have the launch screen, intro and how-it-works keys in both languages", () => {
+        const required = [
+            "launch.kicker", "launch.headlineStart", "launch.headlineEnd", "launch.gavelLabel",
+            "launch.session", "launch.docket", "launch.ready", "launch.step1", "launch.step2", "launch.step3",
+            "launch.slow", "launch.footer", "launch.signIn", "launch.signingIn",
+            "launch.errors.session", "launch.errors.signIn", "launch.errors.notJuror", "launch.errors.busy", "launch.errors.unknown",
+            "intro.pageLabel", "intro.gavelLabel", "intro.stepsLabel", "intro.skip", "intro.back", "intro.begin", "intro.next", "intro.enter", "intro.footer",
+            ...["step1", "step2", "step3"].flatMap((step) => ["nav", "kicker", "titleStart", "titleHighlight", "body"].map((part) => `intro.${step}.${part}`)),
+            "home.howItWorks", "states.objection", "states.technicalDetails", "common.retry",
+        ];
+        const enKeys = new Set(enEntries.map(([key]) => key));
+        const esKeys = new Set(esEntries.map(([key]) => key));
+        expect(required.filter((key) => !enKeys.has(key))).toEqual([]);
+        expect(required.filter((key) => !esKeys.has(key))).toEqual([]);
+    });
+
     it("have only non-empty string values", () => {
         for (const [key, value] of [...enEntries, ...esEntries]) {
             expect(typeof value, key).toBe("string");

@@ -7,7 +7,10 @@ import { caseNumber } from "@/screens/docket/docket-views";
 import { Ticker, type TickerItem } from "@/components/docket/ticker";
 import { listAgents, listJurors, type AgentRow, type JurorRow } from "@/data/directory.service";
 import type { Docket } from "@/data/docket";
+import { hasUserFlag, setUserFlag, USER_FLAGS } from "@/data/user-flags.service";
 import { useAsync } from "@/hooks/use-async";
+import { LaunchGate } from "@/launch/launch-gate";
+import { docketStage, routeAfterLaunch, sessionStage } from "@/launch/launch-stages";
 import { getRayfinClient, type AppRayfinClient } from "@/lib/rayfin-client";
 import { formatRoute, useRoute, type Route } from "@/lib/route";
 import { CaseDetail } from "@/screens/case-detail/case-detail.screen";
@@ -18,6 +21,7 @@ import { viewerFor, type Viewer } from "@/screens/docket/viewer";
 import { HomeScreen } from "@/screens/home/home.screen";
 import { HearingScreen } from "@/screens/hearings/hearing.screen";
 import { HearingsScreen } from "@/screens/hearings/hearings.screen";
+import { IntroScreen } from "@/screens/intro/intro.screen";
 
 type Page = "home" | "cases" | "hearings" | "clerk";
 
@@ -71,6 +75,14 @@ function App() {
     const { route, navigate, replace } = useRoute();
     const jury = useAsync(() => (client ? listJurors(client) : Promise.reject(connectError)));
     const agentList = useAsync(() => (client ? listAgents(client) : Promise.reject(connectError)));
+    // Per-user "Intro seen" flag, read in the same round as the other initial loads.
+    const introFlag = useAsync(() => (client ? hasUserFlag(client, USER_FLAGS.introSeen) : Promise.resolve(true)));
+    const [launched, setLaunched] = useState(false);
+    const [introMarked, setIntroMarked] = useState(false);
+    const [afterIntro, setAfterIntro] = useState<Route>();
+    // A failed lookup counts as seen: a hiccup must not trap anyone in the Intro.
+    const introSeen = introMarked || introFlag.status !== "success" || introFlag.data;
+    const introChecked = introFlag.status !== "loading";
 
     const session = client?.auth.getSession();
     const sessionUserId = session?.isAuthenticated ? session.user?.id : undefined;
@@ -87,7 +99,8 @@ function App() {
     const agent: AgentRow | undefined = activeAgents.find((row) => row.id === routeAgentId) ?? activeAgents[0];
 
     // A #clerk link waits for the jury list; non-admins then land on Home. clerkExecute is the real check.
-    const page: Page | "case" | "hearing" = route.page === "clerk" ? (isAdmin || !jury.data ? "clerk" : "home") : route.page;
+    const page: Page | "case" | "hearing" =
+        route.page === "clerk" ? (isAdmin || !jury.data ? "clerk" : "home") : route.page === "intro" ? "home" : route.page;
     const current: Page = page === "case" ? "cases" : page === "hearing" ? "hearings" : page;
 
     const items: NavItem<Page>[] = [
@@ -115,11 +128,54 @@ function App() {
         );
     }
 
+    const directoryError = jury.status === "error" ? jury.error : agentList.status === "error" ? agentList.error : undefined;
+    const directoryFailed = directoryError !== undefined && (!jury.data || !agentList.data);
+    const usesDocket = route.page === "home" || route.page === "cases" || route.page === "hearings" || route.page === "intro";
+
+    // The launch screen (design guide, 6b) comes first and stays until the session and the initial load are done.
+    // Its steps are the real work: the juror record (Session) and the parallel initial load (Docket).
+    const launchSession = sessionStage({
+        connectError: client ? undefined : (connectError ?? "No Rayfin client."),
+        jury,
+        hasJurorRecord: Boolean(viewer.juror),
+    });
+    const reloadInitialLoads = () => {
+        jury.reload();
+        agentList.reload();
+        introFlag.reload();
+    };
+    const finishLaunch = () => {
+        const destination = routeAfterLaunch(introSeen, route);
+        setAfterIntro(destination.afterIntro);
+        if (destination.route !== route) replace(destination.route);
+        setLaunched(true);
+    };
+    const leaveIntro = () => {
+        if (client && !introSeen) {
+            setIntroMarked(true);
+            void setUserFlag(client, USER_FLAGS.introSeen).catch((error: unknown) => console.warn("[Intro] Could not save that the intro was seen.", error));
+        }
+        setAfterIntro(undefined);
+        replace(afterIntro ?? { page: "home", agentId: agent?.id });
+    };
+
+    if (!launched && (!client || !usesDocket || directoryFailed || (agentList.data && !agent))) {
+        return (
+            <LaunchGate
+                session={launchSession}
+                docket={docketStage({ agents: agentList, introChecked })}
+                onRetry={reloadInitialLoads}
+                onReady={finishLaunch}
+            />
+        );
+    }
+
+    const intro = route.page === "intro" ? <IntroScreen onDone={leaveIntro} /> : undefined;
+
     if (!client) return layout(<Objection message={t("errors.load")} technicalDetails={String(connectError)} />);
     if (page === "clerk") return layout(<ClerksOffice client={client} jury={jury} me={viewer.juror} />);
 
-    const directoryError = jury.status === "error" ? jury.error : agentList.status === "error" ? agentList.error : undefined;
-    if (directoryError !== undefined && (!jury.data || !agentList.data)) {
+    if (directoryFailed) {
         return layout(
             <Objection
                 message={t("errors.load")}
@@ -205,15 +261,29 @@ function App() {
 
     // The docket loads in the same round as the jury and agent lists: by agent when the URL names a
     // valid one, otherwise every agent's records, scoped once the first active agent is known.
-    if (agentList.data && !agent) return layout(ready ? renderPage() : <Deliberating />);
+    if (agentList.data && !agent) return intro ?? layout(ready ? renderPage() : <Deliberating />);
     const requestedAgentId = !agentList.data || agent?.id === routeAgentId ? routeAgentId : undefined;
     return (
         <WithDocket key={requestedAgentId ?? "all-agents"} client={client} requestedAgentId={requestedAgentId} agentId={agent?.id} jurors={jury.data} viewer={viewer}>
-            {(docket) =>
-                ready && agent
+            {(docket) => {
+                if (!launched) {
+                    return (
+                        <LaunchGate
+                            session={launchSession}
+                            docket={docketStage({ agents: agentList, docket, introChecked })}
+                            onRetry={() => {
+                                reloadInitialLoads();
+                                docket.reload();
+                            }}
+                            onReady={finishLaunch}
+                        />
+                    );
+                }
+                if (intro) return intro;
+                return ready && agent
                     ? layout(renderPage(docket), route.page === "home" ? <Ticker items={tickerItems(docket.data, t)} /> : undefined)
-                    : layout(<Deliberating />)
-            }
+                    : layout(<Deliberating />);
+            }}
         </WithDocket>
     );
 }

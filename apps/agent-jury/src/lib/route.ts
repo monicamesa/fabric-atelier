@@ -8,7 +8,8 @@ export type Route =
     | { page: "case"; caseId: string }
     | { page: "hearings"; agentId?: string }
     | { page: "hearing"; hearingId: string }
-    | { page: "clerk" };
+    | { page: "clerk" }
+    | { page: "intro" };
 
 const ID = /^[0-9a-f-]{1,36}$/i;
 
@@ -19,6 +20,7 @@ export function parseRoute(hash: string): Route {
     const agent = params.get("agent");
     const agentId = agent && ID.test(agent) ? agent : undefined;
     if (path === "clerk") return { page: "clerk" };
+    if (path === "intro") return { page: "intro" };
     if (path.startsWith("hearing/")) {
         const hearingId = path.slice("hearing/".length);
         if (ID.test(hearingId)) return { page: "hearing", hearingId };
@@ -39,6 +41,8 @@ export function formatRoute(route: Route): string {
     switch (route.page) {
         case "clerk":
             return "#clerk";
+        case "intro":
+            return "#intro";
         case "case":
             return `#case/${route.caseId}`;
         case "hearing":

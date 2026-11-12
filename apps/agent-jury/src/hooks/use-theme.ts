@@ -6,6 +6,7 @@
 //-----------------------------------------------------------------------
 
 import { useState, useEffect } from "react";
+import { isDarkAtStart } from "./initial-theme";
 
 /**
  * Detects the current color scheme preference and toggles the `dark`
@@ -13,18 +14,7 @@ import { useState, useEffect } from "react";
  * the `data-appearance` attribute on `<html>`.
  */
 export function useAppTheme() {
-    const [isDark, setIsDark] = useState(() => {
-        // Check data-appearance attribute first (set by host environment)
-        const appearance = document.documentElement.getAttribute("data-appearance");
-        if (appearance === "dark") return true;
-        if (appearance === "light") return false;
-
-        // Check for .dark class
-        if (document.documentElement.classList.contains("dark")) return true;
-
-        // Fall back to OS preference
-        return window.matchMedia("(prefers-color-scheme: dark)").matches;
-    });
+    const [isDark, setIsDark] = useState(isDarkAtStart);
 
     useEffect(() => {
         // Sync the .dark class on <html> for Tailwind dark mode, and data-theme for the Docket tokens

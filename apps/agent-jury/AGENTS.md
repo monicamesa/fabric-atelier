@@ -171,7 +171,7 @@ These rules come from [docs/especificacion-general.md](docs/especificacion-gener
 
 ### Business rules and security
 
-15. `Case`, `Testimony`, `CaseDismissal`, `Vote` and `VerdictReview` are insert-only: no update or delete. Their policies require `claims.sub.eq(item.<role>UserId)` (for example `authorUserId`, `voterUserId`) so nobody inserts on behalf of someone else.
+15. `Case`, `Testimony`, `CaseDismissal`, `Vote` and `VerdictReview` are insert-only: no update or delete. Their policies require `claims.sub.eq(item.<role>UserId)` (for example `authorUserId`, `voterUserId`) so nobody inserts on behalf of someone else. `UserFlag` (one-time per-user flags such as `intro_seen`) is insert-only too, and its create and read policies both require `claims.sub.eq(item.userId)`; it stores no email or name, and flag values are constants in code.
 16. Votes are immutable; a juror's latest vote counts (R1). An author's vote on their own testimony does not count (R2).
 17. Consensus (R3): at least `N` valid votes in favour from active jurors (default `N = 1`), at least one from an approver, and no current vote against from an approver. A case is disputed (R4) when two or more testimonies have votes in favour, or one testimony has approver votes both for and against. Only cases and testimonies authored by active jurors count; the rest are shown as unverified (R7). A case is dismissed by a `CaseDismissal` from its author or an admin (R8).
 18. A case's state is computed, never written by the client (R6). The logic lives in a single shared module with tests. The frontend uses it for display; the notebook or Function uses it for anything authoritative.

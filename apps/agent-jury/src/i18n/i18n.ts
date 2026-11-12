@@ -14,6 +14,7 @@ export const i18n: I18n = i18next.createInstance();
 /** Initialises translations synchronously; the bundles are part of the build. */
 export function initI18n(language: AppLanguage = readLanguagePreference()): I18n {
     if (!i18n.isInitialized) {
+        document.documentElement.lang = language;
         void i18n.use(initReactI18next).init({
             resources: { en: { translation: en }, es: { translation: es } },
             lng: language,

@@ -40,6 +40,7 @@ Define them as CSS custom properties on `:root` and override them under `[data-t
 | `--review` | `#4B6B8F` | `#A9B8D6` | Under review (border/bar) |
 | `--review-text` | `#3D5A7A` | `#A9B8D6` | Under review (text) |
 | `--overruled` | `#FFD27A` | `#FFD27A` | "Judge overruled" chip (text always `#14110D`) |
+| `--highlight` | `#FF8A62` | `#C8502B` | Underline that draws in under a word of a hero headline (launch, intro) |
 | `--ticker-bg` | `#14110D` | `#0A0806` | Verdict ticker |
 | `--ticker-text` | `#F3EEE4` | `#F3EEE4` | Verdict ticker text (light on the dark band in both themes) |
 | `--focus` | `#0F6E5C` | `#7FE0C4` | Focus outline |
@@ -130,11 +131,26 @@ Load fonts from npm (`@fontsource-variable/fraunces`, `@fontsource-variable/inte
 
 | State | Pattern |
 |---|---|
+| App launch | Full-screen launch screen (see 6b), once per app load |
 | Loading a page | Gavel + rotating line ("The jury is deliberating…", "Counting votes…"), skeletons with the exact shape of the content |
 | Long work (hearing) | Dark panel "IN SESSION", step list (✓ done · ● now · ○ next), progress bar, time estimate, "You can leave" + link |
 | Error | `role="alert"` block: "Objection!" + what happened + "Your cases are safe" + Try again / Copy details + collapsible technical details |
 | Empty | Short explanation + the one action that fills it (e.g. "No cases yet. Propose the first question your agent should answer.") |
 | Demo mode | Full-width band at the top: "Demo data — nothing here is real" |
+
+### 6b. Launch screen
+
+Shown from the first paint until the app knows who the user is and has the docket data. It is not the page loader: page changes keep the small "The jury is deliberating…" loader.
+
+- **Layout:** full-screen paper. Kicker "Quality control for Fabric Data Agents" · large gavel · "Agent Jury" wordmark · H1 "Who judges the *judge?*" (coral highlight) · double rule · status line · 3-step list · footer "An open-source community app for Microsoft Fabric".
+- **Steps (real, not fake):** 1 · Session (auth/claims, juror record) → 2 · Docket (the parallel initial data load) → 3 · All rise (ready: gavel strikes once, then route).
+- **Status copy:** EN "Checking your seat on the jury…" / "Calling the docket…" / "All rise." · ES "Comprobando tu asiento en el jurado…" / "Llamando a la lista de casos…" / "En pie, se abre la sesión."
+- **Timing:** minimum ~800 ms on screen (no flash); "All rise." holds ~600 ms; after ~8 s show "Taking longer than usual. Fabric may be busy; your cases are safe." + Try again (ES: "Está tardando más de lo normal. Puede que Fabric esté ocupado; tus casos están a salvo." + Reintentar).
+- **Errors:** the "Objection!" alert inside the launch screen: what happened in plain words, primary action, collapsible technical details. Cases: expired session (Sign in with Fabric), not a juror ("You are not on this jury yet. Ask an admin to add you."), throttling/5xx (Try again).
+- **After ready:** first time for this user → Intro; otherwise → Home (or the deep-linked route).
+- **A11y:** status in `role="status" aria-live="polite"`, errors in `role="alert"`, gavel `role="img"`, step list `aria-hidden`; reduced motion = static gavel, no strike or underline animation.
+- **Theme/i18n:** light and dark tokens; EN/ES from the saved language or the browser before the profile loads.
+- Mockup: `launch.html` (plain HTML; open it directly, or use `?state=session|docket|ready|slow|error&lang=es&theme=dark`. The dashed control bar only exists to review the states: do not build it).
 
 ---
 
@@ -142,7 +158,8 @@ Load fonts from npm (`@fontsource-variable/fraunces`, `@fontsource-variable/inte
 
 | Animation | Duration | Where |
 |---|---|---|
-| Gavel strike | 2.4–2.8 s (loop) / once | Loading, intro / on ruling |
+| Gavel strike | 2.4–2.8 s (loop) / once | Loading, intro / on ruling, launch ready |
+| Gavel breathe | 2.4 s loop | Launch screen while working |
 | Stamp in | ~0.5 s | Verdicts, story card |
 | Highlight underline draws in | 1 s | Hero headline |
 | Intro step change | 0.55 s rise | Intro |
@@ -167,7 +184,8 @@ All of these are disabled under `@media (prefers-reduced-motion: reduce)`.
 | Defendant (agent) | Agent (on the stand) | Agente (en el estrado) |
 | Case | Case | Caso |
 | Testimony (expected answer) | Answer / testimony | Respuesta / testimonio |
-| Ruling | Ruling / ruled | Resolución / resuelto |
+| Ruling (by the jury) | Ruling / ruled | Resolución / resuelto |
+| Verdict (by the AI judge only) | Verdict | Veredicto |
 | Dispute | Dispute / disputed | Disputa / en disputa |
 | Appeal (UI term; stored as a `VerdictReview` that disagrees with the judge) | Appeal | Recurso |
 | Case law | Case law | Jurisprudencia |
@@ -201,6 +219,7 @@ All of these are disabled under `@media (prefers-reduced-motion: reduce)`.
 | 5 | Loading / long work / error | `states.html` | I1 (patterns) |
 | 6 | Live hearing | `live-hearing.html` | I3+ |
 | 7 | Admin "Clerk's office" (jurors, agents, admin log) | `admin.html` | I1b |
+| 8 | Launch screen (session → docket → all rise, slow, error) | `launch.html` | UX pass |
 
 Sample data in the mockups (names, numbers, products) is illustrative only.
 
