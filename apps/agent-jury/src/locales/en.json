@@ -361,7 +361,8 @@
         "seeAll_other": "See all {{count}} cases →",
         "noAgents": "No agents on trial yet. An admin registers them in the clerk's office.",
         "openClerk": "Go to the clerk's office",
-        "howItWorks": "How it works"
+        "howItWorks": "How it works",
+        "userGuide": "User guide"
     },
     "clerk": {
         "kicker": "Only visible to admins",
@@ -737,6 +738,12 @@
             "unknown": "Something went wrong while opening the court. Your cases are safe."
         }
     },
+    "guide": {
+        "kicker": "Help",
+        "title": "User guide",
+        "help": "How to play, who can do what, and the exact rules for rulings, disputes, hearings and judge trust.",
+        "back": "Back"
+    },
     "intro": {
         "pageLabel": "Special edition · Page {{step}} of 3",
         "gavelLabel": "A gavel striking its block",
@@ -747,8 +754,6 @@
         "next": "Next",
         "enter": "Enter the courtroom",
         "guide": "Read the full guide",
-        "guideUrl": "https://github.com/monicamesa/fabric-atelier/blob/main/apps/agent-jury/docs/user-guide.md",
-        "guideNewTab": "(opens in a new tab)",
         "footer": "Shown once. You can replay it any time from How it works.",
         "step1": {
             "nav": "1 · Court is in session",

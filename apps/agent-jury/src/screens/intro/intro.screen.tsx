@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { Button } from "@/components/docket/button";
 import { LaunchGavel } from "@/components/docket/launch-gavel";
 import { LanguageToggle } from "@/components/docket/masthead";
+import { formatRoute } from "@/lib/route";
 import { cn } from "@/lib/utils";
 
 const STEPS = ["step1", "step2", "step3"] as const;
@@ -95,13 +96,10 @@ export function IntroScreen({ onDone }: IntroScreenProps) {
                         )}
                         {last && (
                             <a
-                                href={t("intro.guideUrl")}
-                                target="_blank"
-                                rel="noopener noreferrer"
+                                href={formatRoute({ page: "guide" })}
                                 className="inline-flex min-h-[54px] items-center px-2 text-[16px] font-bold text-action-text underline underline-offset-4 hover:text-ink"
                             >
                                 {t("intro.guide")}
-                                <span className="sr-only"> {t("intro.guideNewTab")}</span>
                             </a>
                         )}
                     </div>

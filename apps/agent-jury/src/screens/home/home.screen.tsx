@@ -62,6 +62,9 @@ export function HomeScreen({ client, agents, agent, docket, viewer, onAgentChang
                         <a href={formatRoute({ page: "intro" })} className="inline-flex min-h-11 items-center text-[16px] font-bold text-action-text underline">
                             {t("home.howItWorks")}
                         </a>
+                        <a href={formatRoute({ page: "guide" })} className="inline-flex min-h-11 items-center text-[16px] font-bold text-action-text underline">
+                            {t("home.userGuide")}
+                        </a>
                     </div>
                 </div>
                 {showTrust && <JudgeTrustPanel trust={data?.trust} className="hidden min-[900px]:flex" />}

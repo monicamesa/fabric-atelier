@@ -1,6 +1,6 @@
 # Agent Jury · Guía de usuario
 
-Agent Jury pone a personas de negocio a decidir qué respuesta es la correcta antes de dejar que un juez de IA califique a un Fabric Data Agent. Esta guía explica cómo se juega y qué reglas hay. Para probar la app de principio a fin, usa el [guion de pruebas](manual-test.md). English version: [user-guide.md](user-guide.md).
+Agent Jury pone a personas de negocio a decidir qué respuesta es la correcta antes de dejar que un juez de IA califique a un Fabric Data Agent. Esta guía explica cómo se juega y qué reglas hay.<!-- repo-only --> Para probar la app de principio a fin, usa el [guion de pruebas](manual-test.md). English version: [user-guide.md](user-guide.md).<!-- /repo-only -->
 
 ## Qué es y quién hace qué
 

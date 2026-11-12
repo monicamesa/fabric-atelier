@@ -22,7 +22,7 @@ The app uses a trial metaphor. Each term is also explained in the app.
 
 ## User guide
 
-- [User guide](docs/user-guide.md) (EN) / [Guía de usuario](docs/user-guide.es.md) (ES): how to play, roles and the rules (when a case is ruled, disputes, hearings, reopening, judge trust). The Intro's last step links to it.
+- [User guide](docs/user-guide.md) (EN) / [Guía de usuario](docs/user-guide.es.md) (ES): how to play, roles and the rules (when a case is ruled, disputes, hearings, reopening, judge trust). The Intro's last step and Home link to the in-app copy (`#guide`, rendered from these files at build time with `marked`), because jurors may not have access to the repository.
 - [Manual test script](docs/manual-test.md) (ES): end-to-end checklist for one person (Prueba A) and for an admin plus two jurors (Prueba B).
 
 ## Status

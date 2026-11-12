@@ -361,7 +361,8 @@
         "seeAll_other": "Ver los {{count}} casos →",
         "noAgents": "Todavía no hay agentes a juicio. Un admin los registra en la secretaría.",
         "openClerk": "Ir a la secretaría",
-        "howItWorks": "Cómo funciona"
+        "howItWorks": "Cómo funciona",
+        "userGuide": "Guía de usuario"
     },
     "clerk": {
         "kicker": "Solo la ven los admins",
@@ -737,6 +738,12 @@
             "unknown": "Algo ha ido mal al abrir la sala. Tus casos están a salvo."
         }
     },
+    "guide": {
+        "kicker": "Ayuda",
+        "title": "Guía de usuario",
+        "help": "Cómo se juega, quién puede hacer qué y las reglas exactas de resoluciones, disputas, vistas y confianza en el juez.",
+        "back": "Volver"
+    },
     "intro": {
         "pageLabel": "Edición especial · Página {{step}} de 3",
         "gavelLabel": "Un mazo golpeando su base",
@@ -747,8 +754,6 @@
         "next": "Siguiente",
         "enter": "Entrar en la sala",
         "guide": "Leer la guía completa",
-        "guideUrl": "https://github.com/monicamesa/fabric-atelier/blob/main/apps/agent-jury/docs/user-guide.es.md",
-        "guideNewTab": "(se abre en una pestaña nueva)",
         "footer": "Se muestra una sola vez. Puedes volver a verla cuando quieras desde Cómo funciona.",
         "step1": {
             "nav": "1 · Se abre la sesión",

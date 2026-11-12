@@ -328,6 +328,11 @@ Paths below are relative to this file. `I1a`, `I1b`, `I1c` and `I3` are the iter
 ### Ask for confirmation at the gates that cost money
 - **What we did:** the owner confirms the capacity before each spike; after that confirmation was relaxed, the stop conditions were explicit (stop if a run takes more than twice the expected time or fails with a capacity or throttling error).
 
+### A link to a repository file breaks for jurors
+- **Symptom:** "Read the full guide" in the Intro opened a GitHub 404 for jurors.
+- **Cause:** jurors do not necessarily have access to the repository (private, or a different account).
+- **What we did:** the guide is bundled into the app at build time (`docs/user-guide*.md`, `?raw` import, rendered by `marked`) and opened at `#guide`. Never link end users to repository files.
+
 ### Personal data in history: decision
 - **What we did:** personal data in file contents is blocked by the pre-commit hook going forward; the author's email as commit author metadata is accepted (it is already public on every commit), so history is not rewritten.
 

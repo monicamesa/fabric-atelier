@@ -15,6 +15,7 @@ import { useRoute, type Route } from "@/lib/route";
 import { CaseDetail } from "@/screens/case-detail/case-detail.screen";
 import { CasesScreen } from "@/screens/cases/cases.screen";
 import { ClerksOffice } from "@/screens/clerks-office/clerks-office.screen";
+import { GuideScreen } from "@/screens/guide/guide.screen";
 import { useDocket, type DocketState } from "@/screens/docket/use-docket";
 import { viewerFor, type Viewer } from "@/screens/docket/viewer";
 import { HomeScreen } from "@/screens/home/home.screen";
@@ -83,7 +84,7 @@ function App() {
 
     // A #clerk link waits for the jury list; non-admins then land on Home. clerkExecute is the real check.
     const page: Page | "case" | "hearing" =
-        route.page === "clerk" ? (isAdmin || !jury.data ? "clerk" : "home") : route.page === "intro" ? "home" : route.page;
+        route.page === "clerk" ? (isAdmin || !jury.data ? "clerk" : "home") : route.page === "intro" || route.page === "guide" ? "home" : route.page;
     const current: Page = page === "case" ? "cases" : page === "hearing" ? "hearings" : page;
 
     const items: NavItem<Page>[] = [
@@ -157,6 +158,10 @@ function App() {
 
     if (!client) return layout(<Objection message={t("errors.load")} technicalDetails={String(connectError)} />);
     if (page === "clerk") return layout(<ClerksOffice client={client} jury={jury} me={viewer.juror} onDirectoryChanged={agentList.reload} />);
+    // The guide needs no data: jurors read it here, never on an external site. Back returns to where they came from (the Intro or Home).
+    if (route.page === "guide") {
+        return layout(<GuideScreen onBack={() => (window.history.length > 1 ? window.history.back() : navigate({ page: "home", agentId: agent?.id }))} />);
+    }
 
     if (directoryFailed) {
         return layout(

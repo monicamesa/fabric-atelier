@@ -1,6 +1,6 @@
 # Agent Jury · User guide
 
-Agent Jury has business people decide which answer is the right one before an AI judge scores a Fabric Data Agent. This guide explains how to play and what the rules are. To test the app end to end, use the [test script](manual-test.md) (in Spanish). Versión en español: [user-guide.es.md](user-guide.es.md).
+Agent Jury has business people decide which answer is the right one before an AI judge scores a Fabric Data Agent. This guide explains how to play and what the rules are.<!-- repo-only --> To test the app end to end, use the [test script](manual-test.md) (in Spanish). Versión en español: [user-guide.es.md](user-guide.es.md).<!-- /repo-only -->
 
 ## What it is and who does what
 

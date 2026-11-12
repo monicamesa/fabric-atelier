@@ -27,19 +27,18 @@ describe("IntroScreen", () => {
         expect(onDone).toHaveBeenCalledTimes(1);
     });
 
-    it("links to the full guide only on the last step, in a new tab, in the selected language", async () => {
+    it("links to the in-app guide only on the last step, in the selected language", async () => {
         render(<IntroScreen onDone={vi.fn()} />);
         expect(screen.queryByRole("link", { name: /Read the full guide/ })).not.toBeInTheDocument();
         fireEvent.click(screen.getByRole("button", { name: /Begin/ }));
         fireEvent.click(screen.getByRole("button", { name: /Next/ }));
         const link = screen.getByRole("link", { name: /Read the full guide/ });
-        expect(link).toHaveAttribute("href", expect.stringMatching(/\/docs\/user-guide\.md$/));
-        expect(link).toHaveAttribute("target", "_blank");
-        expect(link).toHaveAttribute("rel", expect.stringContaining("noopener"));
+        expect(link).toHaveAttribute("href", "#guide");
+        expect(link).not.toHaveAttribute("target");
 
         await i18n.changeLanguage("es");
         try {
-            expect(screen.getByRole("link", { name: /Leer la guía completa/ })).toHaveAttribute("href", expect.stringMatching(/\/docs\/user-guide\.es\.md$/));
+            expect(screen.getByRole("link", { name: /Leer la guía completa/ })).toHaveAttribute("href", "#guide");
         } finally {
             await i18n.changeLanguage("en");
         }
