@@ -56,3 +56,7 @@ agent-jury: add vote entity and consensus tests
 ```
 
 Use `repo:` for changes that only affect the repository root (README, shared docs, `.gitignore`).
+
+## License
+
+MIT, copyright Mónica Mesa. See [LICENSE](LICENSE).

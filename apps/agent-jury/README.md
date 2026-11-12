@@ -186,4 +186,8 @@ apps/agent-jury/
 | Component | Version |
 |---|---|
 | Rayfin CLI (`@microsoft/rayfin-cli`) | 1.36.2 |
-| `fabric-data-agent-sdk` | To be pinned in iteration 3 |
+| `fabric-data-agent-sdk` | 0.1.36a0 (pinned in the `evaluate_agent` notebook) |
+
+## License
+
+MIT, copyright Mónica Mesa. See [LICENSE](../../LICENSE).
