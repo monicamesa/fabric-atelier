@@ -161,8 +161,12 @@
             "needsVotes_one": "Falta {{count}} voto a favor.",
             "needsVotes_other": "Faltan {{count}} votos a favor.",
             "needsApprover": "Hay votos suficientes, pero ningún aprobador ha confirmado la respuesta.",
-            "approverAgainst": "Un aprobador votó en contra de la respuesta con más votos."
+            "approverAgainst": "Un aprobador votó en contra de la respuesta con más votos.",
+            "reopened": "Reabierto: un aprobador cuestionó la respuesta esperada tras una vista. El jurado vota de nuevo."
         },
+        "reopenedBy": "{{who}} cuestionó la respuesta {{letter}} tras una vista.",
+        "reopenedVotes_one": "El {{count}} voto anterior sigue en el acta, marcado “antes de la revisión”, pero ya no cuenta: quien votó tiene que votar de nuevo.",
+        "reopenedVotes_other": "Los {{count}} votos anteriores siguen en el acta, marcados “antes de la revisión”, pero ya no cuentan: quien votó tiene que votar de nuevo.",
         "threshold_one": "{{count}} voto resuelve el caso.",
         "threshold_other": "{{count}} votos resuelven el caso.",
         "dismissedBecause": "Motivo: {{reason}}",
@@ -244,6 +248,10 @@
         "notCounted": "no cuenta: no es un jurado activo",
         "noReason": "sin motivo, no cuenta",
         "futureDated": "con fecha futura, no cuenta",
+        "reviewAgree": "{{who}} estuvo de acuerdo con el juez",
+        "reviewAppeal": "{{who}} recurrió el veredicto del juez ({{verdict}})",
+        "reviewReopens": "{{who}} recurrió ({{verdict}}) y reabrió el caso",
+        "beforeReview": "antes de la revisión: se conserva aquí, pero ya no cuenta",
         "footnote": "El acta nunca se edita. Cada voto y cada respuesta se quedan aquí, así que cualquiera puede ver cómo llegó el jurado a su resolución."
     },
     "answerForm": {
@@ -313,6 +321,12 @@
         "needYourVote_one": "{{count}} caso necesita tu voto →",
         "needYourVote_other": "{{count}} casos necesitan tu voto →",
         "trustPending": "Aparece tras las primeras vistas: con qué frecuencia el jurado está de acuerdo con el juez de IA.",
+        "trustOf": "{{agreed}} de {{decided}}",
+        "trustCaption": "El jurado coincidió con el juez en {{agreed}} de {{decided}} veredictos revisados.",
+        "trustPendingCount_one": "{{count}} veredicto dividido aún no se cuenta.",
+        "trustPendingCount_other": "{{count}} veredictos divididos aún no se cuentan.",
+        "trustHistory": "Prompts anteriores del juez",
+        "trustPrompt": "Prompt del juez: {{version}}",
         "docketTitle": "Casos de hoy",
         "docketHelp": "Casos del agente que elijas. Primero, los que esperan tu voto.",
         "columns": {
@@ -614,8 +628,49 @@
             "incorrect": "Incorrecta",
             "unclear": "Sin claro",
             "waiting": "Esperando al agente…",
-            "agentVersion": "Versión del agente {{version}}, publicada {{when}}",
-            "reviewSoon": "En el siguiente paso el jurado podrá confirmar o recurrir cada veredicto."
+            "agentVersion": "Versión del agente {{version}}, publicada {{when}}"
+        },
+        "review": {
+            "none": "Todavía ningún jurado ha revisado este veredicto.",
+            "summary": "Jurados hasta ahora: {{agree}} de acuerdo, {{appeal}} recurren.",
+            "mineAgree": "Estuviste de acuerdo con el juez",
+            "mineAppeal": "Recurriste: {{verdict}}",
+            "jurorsOnly": "Solo los jurados activos pueden revisar un veredicto.",
+            "agree": "Sí, de acuerdo",
+            "appeal": "No, recurrir",
+            "formTitle": "¿Por qué se equivoca el juez?",
+            "humanLegend": "¿Cuál es el veredicto correcto?",
+            "human": {
+                "correct": "Correcta",
+                "incorrect": "Incorrecta",
+                "ambiguous": "Ambigua"
+            },
+            "humanHelp": {
+                "correct": "La respuesta del agente coincide con lo que quiere decir el negocio.",
+                "incorrect": "La respuesta del agente no coincide con lo que quiere decir el negocio.",
+                "ambiguous": "No se puede decir sin una definición más precisa."
+            },
+            "reasonLabel": "Motivo",
+            "reason": {
+                "judge_too_strict": "El juez fue demasiado estricto",
+                "judge_too_lenient": "El juez fue demasiado permisivo",
+                "expected_answer_wrong": "La respuesta esperada es incorrecta",
+                "other": "Otro motivo"
+            },
+            "reopensNote": "Como aprobador, esto reabre el caso: el jurado tendrá que votar de nuevo su respuesta.",
+            "approverOnlyNote": "Tu revisión queda registrada, pero solo un aprobador puede reabrir el caso.",
+            "commentLabel": "Tu explicación",
+            "commentHint": "Obligatoria. Explica con palabras sencillas lo que el juez no vio.",
+            "commentRequired": "Escribe por qué no estás de acuerdo con el juez.",
+            "send": "Enviar recurso",
+            "saving": "Guardando…",
+            "keys": "Teclas: A de acuerdo · X recurrir · J / K veredicto siguiente o anterior · ? ayuda",
+            "keysHelp": "Elige un veredicto con J y K, y pulsa A para estar de acuerdo o X para recurrir. Escribir en un cuadro nunca activa una tecla.",
+            "hearingTrust": "El jurado coincide con el juez en {{agreed}} de {{decided}} veredictos revisados de esta vista.",
+            "hearingTrustNone": "Todavía no se ha revisado ningún veredicto de esta vista.",
+            "hearingPending_one": "{{count}} veredicto está dividido y sigue pendiente.",
+            "hearingPending_other": "{{count}} veredictos están divididos y siguen pendientes.",
+            "judgePrompt": "Prompt del juez: {{version}}"
         },
         "scoreboard": {
             "title": "Marcador",

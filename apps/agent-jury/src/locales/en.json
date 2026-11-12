@@ -161,8 +161,12 @@
             "needsVotes_one": "Needs {{count}} more vote in favour.",
             "needsVotes_other": "Needs {{count}} more votes in favour.",
             "needsApprover": "Enough votes, but no approver has confirmed the answer yet.",
-            "approverAgainst": "An approver voted against the leading answer."
+            "approverAgainst": "An approver voted against the leading answer.",
+            "reopened": "Reopened: an approver challenged the expected answer after a hearing. The jury votes again."
         },
+        "reopenedBy": "{{who}} challenged answer {{letter}} after a hearing.",
+        "reopenedVotes_one": "The {{count}} earlier vote stays in the court record, marked “before the review”, but no longer counts: jurors who voted must vote again.",
+        "reopenedVotes_other": "The {{count}} earlier votes stay in the court record, marked “before the review”, but no longer count: jurors who voted must vote again.",
         "threshold_one": "{{count}} vote settles the case.",
         "threshold_other": "{{count}} votes settle the case.",
         "dismissedBecause": "Reason: {{reason}}",
@@ -244,6 +248,10 @@
         "notCounted": "not counted: not an active juror",
         "noReason": "no reason given, not counted",
         "futureDated": "dated in the future, not counted",
+        "reviewAgree": "{{who}} agreed with the judge",
+        "reviewAppeal": "{{who}} appealed the judge's verdict ({{verdict}})",
+        "reviewReopens": "{{who}} appealed ({{verdict}}) and reopened the case",
+        "beforeReview": "before the review: kept here, no longer counted",
         "footnote": "The record is never edited. Every vote and answer stays here, so anyone can see how the jury got to its ruling."
     },
     "answerForm": {
@@ -313,6 +321,12 @@
         "needYourVote_one": "{{count}} case needs your vote →",
         "needYourVote_other": "{{count}} cases need your vote →",
         "trustPending": "Shown after the first hearings: how often the jury agrees with the AI judge.",
+        "trustOf": "{{agreed}} of {{decided}}",
+        "trustCaption": "The jury agreed with the judge on {{agreed}} of {{decided}} reviewed verdicts.",
+        "trustPendingCount_one": "{{count}} split verdict is not counted yet.",
+        "trustPendingCount_other": "{{count}} split verdicts are not counted yet.",
+        "trustHistory": "Earlier judge prompts",
+        "trustPrompt": "Judge prompt: {{version}}",
         "docketTitle": "Today's docket",
         "docketHelp": "Cases for the agent you pick. Cases waiting for your vote come first.",
         "columns": {
@@ -614,8 +628,49 @@
             "incorrect": "Incorrect",
             "unclear": "Unclear",
             "waiting": "Waiting for the agent…",
-            "agentVersion": "Agent version {{version}}, published {{when}}",
-            "reviewSoon": "The jury will be able to confirm or appeal each verdict in the next step."
+            "agentVersion": "Agent version {{version}}, published {{when}}"
+        },
+        "review": {
+            "none": "No juror has reviewed this verdict yet.",
+            "summary": "Jurors so far: {{agree}} agree, {{appeal}} appeal.",
+            "mineAgree": "You agreed with the judge",
+            "mineAppeal": "You appealed: {{verdict}}",
+            "jurorsOnly": "Only active jurors can review a verdict.",
+            "agree": "Yes, agree",
+            "appeal": "No, appeal",
+            "formTitle": "Why is the judge wrong?",
+            "humanLegend": "What is the right verdict?",
+            "human": {
+                "correct": "Correct",
+                "incorrect": "Incorrect",
+                "ambiguous": "Ambiguous"
+            },
+            "humanHelp": {
+                "correct": "The agent's answer matches what the business means.",
+                "incorrect": "The agent's answer does not match what the business means.",
+                "ambiguous": "It can't be said without more definition."
+            },
+            "reasonLabel": "Reason",
+            "reason": {
+                "judge_too_strict": "The judge was too strict",
+                "judge_too_lenient": "The judge was too lenient",
+                "expected_answer_wrong": "The expected answer is wrong",
+                "other": "Something else"
+            },
+            "reopensNote": "As an approver, this reopens the case: the jury will have to vote on its answer again.",
+            "approverOnlyNote": "Your review is recorded, but only an approver can reopen the case.",
+            "commentLabel": "Your explanation",
+            "commentHint": "Required. Say what the judge missed, in plain words.",
+            "commentRequired": "Write why you disagree with the judge.",
+            "send": "Send appeal",
+            "saving": "Saving…",
+            "keys": "Keys: A agree · X appeal · J / K next or previous verdict · ? help",
+            "keysHelp": "Pick a verdict with J and K, then press A to agree or X to appeal. Typing in a box never triggers a key.",
+            "hearingTrust": "The jury agrees with the judge on {{agreed}} of {{decided}} reviewed verdicts in this hearing.",
+            "hearingTrustNone": "No verdict of this hearing has been reviewed yet.",
+            "hearingPending_one": "{{count}} verdict is split and still pending.",
+            "hearingPending_other": "{{count}} verdicts are split and still pending.",
+            "judgePrompt": "Judge prompt: {{version}}"
         },
         "scoreboard": {
             "title": "Scoreboard",

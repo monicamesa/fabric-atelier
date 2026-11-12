@@ -2,7 +2,8 @@ import sql from 'mssql';
 import { randomUUID } from 'node:crypto';
 import type { ClerkCode, ClerkCommand, ClerkReason } from './clerk-actions.js';
 import { HEARING_COOLDOWN_SECONDS, HEARING_MAX_CASES, hearingState, type HearingEventKind } from './hearing-rules.js';
-import { analyzeCase, type CaseDismissalRecord, type CaseRecord, type JurorRecord, type TestimonyRecord, type VoteRecord } from './rules/case-validity.js';
+import { analyzeCase, type CaseDismissalRecord, type CaseRecord, type JurorRecord, type ReviewRecord, type ReviewRecords, type TestimonyRecord, type VoteRecord } from './rules/case-validity.js';
+import { CRITIC_PROMPT } from './rules/judge-trust.js';
 
 // launchHearing, cancelHearing and checkWithFabric. They run inside the transaction of executeAdminRequest, so the
 // requester is already proven to be an active admin. Hearings are insert-only: a failed start is recorded as a
@@ -55,6 +56,8 @@ interface CaseRows {
   votes: VoteRecord[];
   dismissals: CaseDismissalRecord[];
   jurors: JurorRecord[];
+  /** R9: verdicts, the testimony each hearing asked about, and the jurors' reviews. */
+  reviewRecords: ReviewRecords;
 }
 
 async function loadCaseRows(transaction: sql.Transaction, agentId: string): Promise<CaseRows> {
@@ -76,7 +79,19 @@ async function loadCaseRows(transaction: sql.Transaction, agentId: string): Prom
      FROM dbo.[CaseDismissals] d JOIN dbo.[Cases] c ON c.id = d.case_id WHERE c.agent_id = @agentId`,
   );
   const jurors = await run<JurorRecord>(`SELECT email, role, active FROM dbo.[Jurors]`);
-  return { cases, testimonies, votes, dismissals, jurors };
+  const verdicts = await run<ReviewRecords['verdicts'][number]>(
+    `SELECT LOWER(CONVERT(NVARCHAR(36), v.id)) AS id, LOWER(CONVERT(NVARCHAR(36), v.hearing_id)) AS hearing_id, LOWER(CONVERT(NVARCHAR(36), v.case_id)) AS case_id, v.judgeVerdict, v.createdAt
+     FROM dbo.[Verdicts] v JOIN dbo.[Cases] c ON c.id = v.case_id WHERE c.agent_id = @agentId`,
+  );
+  const hearingCases = await run<ReviewRecords['hearingCases'][number]>(
+    `SELECT LOWER(CONVERT(NVARCHAR(36), h.hearing_id)) AS hearing_id, LOWER(CONVERT(NVARCHAR(36), h.case_id)) AS case_id, LOWER(CONVERT(NVARCHAR(36), h.testimony_id)) AS testimony_id
+     FROM dbo.[HearingCases] h JOIN dbo.[Cases] c ON c.id = h.case_id WHERE c.agent_id = @agentId`,
+  );
+  const reviews = await run<ReviewRecord>(
+    `SELECT LOWER(CONVERT(NVARCHAR(36), r.id)) AS id, LOWER(CONVERT(NVARCHAR(36), r.verdict_id)) AS verdict_id, r.humanVerdict, r.reason, r.comment, r.reviewerUserId, r.reviewerEmail, r.source, r.createdAt
+     FROM dbo.[VerdictReviews] r JOIN dbo.[Verdicts] v ON v.id = r.verdict_id JOIN dbo.[Cases] c ON c.id = v.case_id WHERE c.agent_id = @agentId`,
+  );
+  return { cases, testimonies, votes, dismissals, jurors, reviewRecords: { verdicts, hearingCases, reviews } };
 }
 
 /** R5 and R7: the cases of the agent that are ruled and verified, with the ruled testimony as the expected answer. */
@@ -92,6 +107,7 @@ export function rulingSnapshot(rows: CaseRows, caseIds: readonly string[], now: 
       dismissals: rows.dismissals,
       jurors: rows.jurors,
       now,
+      reviewRecords: rows.reviewRecords,
     });
     const ruling = rows.testimonies.find((testimony) => testimony.id === analysis.rulingTestimonyId);
     if (analysis.state !== 'ruled' || !analysis.verified || !ruling) {
@@ -152,9 +168,10 @@ export async function launchHearing(
     .input('requestId', sql.UniqueIdentifier, context.requestId)
     .input('email', sql.NVarChar(254), context.requesterEmail)
     .input('count', sql.Int, snapshot.items.length)
+    .input('criticPromptVersion', sql.NVarChar(64), CRITIC_PROMPT.version)
     .query(
-      `INSERT INTO dbo.[Hearings] (id, agent_id, stage, requestId, launchedByEmail, caseCount, createdAt)
-       VALUES (@id, @agentId, @stage, @requestId, @email, @count, SYSUTCDATETIME())`,
+      `INSERT INTO dbo.[Hearings] (id, agent_id, stage, requestId, launchedByEmail, caseCount, criticPromptVersion, createdAt)
+       VALUES (@id, @agentId, @stage, @requestId, @email, @count, @criticPromptVersion, SYSUTCDATETIME())`,
     );
   for (const [index, item] of snapshot.items.entries()) {
     await new sql.Request(transaction)
@@ -186,6 +203,8 @@ export async function launchHearing(
             STAGE: { value: command.stage, type: 'string' },
             APP_SQL_SERVER: { value: settings.appServer, type: 'string' },
             APP_SQL_DATABASE: { value: settings.appDatabase, type: 'string' },
+            // Only sent for a custom critic prompt; without it the SDK's default prompt runs.
+            ...(CRITIC_PROMPT.text ? { CRITIC_PROMPT: { value: CRITIC_PROMPT.text, type: 'string' } } : {}),
           },
         },
       }),

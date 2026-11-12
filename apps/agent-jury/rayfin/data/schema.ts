@@ -11,6 +11,7 @@ import { Verdict } from './Verdict.js';
 import { AdminRequest } from './AdminRequest.js';
 import { AdminRequestResult } from './AdminRequestResult.js';
 import { UserFlag } from './UserFlag.js';
+import { VerdictReview } from './VerdictReview.js';
 
 export type AgentJurySchema = {
   Juror: Juror;
@@ -26,6 +27,7 @@ export type AgentJurySchema = {
   AdminRequest: AdminRequest;
   AdminRequestResult: AdminRequestResult;
   UserFlag: UserFlag;
+  VerdictReview: VerdictReview;
 };
 
-export const schema = [Juror, Agent, Case, Testimony, CaseDismissal, Vote, Hearing, HearingCase, HearingEvent, Verdict, AdminRequest, AdminRequestResult, UserFlag];
+export const schema = [Juror, Agent, Case, Testimony, CaseDismissal, Vote, Hearing, HearingCase, HearingEvent, Verdict, AdminRequest, AdminRequestResult, UserFlag, VerdictReview];

@@ -8,6 +8,8 @@ AGENT_WORKSPACE_ID = ""
 STAGE = "production"
 APP_SQL_SERVER = ""
 APP_SQL_DATABASE = ""
+# Empty: the SDK's default critic prompt. The app sends it only for a custom prompt (CRITIC_PROMPT in rules/judge-trust.ts).
+CRITIC_PROMPT = ""
 # %% install
 %pip install fabric-data-agent-sdk==0.1.36a0
 # %% run
@@ -82,9 +84,10 @@ try:
     done = 0
     for position, case_id, question, expected in questions:
         frame = pd.DataFrame([[question, expected]], columns=["question", "expected_answer"])
+        extra = {"critic_prompt": CRITIC_PROMPT} if CRITIC_PROMPT else {}
         try:
             evaluation_id = evaluate_data_agent(
-                frame, AGENT_NAME, workspace_name=workspace_name, table_name=TABLE, data_agent_stage=STAGE
+                frame, AGENT_NAME, workspace_name=workspace_name, table_name=TABLE, data_agent_stage=STAGE, **extra
             )
             row = get_evaluation_details(evaluation_id, TABLE, get_all_rows=True, verbose=False).to_dict("records")[0]
             verdict(

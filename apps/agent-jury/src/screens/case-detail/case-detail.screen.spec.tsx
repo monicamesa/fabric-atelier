@@ -31,6 +31,10 @@ function fakeClient(testimonies: object[], user: { id: string; email: string }) 
             Testimony: { select: () => page(testimonies) },
             Vote: { select: () => page([]), create: createVote },
             CaseDismissal: { select: () => page([]) },
+            Verdict: { select: () => page([]) },
+            HearingCase: { select: () => page([]) },
+            Hearing: { select: () => page([]) },
+            VerdictReview: { select: () => page([]) },
         },
         auth: { getSession: () => ({ isAuthenticated: true, user }) },
     } as unknown as AppRayfinClient;

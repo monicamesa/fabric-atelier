@@ -34,7 +34,7 @@ function fakeClient(pages: Record<string, { items: unknown[]; hasNextPage: boole
                     return builder;
                 };
             }
-            builder.executePaginated = async () => pages[entity].shift();
+            builder.executePaginated = async () => pages[entity]?.shift() ?? { items: [], hasNextPage: false };
             return builder;
         };
         return {
@@ -179,8 +179,8 @@ describe("batched reads", () => {
             CaseDismissal: [{ items: [{ id: "d9", case_id: "other-case" }], hasNextPage: false }],
         });
         const loading = loadDocketRecords(client, "agent-1");
-        // All four queries start before any of them answers.
-        expect(queries.map((query) => query.entity).sort()).toEqual(["Case", "CaseDismissal", "Testimony", "Vote"]);
+        // All the queries (records, verdicts, hearings and reviews) start before any of them answers.
+        expect(queries.map((query) => query.entity).sort()).toEqual(["Case", "CaseDismissal", "Hearing", "HearingCase", "Testimony", "Verdict", "VerdictReview", "Vote"]);
         const records = await loading;
         expect(records.testimonies.map((row) => row.id)).toEqual(["t1"]);
         expect(records.votes.map((row) => row.id)).toEqual(["v1"]);
@@ -195,7 +195,7 @@ describe("batched reads", () => {
             CaseDismissal: [{ items: [{ id: "d2", case_id: "c2" }], hasNextPage: false }],
         });
         const loading = loadAllDocketRecords(client);
-        expect(queries.map((query) => query.entity).sort()).toEqual(["Case", "CaseDismissal", "Testimony", "Vote"]);
+        expect(queries.map((query) => query.entity).sort()).toEqual(["Case", "CaseDismissal", "Hearing", "HearingCase", "Testimony", "Verdict", "VerdictReview", "Vote"]);
         expect(queries.find((query) => query.entity === "Case")!.calls.some(([name]) => name === "where")).toBe(false);
         const scoped = scopeToAgent(await loading, "agent-2");
         expect(scoped.cases.map((row) => row.id)).toEqual(["c2"]);

@@ -30,6 +30,7 @@ function fakeClient(events: object[], verdicts: object[], startedSecondsAgo = 90
             },
             HearingEvent: { select: () => page(events) },
             Verdict: { select: () => page(verdicts) },
+        VerdictReview: { select: () => page([]) },
         },
         auth: { getSession: () => ({ isAuthenticated: true, user: { id: "sub-dario", email: "dario.admin@example.com" } }) },
         functions: { clerkExecute: { invoke: vi.fn() } },

@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useEffectEvent, useMemo, useState, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/docket/button";
 import { Chip, type ChipTone } from "@/components/docket/chip";
@@ -11,18 +11,23 @@ import { runClerkAction } from "@/data/clerk.service";
 import { describeClerkError, type ClerkErrorView } from "@/data/clerk-errors";
 import type { AgentRow, JurorRow } from "@/data/directory.service";
 import { loadHearingRecords, type VerdictRow } from "@/data/hearings.service";
+import { createVerdictReview } from "@/data/reviews.service";
 import { useAsync } from "@/hooks/use-async";
 import { useClerkAction } from "@/hooks/use-clerk-action";
 import { isAppLanguage, type AppLanguage } from "@/i18n/language-preference";
 import { formatDateTime } from "@/lib/format";
 import type { AppRayfinClient } from "@/lib/rayfin-client";
 import { formatRoute } from "@/lib/route";
+import { cn } from "@/lib/utils";
+import { criticPromptVersionOf, judgeTrust } from "@/rules/judge-trust";
 import { ClerkError } from "../clerks-office/clerk-feedback";
 import { personName, type Viewer } from "../docket/viewer";
 import { questionFor, scoreboard, viewHearing, type HearingView } from "./hearing-view";
 import { AgentAnswer } from "./agent-answer";
+import { agreementFor, type AppealInput } from "./review-choices";
 import { SessionPanel } from "./session-panel";
 import { useAutoRefresh } from "./use-auto-refresh";
+import { VerdictReviewPanel } from "./verdict-review";
 
 const STATE_TONE: Record<HearingView["state"], { tone: ChipTone; filled: boolean }> = {
     in_progress: { tone: "action", filled: true },
@@ -32,12 +37,24 @@ const STATE_TONE: Record<HearingView["state"], { tone: ChipTone; filled: boolean
     no_news: { tone: "review", filled: false },
 };
 
-function VerdictCard({ view, verdict, language }: { view: HearingView; verdict: VerdictRow; language: AppLanguage }) {
+function VerdictCard({
+    view,
+    verdict,
+    language,
+    active,
+    children,
+}: {
+    view: HearingView;
+    verdict: VerdictRow;
+    language: AppLanguage;
+    active: boolean;
+    children?: ReactNode;
+}) {
     const { t } = useTranslation();
     const asked = questionFor(view, verdict);
     const position = asked?.position ?? 0;
     return (
-        <article className="flex flex-col gap-4 border border-ink bg-paper-raised p-5">
+        <article aria-current={active ? "true" : undefined} data-verdict-id={verdict.id} className={cn("flex flex-col gap-4 border bg-paper-raised p-5", active ? "border-2 border-ink" : "border-ink")}>
             <header className="flex flex-wrap items-center justify-between gap-3">
                 <span className="text-[13px] font-bold uppercase tracking-[0.14em] text-text-muted">
                     {t("hearings.verdicts.position", { position, total: view.total, number: "" })}
@@ -64,6 +81,7 @@ function VerdictCard({ view, verdict, language }: { view: HearingView; verdict: 
                     })}
                 </p>
             )}
+            {children}
         </article>
     );
 }
@@ -99,6 +117,90 @@ export function HearingScreen({ client, hearingId, agents, jurors, viewer, onBac
     const [reported, setReported] = useState<string | null>(null);
     const [checkError, setCheckError] = useState<ClerkErrorView | null>(null);
     const [checking, setChecking] = useState(false);
+    const [activeId, setActiveId] = useState<string>();
+    const [appealingId, setAppealingId] = useState<string>();
+    const [reviewing, setReviewing] = useState(false);
+    const [reviewFailed, setReviewFailed] = useState(false);
+    const [showKeys, setShowKeys] = useState(false);
+
+    const orderedVerdicts = useMemo(
+        () =>
+            view
+                ? view.cases.flatMap((row) => {
+                      const found = view.verdicts.find((item) => item.case_id.toLowerCase() === row.case_id.toLowerCase());
+                      return found ? [found] : [];
+                  })
+                : [],
+        [view],
+    );
+    const trust = useMemo(
+        () =>
+            view && records.data
+                ? judgeTrust({
+                      agentId: view.hearing.agent_id,
+                      hearings: records.data.hearings,
+                      verdicts: records.data.verdicts,
+                      reviewRecords: { verdicts: records.data.verdicts, hearingCases: records.data.cases, reviews: records.data.reviews },
+                      jurors: jurors ?? [],
+                      now: new Date(),
+                  })
+                : undefined,
+        [view, records.data, jurors],
+    );
+
+    async function saveReview(verdict: VerdictRow, input: { humanVerdict: AppealInput["humanVerdict"]; reason?: AppealInput["reason"]; comment?: string }) {
+        setReviewing(true);
+        setReviewFailed(false);
+        try {
+            await createVerdictReview(client, { verdictId: verdict.id, ...input });
+            setAppealingId(undefined);
+            reload();
+        } catch {
+            setReviewFailed(true);
+        } finally {
+            setReviewing(false);
+        }
+    }
+    const agree = (verdict: VerdictRow) => {
+        if (viewer.canAct && !reviewing) void saveReview(verdict, { humanVerdict: agreementFor(verdict.judgeVerdict) });
+    };
+
+    // Keyboard on the live hearing (design guide, section 9): A agree, X appeal, J/K previous/next, ? help.
+    const onKey = useEffectEvent((event: KeyboardEvent) => {
+        if (event.metaKey || event.ctrlKey || event.altKey) return;
+        const target = event.target;
+        if (target instanceof HTMLElement && (target.closest("input, textarea, select") || target.isContentEditable)) return;
+        const index = orderedVerdicts.findIndex((item) => item.id === activeId);
+        const current = orderedVerdicts[index];
+        const move = (next: number) => {
+            const item = orderedVerdicts[Math.max(0, Math.min(orderedVerdicts.length - 1, next))];
+            if (!item) return;
+            setActiveId(item.id);
+            document.querySelector(`[data-verdict-id="${item.id}"]`)?.scrollIntoView?.({ block: "nearest" });
+        };
+        switch (event.key.toLowerCase()) {
+            case "j":
+                move(index + 1);
+                break;
+            case "k":
+                move(index < 0 ? 0 : index - 1);
+                break;
+            case "a":
+                if (current) agree(current);
+                break;
+            case "x":
+                if (current && viewer.canAct) setAppealingId(current.id);
+                break;
+            case "?":
+                setShowKeys((value) => !value);
+                break;
+        }
+    });
+    useEffect(() => {
+        const handler = (event: KeyboardEvent) => onKey(event);
+        window.addEventListener("keydown", handler);
+        return () => window.removeEventListener("keydown", handler);
+    }, []);
 
     if (!view) {
         if (records.status === "error") {
@@ -141,6 +243,7 @@ export function HearingScreen({ client, hearingId, agents, jurors, viewer, onBac
     }
 
     const tone = STATE_TONE[view.state];
+    const hearingTrust = trust?.byHearing[view.hearing.id];
     return (
         <div className="flex flex-col gap-6">
             <a href={formatRoute({ page: "hearings", agentId: view.hearing.agent_id })} className="w-fit text-[15px] font-semibold text-ink underline">
@@ -223,10 +326,45 @@ export function HearingScreen({ client, hearingId, agents, jurors, viewer, onBac
                         ))}
                     </dl>
                 </div>
+                {hearingTrust && (
+                    <p role="status" className="m-0 border-l-4 border-ruled pl-3 text-[15px] text-text">
+                        {hearingTrust.decided > 0
+                            ? t("hearings.review.hearingTrust", { agreed: hearingTrust.agreed, decided: hearingTrust.decided })
+                            : t("hearings.review.hearingTrustNone")}
+                        {hearingTrust.pending > 0 && <span className="text-text-muted"> · {t("hearings.review.hearingPending", { count: hearingTrust.pending })}</span>}
+                        <span className="text-text-muted"> · {t("hearings.review.judgePrompt", { version: criticPromptVersionOf(view.hearing) })}</span>
+                    </p>
+                )}
                 {view.verdicts.length === 0 && <EmptyState message={t("hearings.verdicts.empty")} />}
                 {view.cases.map((row) => {
                     const verdict = view.verdicts.find((item) => item.case_id.toLowerCase() === row.case_id.toLowerCase());
-                    if (verdict) return <VerdictCard key={row.id} view={view} verdict={verdict} language={language} />;
+                    if (verdict) {
+                        return (
+                            <VerdictCard key={row.id} view={view} verdict={verdict} language={language} active={verdict.id === activeId}>
+                                <VerdictReviewPanel
+                                    verdict={verdict}
+                                    reviews={records.data?.reviews ?? []}
+                                    jurors={jurors ?? []}
+                                    viewer={viewer}
+                                    appealing={appealingId === verdict.id}
+                                    saving={reviewing}
+                                    failed={reviewFailed && (appealingId === verdict.id || activeId === verdict.id)}
+                                    onAppealingChange={(open) => {
+                                        setActiveId(verdict.id);
+                                        setAppealingId(open ? verdict.id : undefined);
+                                    }}
+                                    onAgree={() => {
+                                        setActiveId(verdict.id);
+                                        agree(verdict);
+                                    }}
+                                    onAppeal={(input) => {
+                                        setActiveId(verdict.id);
+                                        void saveReview(verdict, input);
+                                    }}
+                                />
+                            </VerdictCard>
+                        );
+                    }
                     if (running && nextWaiting?.id === row.id) {
                         return (
                             <p key={row.id} role="status" className="m-0 border border-dashed border-text-muted p-4 text-[15px] text-text-muted">
@@ -236,7 +374,12 @@ export function HearingScreen({ client, hearingId, agents, jurors, viewer, onBac
                     }
                     return null;
                 })}
-                <p className="m-0 text-[14px] text-text-muted">{t("hearings.verdicts.reviewSoon")}</p>
+                {view.verdicts.length > 0 && (
+                    <p className="m-0 text-[14px] text-text-muted">
+                        {t("hearings.review.keys")}
+                        {showKeys && <span> {t("hearings.review.keysHelp")}</span>}
+                    </p>
+                )}
             </section>
         </div>
     );

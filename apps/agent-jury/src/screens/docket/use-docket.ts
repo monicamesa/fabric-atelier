@@ -21,7 +21,7 @@ export function useDocket(
 ): DocketState {
     const records = useAsync(() => (requestedAgentId ? loadDocketRecords(client, requestedAgentId) : loadAllDocketRecords(client)));
     const data = useMemo(
-        () => (records.data && jurors && agentId ? buildDocket(scopeToAgent(records.data, agentId), jurors, me, new Date()) : undefined),
+        () => (records.data && jurors && agentId ? buildDocket(scopeToAgent(records.data, agentId), jurors, me, new Date(), agentId) : undefined),
         [records.data, jurors, me, agentId],
     );
     return { ...records, data } as DocketState;

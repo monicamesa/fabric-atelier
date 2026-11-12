@@ -156,6 +156,16 @@ export function CaseDetail({ client, caseId, agents, jurors, viewer }: CaseDetai
                             {open && analysis.state !== "ruled" && <b className="text-ink">{t("caseDetail.threshold", { count: CONSENSUS_MIN_VOTES })}</b>}
                         </p>
                         {dismissal && <p className="m-0 text-[15px] text-text">{t("caseDetail.dismissedBecause", { reason: dismissal.reason })}</p>}
+                        {analysis.reopened[0] && analysis.state !== "ruled" && analysis.state !== "dismissed" && (
+                            <p className="m-0 max-w-[760px] border-l-4 border-action pl-3 text-[15px] text-text">
+                                {t("caseDetail.reopenedBy", {
+                                    who: personName(analysis.reopened[0].reviewerEmail, jurors),
+                                    letter: letters.get(analysis.reopened[0].testimonyId) ?? "?",
+                                })}
+                                {analysis.reopened[0].comment?.trim() && <span className="text-text-muted"> “{analysis.reopened[0].comment.trim()}”</span>}{" "}
+                                {t("caseDetail.reopenedVotes", { count: analysis.supersededVotes.length })}
+                            </p>
+                        )}
                     </div>
                     <dl className="m-0 grid grid-cols-[auto_minmax(0,1fr)] gap-x-2 gap-y-1 text-[15px]">
                         <dt className="font-semibold text-ink">{t("caseDetail.proposedBy")}</dt>

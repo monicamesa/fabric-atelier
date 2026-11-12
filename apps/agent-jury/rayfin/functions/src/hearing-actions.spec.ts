@@ -28,6 +28,7 @@ const rows = {
   ],
   dismissals: [],
   jurors: JURORS,
+  reviewRecords: { verdicts: [], hearingCases: [], reviews: [] },
 };
 
 describe('rulingSnapshot (R5, R7)', () => {
@@ -53,5 +54,30 @@ describe('rulingSnapshot (R5, R7)', () => {
 
   it('refuses a case that belongs to another agent', () => {
     expect(rulingSnapshot(rows, ['unknown'], NOW)).toEqual({ ok: false, detail: 'A chosen case does not belong to this agent.' });
+  });
+
+  it('refuses a ruled case that an approver reopened with an expected_answer_wrong review (R9, R5)', () => {
+    const reviewed = {
+      ...rows,
+      reviewRecords: {
+        verdicts: [{ id: 'verdict1', hearing_id: 'h1', case_id: 'c1', judgeVerdict: 'correct' as const, createdAt: day(5) }],
+        hearingCases: [{ hearing_id: 'h1', case_id: 'c1', testimony_id: 't1' }],
+        reviews: [
+          {
+            id: 'r1',
+            verdict_id: 'verdict1',
+            humanVerdict: 'incorrect' as const,
+            reason: 'expected_answer_wrong' as const,
+            comment: 'The business counts by shipping country.',
+            reviewerUserId: 'sub-carla.approver@example.com',
+            reviewerEmail: 'carla.approver@example.com',
+            createdAt: day(4),
+          },
+        ],
+      },
+    };
+    expect(rulingSnapshot(reviewed, ['c1'], NOW)).toMatchObject({ ok: false });
+    const byExpert = { ...reviewed, reviewRecords: { ...reviewed.reviewRecords, reviews: [{ ...reviewed.reviewRecords.reviews[0], reviewerEmail: 'ana.expert@example.com', reviewerUserId: 'sub-ana.expert@example.com' }] } };
+    expect(rulingSnapshot(byExpert, ['c1'], NOW)).toMatchObject({ ok: true });
   });
 });

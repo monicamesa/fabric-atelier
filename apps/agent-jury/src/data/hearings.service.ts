@@ -1,6 +1,8 @@
 import type { AppRayfinClient } from "@/lib/rayfin-client";
+import type { ReviewRecord } from "@/rules/case-validity";
 import type { HearingEventKind, HearingStage } from "../../rayfin/functions/src/hearing-rules";
 import { readAllPages } from "./pagination";
+import { listReviews } from "./reviews.service";
 
 type DataClient = Pick<AppRayfinClient, "data">;
 
@@ -10,6 +12,7 @@ export interface HearingRow {
     stage: HearingStage;
     launchedByEmail: string;
     caseCount: number;
+    criticPromptVersion?: string | null;
     createdAt: Date | string;
 }
 
@@ -17,6 +20,7 @@ export interface HearingCaseRow {
     id: string;
     hearing_id: string;
     case_id: string;
+    testimony_id: string;
     position: number;
     question: string;
     expectedAnswer: string;
@@ -48,10 +52,12 @@ export interface HearingRecords {
     cases: HearingCaseRow[];
     events: HearingEventRow[];
     verdicts: VerdictRow[];
+    /** The jurors' reviews of the verdicts (appeals are reviews that differ from the judge). */
+    reviews: ReviewRecord[];
 }
 
-const HEARING_FIELDS = ["id", "agent_id", "stage", "launchedByEmail", "caseCount", "createdAt"] as const;
-const CASE_FIELDS = ["id", "hearing_id", "case_id", "position", "question", "expectedAnswer"] as const;
+const HEARING_FIELDS = ["id", "agent_id", "stage", "launchedByEmail", "caseCount", "criticPromptVersion", "createdAt"] as const;
+const CASE_FIELDS = ["id", "hearing_id", "case_id", "testimony_id", "position", "question", "expectedAnswer"] as const;
 const EVENT_FIELDS = ["id", "hearing_id", "kind", "detail", "createdAt"] as const;
 const VERDICT_FIELDS = [
     "id",
@@ -70,7 +76,7 @@ const PAGE = 1000;
 
 /** Everything about hearings in one parallel round; the screens filter it in the client. */
 export async function loadHearingRecords(client: DataClient): Promise<HearingRecords> {
-    const [hearings, cases, events, verdicts] = await Promise.all([
+    const [hearings, cases, events, verdicts, reviews] = await Promise.all([
         readAllPages((after) => {
             const query = client.data.Hearing.select([...HEARING_FIELDS]).orderBy({ createdAt: "desc" }).first(PAGE);
             return (after ? query.after(after) : query).executePaginated();
@@ -87,11 +93,13 @@ export async function loadHearingRecords(client: DataClient): Promise<HearingRec
             const query = client.data.Verdict.select([...VERDICT_FIELDS]).orderBy({ createdAt: "asc" }).first(PAGE);
             return (after ? query.after(after) : query).executePaginated();
         }),
+        listReviews(client),
     ]);
     return {
         hearings: hearings as HearingRow[],
         cases: cases as HearingCaseRow[],
         events: events as HearingEventRow[],
         verdicts: verdicts as VerdictRow[],
+        reviews,
     };
 }

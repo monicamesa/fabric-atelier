@@ -6,7 +6,7 @@ const AGENT = "00000000-0000-4000-8000-000000000023";
 const NOW = new Date("2026-11-10T10:10:00Z");
 const hearing = (id: string, startedAt: string, caseCount = 2): HearingRow => ({ id, agent_id: AGENT, stage: "production", launchedByEmail: "dario.admin@example.com", caseCount, createdAt: startedAt });
 const event = (hearing_id: string, kind: HearingEventRow["kind"], createdAt: string, detail?: string): HearingEventRow => ({ id: `${hearing_id}-${kind}-${createdAt}`, hearing_id, kind, createdAt, detail });
-const row = (hearing_id: string, position: number, case_id: string): HearingCaseRow => ({ id: `${hearing_id}-${position}`, hearing_id, case_id, position, question: `Q${position}`, expectedAnswer: `A${position}` });
+const row = (hearing_id: string, position: number, case_id: string): HearingCaseRow => ({ id: `${hearing_id}-${position}`, hearing_id, case_id, testimony_id: `t-${case_id}`, position, question: `Q${position}`, expectedAnswer: `A${position}` });
 const verdict = (hearing_id: string, case_id: string, judgeVerdict: VerdictRow["judgeVerdict"]): VerdictRow => ({
     id: `${hearing_id}-${case_id}`,
     hearing_id,
@@ -28,6 +28,7 @@ const records: HearingRecords = {
         event("h0", "failed", "2026-11-09T10:03:00Z", "launch: boom"),
     ],
     verdicts: [verdict("h1", "c1", "incorrect"), verdict("h0", "c1", "correct")],
+    reviews: [],
 };
 
 describe("hearing view", () => {

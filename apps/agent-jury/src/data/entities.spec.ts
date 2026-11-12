@@ -7,7 +7,7 @@ const dataDir = join(import.meta.dirname, "..", "..", "rayfin", "data");
 const entityFiles = readdirSync(dataDir).filter((name) => name.endsWith(".ts") && name !== "schema.ts" && !name.endsWith(".spec.ts"));
 const sources = Object.fromEntries(entityFiles.map((name) => [name, readFileSync(join(dataDir, name), "utf8")]));
 
-const INSERT_ONLY = ["Case.ts", "Testimony.ts", "CaseDismissal.ts", "Vote.ts"];
+const INSERT_ONLY = ["Case.ts", "Testimony.ts", "CaseDismissal.ts", "Vote.ts", "VerdictReview.ts"];
 const READ_ONLY = ["Juror.ts", "Agent.ts", "Hearing.ts", "HearingCase.ts", "HearingEvent.ts", "Verdict.ts"];
 
 describe("entity definitions", () => {
@@ -25,6 +25,7 @@ describe("entity definitions", () => {
             "Testimony.ts",
             "UserFlag.ts",
             "Verdict.ts",
+            "VerdictReview.ts",
             "Vote.ts",
         ]);
     });
@@ -53,6 +54,17 @@ describe("entity definitions", () => {
         expect(source.match(/claims\.sub\.eq\(item\.userId\)/g)).toHaveLength(2);
         expect(source).not.toMatch(/@(anonymous|role|email)\(/);
         expect(source).not.toMatch(/@\w+\([^)]*\)\s+\w*(email|name)!/i);
+    });
+
+    it("VerdictReview needs both the subject and the email of the reviewer to create, and can carry a seed marker", () => {
+        const source = sources["VerdictReview.ts"];
+        expect(source).toMatch(/claims\.sub\.eq\(item\.reviewerUserId\)\.and\(claims\.email\.eq\(item\.reviewerEmail\)\)/);
+        expect(source).toMatch(/@text\(\{ max: 20, optional: true \}\) source\?/);
+        expect(source).toMatch(/@uuid\(\) verdict_id/);
+    });
+
+    it("Hearing records the critic-prompt version as optional text", () => {
+        expect(sources["Hearing.ts"]).toMatch(/@text\(\{ max: 64, optional: true \}\) criticPromptVersion\?/);
     });
 
     it.each(entityFiles)("%s gives every text and email field an explicit max", (name) => {

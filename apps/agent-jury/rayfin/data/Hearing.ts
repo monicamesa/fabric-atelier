@@ -1,4 +1,4 @@
-import { entity, authenticated, uuid, email, date, set, int, one, many } from '@microsoft/rayfin-core';
+import { entity, authenticated, uuid, email, text, date, set, int, one, many } from '@microsoft/rayfin-core';
 import { Agent } from './Agent.js';
 import { HearingCase } from './HearingCase.js';
 import { HearingEvent } from './HearingEvent.js';
@@ -18,6 +18,9 @@ export class Hearing {
   @uuid({ unique: true }) requestId!: string;
   @email({ max: 254 }) launchedByEmail!: string;
   @int() caseCount!: number;
+  // The critic-prompt version the judge ran with (see CRITIC_PROMPT in rules/judge-trust.ts). Empty on hearings
+  // from before it was recorded: they used the SDK's default prompt.
+  @text({ max: 64, optional: true }) criticPromptVersion?: string;
   @date() createdAt!: Date;
   @many(() => HearingCase) cases?: HearingCase[];
   @many(() => HearingEvent) events?: HearingEvent[];

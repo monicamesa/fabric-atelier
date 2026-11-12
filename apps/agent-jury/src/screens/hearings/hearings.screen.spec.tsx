@@ -67,6 +67,7 @@ function fakeClient() {
             HearingCase: { select: () => page([]) },
             HearingEvent: { select: () => page(EVENTS) },
             Verdict: { select: () => page(VERDICTS) },
+            VerdictReview: { select: () => page([]) },
         },
         auth: { getSession: () => ({ isAuthenticated: true, user: ADMIN }) },
     } as unknown as AppRayfinClient;

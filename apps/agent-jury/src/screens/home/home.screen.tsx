@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import { Button } from "@/components/docket/button";
 import { Deliberating } from "@/components/docket/gavel";
 import { Glossary } from "@/components/docket/glossary";
-import { JudgeTrustLine, JudgeTrustPlaceholder } from "@/components/docket/judge-trust";
+import { JudgeTrustLine, JudgeTrustPanel } from "@/components/docket/judge-trust";
 import { Objection } from "@/components/docket/objection";
 import { CaseNumber, StatusChip, UnverifiedChip } from "@/components/docket/status-chip";
 import { EmptyState, Skeleton } from "@/components/docket/states";
@@ -60,7 +60,7 @@ export function HomeScreen({ client, agents, agent, docket, viewer, onAgentChang
                         </a>
                     </div>
                 </div>
-                <JudgeTrustPlaceholder className="hidden min-[900px]:flex" />
+                <JudgeTrustPanel trust={data?.trust} className="hidden min-[900px]:flex" />
             </section>
 
             {proposing && agent && (
@@ -139,7 +139,7 @@ export function HomeScreen({ client, agents, agent, docket, viewer, onAgentChang
             </section>
 
             {/* Until there are hearings, phones get judge trust as one line below the docket. */}
-            <JudgeTrustLine className="min-[900px]:hidden" />
+            <JudgeTrustLine trust={data?.trust} className="min-[900px]:hidden" />
         </div>
     );
 }

@@ -31,8 +31,22 @@ export function CourtRecord({ events, letters, jurors, now }: CourtRecordProps) 
         }
         const who = personName(event.actorEmail, jurors);
         if (event.kind === "proposed") return t("record.proposed", { who });
+        if (event.kind === "review") {
+            const main = !event.appeal
+                ? t("record.reviewAgree", { who })
+                : t(event.reopens ? "record.reviewReopens" : "record.reviewAppeal", { who, verdict: t(`hearings.review.human.${event.humanVerdict}`) });
+            return (
+                <>
+                    {main}
+                    {event.reason && event.appeal && <span className="text-text-muted"> · {t(`hearings.review.reason.${event.reason}`)}</span>}
+                    {event.comment?.trim() && <span className="text-text-muted">: “{event.comment.trim()}”</span>}
+                    {event.futureDated && <span className="text-text-muted"> · {t("record.futureDated")}</span>}
+                </>
+            );
+        }
         const notes: string[] = [];
         if (event.kind !== "vote" && !event.counts) notes.push(t("record.notCounted"));
+        if (event.kind === "vote" && event.beforeReview) notes.push(t("record.beforeReview"));
         if (event.kind === "vote" && event.value === "against" && !event.comment?.trim()) notes.push(t("record.noReason"));
         if (event.futureDated) notes.push(t("record.futureDated"));
         const letter = "testimonyId" in event ? (letters.get(event.testimonyId) ?? "?") : "";
