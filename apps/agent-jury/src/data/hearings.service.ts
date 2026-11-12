@@ -93,7 +93,8 @@ export async function loadHearingRecords(client: DataClient): Promise<HearingRec
             const query = client.data.Verdict.select([...VERDICT_FIELDS]).orderBy({ createdAt: "asc" }).first(PAGE);
             return (after ? query.after(after) : query).executePaginated();
         }),
-        listReviews(client),
+        // Fail open, like Home: the hearing still shows without the reviews if they cannot be read.
+        listReviews(client).catch((): ReviewRecord[] => []),
     ]);
     return {
         hearings: hearings as HearingRow[],

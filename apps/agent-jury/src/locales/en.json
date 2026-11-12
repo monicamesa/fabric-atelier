@@ -80,12 +80,19 @@
         "status": {
             "new": "New",
             "disputed": "Disputed",
-            "ruled": "Ruled"
+            "ruled": "Ruled",
+            "correct": "Correct",
+            "incorrect": "Incorrect",
+            "unclear": "Unclear",
+            "overruled": "Judge overruled"
         },
         "detail": {
             "new": "waiting for jury votes",
             "disputed": "jurors don't agree on the answer",
-            "ruledAll_one": "1 juror agrees",
+            "correct": "the AI judge accepted the agent's answer",
+            "incorrect": "the AI judge rejected the agent's answer",
+            "unclear": "the AI judge could not tell",
+            "overruled": "the jury disagrees with the AI judge",            "ruledAll_one": "1 juror agrees",
             "ruledAll_other": "all {{count}} jurors agree",
             "ruledSome": "{{agreed}} of {{total}} jurors agree"
         }

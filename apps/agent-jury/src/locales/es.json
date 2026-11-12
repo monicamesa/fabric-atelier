@@ -80,12 +80,19 @@
         "status": {
             "new": "Nuevo",
             "disputed": "En disputa",
-            "ruled": "Resuelto"
+            "ruled": "Resuelto",
+            "correct": "Correcta",
+            "incorrect": "Incorrecta",
+            "unclear": "Dudosa",
+            "overruled": "Juez corregido"
         },
         "detail": {
             "new": "esperando los votos del jurado",
             "disputed": "los jurados no se ponen de acuerdo en la respuesta",
-            "ruledAll_one": "1 jurado está de acuerdo",
+            "correct": "el juez de IA dio por buena la respuesta del agente",
+            "incorrect": "el juez de IA rechazó la respuesta del agente",
+            "unclear": "el juez de IA no pudo decidir",
+            "overruled": "el jurado no está de acuerdo con el juez de IA",            "ruledAll_one": "1 jurado está de acuerdo",
             "ruledAll_other": "los {{count}} jurados están de acuerdo",
             "ruledSome": "{{agreed}} de {{total}} jurados están de acuerdo"
         }

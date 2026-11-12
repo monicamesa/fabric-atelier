@@ -90,3 +90,42 @@ describe("buildTicker", () => {
         expect(buildTicker([])).toEqual([]);
     });
 });
+
+describe("buildTicker: the AI judge", () => {
+    const ruled = () =>
+        docketCase("c-judge", 600, { testimonies: [answer("t1", "c-judge", ANA, 590)], votes: [vote("t1", ELENA, 300), vote("t1", BRUNO, 120)] });
+    const hearings = [
+        { id: "h-old", agent_id: "agent-1", criticPromptVersion: null, createdAt: at(-200) },
+        { id: "h-new", agent_id: "agent-1", criticPromptVersion: null, createdAt: at(-60) },
+    ];
+    const verdict = (id: string, hearing: string, judge: "correct" | "incorrect" | "unclear", minutes: number) => ({ id, hearing_id: hearing, case_id: "c-judge", judgeVerdict: judge, createdAt: at(minutes) });
+
+    it("adds one line per case with the verdict of the latest hearing", () => {
+        const events = buildTicker([ruled()], { hearings, verdicts: [verdict("v-old", "h-old", "correct", -190), verdict("v-new", "h-new", "incorrect", -50)], overruled: [] });
+        expect(events.map((event) => event.status)).toEqual(["incorrect", "ruled"]);
+        expect(events[0]).toMatchObject({ caseId: "c-judge", at: at(-50) });
+    });
+
+    it("says unclear for a verdict the judge could not decide", () => {
+        const events = buildTicker([ruled()], { hearings, verdicts: [verdict("v1", "h-new", "unclear", -50)], overruled: [] });
+        expect(events.map((event) => event.status)).toContain("unclear");
+    });
+
+    it("adds an 'overruled' line only for the latest verdict of a case", () => {
+        const data = { hearings, verdicts: [verdict("v-old", "h-old", "correct", -190), verdict("v-new", "h-new", "correct", -50)] };
+        expect(buildTicker([ruled()], { ...data, overruled: [{ verdictId: "v-new", caseId: "c-judge", at: at(-20) }] }).map((event) => event.status)).toEqual(["overruled", "correct", "ruled"]);
+        expect(buildTicker([ruled()], { ...data, overruled: [{ verdictId: "v-old", caseId: "c-judge", at: at(-20) }] }).map((event) => event.status)).not.toContain("overruled");
+    });
+
+    it("leaves out verdicts of dismissed cases, and shows no judge line without judge data", () => {
+        const dismissed = docketCase("c-judge", 600, { dismissed: true });
+        expect(buildTicker([dismissed], { hearings, verdicts: [verdict("v1", "h-new", "correct", -50)], overruled: [] })).toEqual([]);
+        expect(buildTicker([ruled()]).map((event) => event.status)).toEqual(["ruled"]);
+    });
+
+    it("still keeps only the 8 most recent lines", () => {
+        const cases = Array.from({ length: 6 }, (_, i) => docketCase(`c${i}`, 100 - i));
+        const verdicts = cases.map((item, i) => ({ id: `v${i}`, hearing_id: "h-new", case_id: item.record.id, judgeVerdict: "correct" as const, createdAt: at(-10 - i) }));
+        expect(buildTicker(cases, { hearings, verdicts, overruled: [] })).toHaveLength(TICKER_MAX_ITEMS);
+    });
+});

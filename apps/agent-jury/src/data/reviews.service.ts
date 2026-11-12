@@ -11,9 +11,12 @@ export interface ReviewData {
     reviewRecords: ReviewRecords;
     hearings: TrustHearing[];
     verdicts: TrustVerdict[];
+    /** False when the reads failed (for example the schema is not applied yet): everything above is then empty and Home hides what depends on it. */
+    available: boolean;
 }
 
-export const EMPTY_REVIEW_DATA: ReviewData = { reviewRecords: { verdicts: [], hearingCases: [], reviews: [] }, hearings: [], verdicts: [] };
+export const EMPTY_REVIEW_DATA: ReviewData = { reviewRecords: { verdicts: [], hearingCases: [], reviews: [] }, hearings: [], verdicts: [], available: true };
+export const UNAVAILABLE_REVIEW_DATA: ReviewData = { ...EMPTY_REVIEW_DATA, available: false };
 
 export interface NewVerdictReview {
     verdictId: string;
@@ -33,7 +36,20 @@ export async function listReviews(client: DataClient): Promise<ReviewRecord[]> {
     })) as ReviewRecord[];
 }
 
+/**
+ * Same fail-open pattern as intro_seen: if any of these reads fails, Home still loads and only the parts that depend on
+ * them (judge trust, the judge items of the ticker, R9) are left out.
+ */
 export async function loadReviewData(client: DataClient): Promise<ReviewData> {
+    try {
+        return await readReviewData(client);
+    } catch (error) {
+        console.warn("[Reviews] Could not read verdicts and reviews; continuing without them.", error);
+        return UNAVAILABLE_REVIEW_DATA;
+    }
+}
+
+async function readReviewData(client: DataClient): Promise<ReviewData> {
     const [verdicts, hearingCases, hearings, reviews] = await Promise.all([
         readAllPages((after) => {
             const query = client.data.Verdict.select(["id", "hearing_id", "case_id", "judgeVerdict", "createdAt"]).orderBy({ createdAt: "asc" }).first(PAGE);
@@ -53,6 +69,7 @@ export async function loadReviewData(client: DataClient): Promise<ReviewData> {
         reviewRecords: { verdicts: verdicts as TrustVerdict[], hearingCases: hearingCases as HearingCaseLink[], reviews },
         hearings: hearings as TrustHearing[],
         verdicts: verdicts as TrustVerdict[],
+        available: true,
     };
 }
 

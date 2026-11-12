@@ -60,7 +60,7 @@ export function HomeScreen({ client, agents, agent, docket, viewer, onAgentChang
                         </a>
                     </div>
                 </div>
-                <JudgeTrustPanel trust={data?.trust} className="hidden min-[900px]:flex" />
+                {data?.reviewsAvailable !== false && <JudgeTrustPanel trust={data?.trust} className="hidden min-[900px]:flex" />}
             </section>
 
             {proposing && agent && (
@@ -139,7 +139,7 @@ export function HomeScreen({ client, agents, agent, docket, viewer, onAgentChang
             </section>
 
             {/* Until there are hearings, phones get judge trust as one line below the docket. */}
-            <JudgeTrustLine trust={data?.trust} className="min-[900px]:hidden" />
+            {data?.reviewsAvailable !== false && <JudgeTrustLine trust={data?.trust} className="min-[900px]:hidden" />}
         </div>
     );
 }

@@ -14,6 +14,10 @@ const BADGE: Record<TickerStatus, string> = {
     new: "border border-ticker-text text-ticker-text",
     disputed: "bg-action text-ticker-text",
     ruled: "bg-ruled-fill text-ticker-text",
+    correct: "bg-ruled-fill text-ticker-text",
+    incorrect: "bg-action text-ticker-text",
+    unclear: "border border-ticker-text text-ticker-text",
+    overruled: "bg-overruled text-overruled-text",
 };
 
 const FOCUS = "focus-visible:[outline-color:var(--ticker-text)]";
@@ -78,7 +82,7 @@ export function Ticker({ events }: { events: TickerEvent[] }) {
                 {label}
                 <ul className="m-0 flex min-w-0 flex-1 list-none flex-wrap gap-x-8 gap-y-1 px-4 py-2">
                     {events.map((event) => (
-                        <li key={event.caseId}>
+                        <li key={`${event.caseId}-${event.status}`}>
                             <Line event={event} />
                         </li>
                     ))}
@@ -90,7 +94,7 @@ export function Ticker({ events }: { events: TickerEvent[] }) {
     const list = (copy: boolean) => (
         <ul aria-hidden={copy || undefined} className="m-0 flex shrink-0 list-none items-center gap-10 p-0 pr-10">
             {events.map((event) => (
-                <li key={event.caseId} className="whitespace-nowrap">
+                <li key={`${event.caseId}-${event.status}`} className="whitespace-nowrap">
                     <Line event={event} hidden={copy} />
                 </li>
             ))}

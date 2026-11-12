@@ -23,6 +23,7 @@ function records(withReview: boolean): DocketRecords {
         votes: [vote("v1", "elena.expert@example.com", -300), vote("v2", "bruno.approver@example.com", -290)],
         dismissals: [],
         reviews: {
+            available: true,
             hearings: [{ id: "h1", agent_id: AGENT, criticPromptVersion: null, createdAt: at(-100) }],
             verdicts: [{ id: "verdict-1", hearing_id: "h1", case_id: "case-1", judgeVerdict: "correct", createdAt: at(-90) }],
             reviewRecords: {
