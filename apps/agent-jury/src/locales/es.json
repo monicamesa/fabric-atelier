@@ -78,6 +78,7 @@
         "help_other": "Descarga los {{count}} casos resueltos como CSV para Quality Lab.",
         "empty": "Todavía no hay casos resueltos que exportar: primero el jurado tiene que ponerse de acuerdo en una respuesta. Los datos de ejemplo nunca se exportan.",
         "reviewsUnavailable": "No se han podido cargar las revisiones, así que no se puede descartar que haya casos reabiertos. Inténtalo más tarde.",
+        "exampleAgent": "Los agentes de ejemplo nunca se exportan.",
         "loading": "Los casos todavía se están cargando.",
         "done_one": "Se ha exportado {{count}} caso.",
         "done_other": "Se han exportado {{count}} casos."
@@ -127,6 +128,8 @@
     },
     "docket": {
         "agent": "Agente a juicio",
+        "example": "Ejemplo",
+        "exampleNote": "Este es un agente de ejemplo: nunca cuenta en las vistas, en la confianza en el juez ni en la exportación de jurisprudencia.",
         "propose": "+ Proponer un caso",
         "settle": "Resolver la disputa",
         "castVote": "Votar",
@@ -212,7 +215,8 @@
         "votes_one": "{{count}} voto",
         "votes_other": "{{count}} votos",
         "ruling": "Resolución",
-        "progress_one": "{{votes}} de {{count}} voto a favor",
+                "approverNeeded": "al menos uno de un aprobador",
+                "progress_one": "{{votes}} de {{count}} voto a favor",
         "progress_other": "{{votes}} de {{count}} votos a favor",
         "against_one": "{{count}} en contra",
         "against_other": "{{count}} en contra"

@@ -5,6 +5,7 @@ import { Objection } from "@/components/docket/objection";
 import { Deliberating } from "@/components/docket/gavel";
 import { Ticker } from "@/components/docket/ticker";
 import { listAgents, listJurors, type AgentRow, type JurorRow } from "@/data/directory.service";
+import { defaultAgent, visibleAgents } from "@/data/example-agents";
 import { hasUserFlag, setUserFlag, USER_FLAGS } from "@/data/user-flags.service";
 import { useAsync } from "@/hooks/use-async";
 import { LaunchGate } from "@/launch/launch-gate";
@@ -74,11 +75,11 @@ function App() {
         [sessionUserId, sessionEmail, jury.data],
     );
     const isAdmin = viewer.isAdmin;
-    const activeAgents = useMemo(() => (agentList.data ?? []).filter((agent) => agent.active), [agentList.data]);
+    const activeAgents = useMemo(() => visibleAgents((agentList.data ?? []).filter((agent) => agent.active), isAdmin), [agentList.data, isAdmin]);
 
-    // D6: the agent lives in the URL; the default is the first active agent by name.
+    // D6: the agent lives in the URL; the default is the first real (non-example) active agent by name.
     const routeAgentId = route.page === "home" || route.page === "cases" || route.page === "hearings" ? route.agentId : undefined;
-    const agent: AgentRow | undefined = activeAgents.find((row) => row.id === routeAgentId) ?? activeAgents[0];
+    const agent: AgentRow | undefined = defaultAgent(activeAgents, routeAgentId);
 
     // A #clerk link waits for the jury list; non-admins then land on Home. clerkExecute is the real check.
     const page: Page | "case" | "hearing" =
@@ -155,7 +156,7 @@ function App() {
     const intro = route.page === "intro" ? <IntroScreen onDone={leaveIntro} /> : undefined;
 
     if (!client) return layout(<Objection message={t("errors.load")} technicalDetails={String(connectError)} />);
-    if (page === "clerk") return layout(<ClerksOffice client={client} jury={jury} me={viewer.juror} />);
+    if (page === "clerk") return layout(<ClerksOffice client={client} jury={jury} me={viewer.juror} onDirectoryChanged={agentList.reload} />);
 
     if (directoryFailed) {
         return layout(

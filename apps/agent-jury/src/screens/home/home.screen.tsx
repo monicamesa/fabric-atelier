@@ -3,12 +3,14 @@ import { useTranslation } from "react-i18next";
 import { Button } from "@/components/docket/button";
 import { Deliberating } from "@/components/docket/gavel";
 import { Glossary } from "@/components/docket/glossary";
+import { ExampleAgentNote } from "@/components/docket/example-agent-note";
 import { JudgeTrustLine, JudgeTrustPanel } from "@/components/docket/judge-trust";
 import { Objection } from "@/components/docket/objection";
 import { CaseNumber, StatusChip, UnverifiedChip } from "@/components/docket/status-chip";
 import { EmptyState, Skeleton } from "@/components/docket/states";
 import type { AgentRow } from "@/data/directory.service";
 import type { DocketCase } from "@/data/docket";
+import { isExampleAgent } from "@/data/example-agents";
 import type { AppRayfinClient } from "@/lib/rayfin-client";
 import { formatRoute } from "@/lib/route";
 import { CONSENSUS_MIN_VOTES } from "@/rules/consensus";
@@ -34,6 +36,8 @@ export function HomeScreen({ client, agents, agent, docket, viewer, onAgentChang
     const [proposing, setProposing] = useState(false);
     const data = docket?.data;
     const waiting = data?.cases.filter((item) => item.needsMyVote).length ?? 0;
+    // Example agents never count in judge trust; it is also hidden when reviews could not be read.
+    const showTrust = data?.reviewsAvailable !== false && !(agent && isExampleAgent(agent));
 
     return (
         <div className="flex flex-col gap-8">
@@ -60,8 +64,10 @@ export function HomeScreen({ client, agents, agent, docket, viewer, onAgentChang
                         </a>
                     </div>
                 </div>
-                {data?.reviewsAvailable !== false && <JudgeTrustPanel trust={data?.trust} className="hidden min-[900px]:flex" />}
+                {showTrust && <JudgeTrustPanel trust={data?.trust} className="hidden min-[900px]:flex" />}
             </section>
+
+            <ExampleAgentNote agent={agent} />
 
             {proposing && agent && (
                 <ProposeCaseForm
@@ -139,7 +145,7 @@ export function HomeScreen({ client, agents, agent, docket, viewer, onAgentChang
             </section>
 
             {/* Until there are hearings, phones get judge trust as one line below the docket. */}
-            {data?.reviewsAvailable !== false && <JudgeTrustLine trust={data?.trust} className="min-[900px]:hidden" />}
+            {showTrust && <JudgeTrustLine trust={data?.trust} className="min-[900px]:hidden" />}
         </div>
     );
 }

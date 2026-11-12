@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/docket/button";
 import { ExportCaseLaw } from "@/components/docket/export-case-law";
+import { ExampleAgentNote } from "@/components/docket/example-agent-note";
 import { Deliberating } from "@/components/docket/gavel";
 import { Objection } from "@/components/docket/objection";
 import { Segmented } from "@/components/docket/segmented";
@@ -10,6 +11,7 @@ import { EmptyState, Skeleton } from "@/components/docket/states";
 import { VoteBar } from "@/components/docket/vote-bar";
 import type { AgentRow } from "@/data/directory.service";
 import type { DocketCase } from "@/data/docket";
+import { isExampleAgent } from "@/data/example-agents";
 import type { AppRayfinClient } from "@/lib/rayfin-client";
 import { formatRoute, type CasesFilter } from "@/lib/route";
 import { isValidDismissal, type CaseState } from "@/rules/case-validity";
@@ -62,7 +64,7 @@ export function CasesScreen({ client, agents, agent, docket, viewer, filter, que
             </div>
             <div className="flex flex-col items-start gap-3 min-[900px]:items-end">
                 <AgentTabs agents={agents} current={agent.id} onChange={(agentId) => onRouteChange({ agentId })} />
-                <ExportCaseLaw agentName={agent.name} docket={data} />
+                <ExportCaseLaw agentName={agent.name} docket={data} isExample={isExampleAgent(agent)} />
                 {viewer.canAct && !proposing && (
                     <Button variant="primary" onClick={() => setProposing(true)}>
                         {t("docket.propose")}
@@ -75,6 +77,7 @@ export function CasesScreen({ client, agents, agent, docket, viewer, filter, que
     return (
         <div className="flex flex-col gap-6">
             {header}
+            <ExampleAgentNote agent={agent} />
             {!viewer.canAct && <p className="m-0 border-l-4 border-review pl-3 text-[15px] text-text">{t("docket.readOnly")}</p>}
             {proposing && (
                 <ProposeCaseForm

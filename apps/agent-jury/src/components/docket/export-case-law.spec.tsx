@@ -58,6 +58,16 @@ describe("ExportCaseLaw", () => {
         expect(save).not.toHaveBeenCalled();
     });
 
+    it("is disabled for example agents, even with ruled cases", () => {
+        const save = vi.spyOn(download, "downloadTextFile").mockImplementation(() => {});
+        render(<ExportCaseLaw agentName="Sales agent (example)" isExample docket={docketWith([ruledCase("c1", "Q?")])} />);
+        const button = screen.getByRole("button", { name: "Export case law" });
+        expect(button).toHaveAttribute("aria-disabled", "true");
+        expect(button).toHaveAttribute("title", "Example agents are never exported.");
+        fireEvent.click(button);
+        expect(save).not.toHaveBeenCalled();
+    });
+
     it("is disabled while the docket is loading", () => {
         render(<ExportCaseLaw agentName="Sales Agent" docket={undefined} />);
         expect(screen.getByRole("button", { name: "Export case law" })).toHaveAttribute("aria-disabled", "true");

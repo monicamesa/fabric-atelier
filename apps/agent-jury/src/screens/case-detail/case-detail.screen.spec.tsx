@@ -90,6 +90,12 @@ describe("CaseDetail", () => {
         expect(screen.getByRole("button", { name: "Dismiss: the question is ambiguous" })).toBeInTheDocument();
     });
 
+    it("says an approver vote is still needed until one is in", async () => {
+        renderCase([ANSWER], { id: "sub-elena", email: "elena.expert@example.com" });
+        const card = await screen.findByRole("article", { name: /Answer A/ });
+        expect(within(card).getByText(/0 of 2 votes in favour · at least one from an approver/)).toBeInTheDocument();
+    });
+
     it("is read-only for someone who is not on the jury (D2)", async () => {
         renderCase([ANSWER], { id: "sub-visitor", email: "visitor@example.com" });
         await screen.findByRole("article", { name: /Answer A/ });

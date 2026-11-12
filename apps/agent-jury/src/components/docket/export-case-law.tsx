@@ -9,6 +9,8 @@ import { cn } from "@/lib/utils";
 interface ExportCaseLawProps {
     agentName: string;
     docket: Docket | undefined;
+    /** Example agents are demo data and are never exported. */
+    isExample?: boolean;
     className?: string;
 }
 
@@ -16,12 +18,20 @@ interface ExportCaseLawProps {
  * "Export case law": the agent's ruled cases as a Quality Lab CSV, built here from data already loaded. Disabled, with the
  * reason as a tooltip, when there is nothing to export or when reopened cases can't be ruled out.
  */
-export function ExportCaseLaw({ agentName, docket, className }: ExportCaseLawProps) {
+export function ExportCaseLaw({ agentName, docket, isExample = false, className }: ExportCaseLawProps) {
     const { t } = useTranslation();
     const [exported, setExported] = useState<number>();
-    const rows = docket ? buildCaseLaw(docket.cases) : [];
+    const rows = docket && !isExample ? buildCaseLaw(docket.cases) : [];
     const unavailable = docket?.reviewsAvailable === false;
-    const reason = !docket ? t("caseLaw.loading") : unavailable ? t("caseLaw.reviewsUnavailable") : rows.length === 0 ? t("caseLaw.empty") : undefined;
+    const reason = isExample
+        ? t("caseLaw.exampleAgent")
+        : !docket
+          ? t("caseLaw.loading")
+          : unavailable
+            ? t("caseLaw.reviewsUnavailable")
+            : rows.length === 0
+              ? t("caseLaw.empty")
+              : undefined;
 
     function run() {
         if (reason) return;

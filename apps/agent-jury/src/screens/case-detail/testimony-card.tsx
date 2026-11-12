@@ -33,6 +33,8 @@ export function TestimonyCard({ letter, testimony, tally, author, team, minVotes
     const [comment, setComment] = useState("");
     const [commentError, setCommentError] = useState<string>();
     const short = testimony.answer.length <= 24;
+    // Ruling needs a valid approver vote in favour (R3); say so until one is in, unless an approver already voted against.
+    const needsApprover = !isRuling && tally.valid && tally.approverFor === 0 && tally.approverAgainst === 0;
 
     async function submitAgainst(event: FormEvent) {
         event.preventDefault();
@@ -74,6 +76,7 @@ export function TestimonyCard({ letter, testimony, tally, author, team, minVotes
             <VoteBar value={tally.votesFor} max={minVotes} />
             <p className="m-0 text-[14px] text-text-muted">
                 {t("answer.progress", { votes: tally.votesFor, count: minVotes })}
+                {needsApprover && ` · ${t("answer.approverNeeded")}`}
                 {tally.votesAgainst > 0 && ` · ${t("answer.against", { count: tally.votesAgainst })}`}
             </p>
             {isOwn && <p className="m-0 text-[14px] text-text-muted">{t("vote.ownAnswer")}</p>}

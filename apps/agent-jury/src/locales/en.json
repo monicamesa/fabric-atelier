@@ -78,6 +78,7 @@
         "help_other": "Download the {{count}} ruled cases as a CSV for Quality Lab.",
         "empty": "No ruled cases to export yet: the jury has to agree on an answer first. Example data is never exported.",
         "reviewsUnavailable": "Reviews couldn't be loaded, so reopened cases can't be ruled out. Try again later.",
+        "exampleAgent": "Example agents are never exported.",
         "loading": "The cases are still loading.",
         "done_one": "Exported {{count}} case.",
         "done_other": "Exported {{count}} cases."
@@ -127,6 +128,8 @@
     },
     "docket": {
         "agent": "Agent on trial",
+        "example": "Example",
+        "exampleNote": "This is an example agent: it never counts in hearings, judge trust or the case-law export.",
         "propose": "+ Propose a case",
         "settle": "Settle the dispute",
         "castVote": "Cast your vote",
@@ -212,7 +215,8 @@
         "votes_one": "{{count}} vote",
         "votes_other": "{{count}} votes",
         "ruling": "Ruling",
-        "progress_one": "{{votes}} of {{count}} vote in favour",
+                "approverNeeded": "at least one from an approver",
+                "progress_one": "{{votes}} of {{count}} vote in favour",
         "progress_other": "{{votes}} of {{count}} votes in favour",
         "against_one": "{{count}} against",
         "against_other": "{{count}} against"

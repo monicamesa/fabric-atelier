@@ -7,6 +7,7 @@ import { ShortId } from "@/components/docket/identity";
 import { Segmented } from "@/components/docket/segmented";
 import { EmptyState } from "@/components/docket/states";
 import type { AgentRow, AuthorActivity } from "@/data/directory.service";
+import { isExampleAgent, plainAgentName } from "@/data/example-agents";
 import { ClerkError } from "./clerk-feedback";
 import type { ClerkRunner } from "./clerk-runner";
 
@@ -91,10 +92,13 @@ export function AgentsPanel({ agents, activity, clerk, registerClerk, onNotice }
                                 aria-label={agent.name}
                                 className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-4 gap-y-1.5 border border-ink bg-paper-raised p-4"
                             >
-                                <b className="font-serif text-[20px] text-ink">{agent.name}</b>
-                                <Chip tone={agent.active ? "ruled" : "muted"} filled={agent.active}>
-                                    {t(agent.active ? "clerk.agents.active" : "clerk.agents.retired")}
-                                </Chip>
+                                <b className="font-serif text-[20px] text-ink">{plainAgentName(agent)}</b>
+                                <span className="flex flex-wrap items-center justify-end gap-2">
+                                    {isExampleAgent(agent) && <Chip tone="muted">{t("docket.example")}</Chip>}
+                                    <Chip tone={agent.active ? "ruled" : "muted"} filled={agent.active}>
+                                        {t(agent.active ? "clerk.agents.active" : "clerk.agents.retired")}
+                                    </Chip>
+                                </span>
                                 <ShortId id={agent.itemId} label={t("clerk.agents.itemId")} />
                                 {agent.active ? (
                                     <Button variant="danger-text" compact disabled={clerk.pending} onClick={() => void setActive(agent, false)}>

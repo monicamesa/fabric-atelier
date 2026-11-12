@@ -26,13 +26,15 @@ interface ClerksOfficeProps {
     client: AppRayfinClient;
     jury: AsyncState<JurorRow[]> & { reload: () => void };
     me: JurorRow | undefined;
+    /** Called after any clerk action, so lists kept by the app (agent switchers, Home) refresh without a reload. */
+    onDirectoryChanged?: () => void;
 }
 
 function technical(error: unknown): string | undefined {
     return error === undefined ? undefined : describeClerkError(error).technicalDetails;
 }
 
-export function ClerksOffice({ client, jury, me }: ClerksOfficeProps) {
+export function ClerksOffice({ client, jury, me, onDirectoryChanged }: ClerksOfficeProps) {
     const { t } = useTranslation();
     const isAdmin = me?.active === true && me.role === "admin";
 
@@ -84,13 +86,25 @@ export function ClerksOffice({ client, jury, me }: ClerksOfficeProps) {
     return (
         <div className="flex flex-col gap-6">
             {header}
-            <AdminDesk client={client} jury={jury} jurors={jury.data} me={me} />
+            <AdminDesk client={client} jury={jury} jurors={jury.data} me={me} onDirectoryChanged={onDirectoryChanged} />
         </div>
     );
 }
 
 /** Loaded only for active admins, so non-admins never send admin requests. */
-function AdminDesk({ client, jury, jurors, me }: { client: AppRayfinClient; jury: { reload: () => void }; jurors: JurorRow[]; me: JurorRow }) {
+function AdminDesk({
+    client,
+    jury,
+    jurors,
+    me,
+    onDirectoryChanged,
+}: {
+    client: AppRayfinClient;
+    jury: { reload: () => void };
+    jurors: JurorRow[];
+    me: JurorRow;
+    onDirectoryChanged?: () => void;
+}) {
     const { t } = useTranslation();
     const [tab, setTab] = useState<Tab>("jurors");
     const [notice, setNotice] = useState<string | null>(null);
@@ -108,7 +122,8 @@ function AdminDesk({ client, jury, jurors, me }: { client: AppRayfinClient; jury
         reloadJury();
         reloadAgents();
         reloadLog();
-    }, [reloadJury, reloadAgents, reloadLog]);
+        onDirectoryChanged?.();
+    }, [reloadJury, reloadAgents, reloadLog, onDirectoryChanged]);
 
     const rowClerk = useClerkAction(client, reloadAll);
     const swearInClerk = useClerkAction(client, reloadAll);

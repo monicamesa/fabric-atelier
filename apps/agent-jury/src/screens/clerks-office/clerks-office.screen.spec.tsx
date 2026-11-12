@@ -93,6 +93,29 @@ describe("ClerksOffice", () => {
         );
     });
 
+    it("refreshes the app's agent lists right after an agent is registered, without a reload", async () => {
+        const { client, requests } = fakeClient({});
+        const onDirectoryChanged = vi.fn();
+        render(<ClerksOffice client={client} jury={jury([ANA, DARIO])} me={DARIO} onDirectoryChanged={onDirectoryChanged} />);
+        fireEvent.click(await screen.findByRole("tab", { name: /Agents/ }));
+        fireEvent.click(await screen.findByRole("button", { name: /Register an agent/ }));
+        fireEvent.change(screen.getByLabelText("Agent name"), { target: { value: "Quality agent" } });
+        fireEvent.change(screen.getByLabelText("Workspace ID"), { target: { value: "00000000-0000-4000-8000-000000000032" } });
+        fireEvent.change(screen.getByLabelText("Agent ID"), { target: { value: "00000000-0000-4000-8000-000000000043" } });
+        fireEvent.click(screen.getByRole("button", { name: "Register the agent" }));
+        await waitFor(() => expect(onDirectoryChanged).toHaveBeenCalledTimes(1));
+        expect([...requests.values()].some((request) => request.action === "registerAgent")).toBe(true);
+    });
+
+    it("labels example agents as Example in the agents list", async () => {
+        const { client } = fakeClient({});
+        render(<ClerksOffice client={client} jury={jury([ANA, DARIO])} me={DARIO} />);
+        fireEvent.click(await screen.findByRole("tab", { name: /Agents/ }));
+        const card = await screen.findByRole("article", { name: AGENT.name });
+        expect(within(card).getByText("Example")).toBeInTheDocument();
+        expect(within(card).getByText("Sales agent")).toBeInTheDocument();
+    });
+
     it("filters agents into Active and Retired, Active first", async () => {
         const { client } = fakeClient({});
         render(<ClerksOffice client={client} jury={jury([ANA, DARIO])} me={DARIO} />);

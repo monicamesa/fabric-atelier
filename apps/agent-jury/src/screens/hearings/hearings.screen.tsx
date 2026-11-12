@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { Button } from "@/components/docket/button";
 import { Chip } from "@/components/docket/chip";
 import { Deliberating } from "@/components/docket/gavel";
+import { ExampleAgentNote } from "@/components/docket/example-agent-note";
 import { SelectField } from "@/components/docket/field";
 import { Objection } from "@/components/docket/objection";
 import { PageHeader } from "@/components/docket/page-header";
@@ -11,6 +12,7 @@ import { EmptyState } from "@/components/docket/states";
 import { runClerkAction } from "@/data/clerk.service";
 import { describeClerkError, type ClerkErrorView } from "@/data/clerk-errors";
 import type { AgentRow, JurorRow } from "@/data/directory.service";
+import { isExampleAgent } from "@/data/example-agents";
 import { loadHearingRecords } from "@/data/hearings.service";
 import { useAsync } from "@/hooks/use-async";
 import { isAppLanguage, type AppLanguage } from "@/i18n/language-preference";
@@ -83,8 +85,10 @@ export function HearingsScreen({ client, agents, agent, docket, jurors, viewer, 
                 }
             />
 
-            {viewer.isAdmin ? (
-                <section aria-labelledby="launch-title" className="flex flex-col gap-4 border border-ink bg-paper-raised p-5">
+            <ExampleAgentNote agent={agent} />
+
+            {viewer.isAdmin && !isExampleAgent(agent) ? (
+                <section aria-labelledby="launch-title" className="flex flex-col gap-4 border border-ink bg-paper-raised                 p-5">
                     <h2 id="launch-title" className="m-0 font-serif text-[28px] font-bold text-ink">
                         {t("hearings.launch.title")}
                     </h2>
@@ -165,7 +169,7 @@ export function HearingsScreen({ client, agents, agent, docket, jurors, viewer, 
                         )}
                     </div>
                 </section>
-            ) : (
+            ) : viewer.isAdmin ? null : (
                 <p className="m-0 text-[15px] text-text-muted">{t("hearings.launch.adminOnly")}</p>
             )}
 
