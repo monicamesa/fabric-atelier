@@ -4,6 +4,7 @@
 
 ## Dónde estamos (2026-11-10)
 
+- **Plan de I3b escrito (2026-11-12):** [I3b.md](I3b.md), con decisiones D1–D8 pendientes de la propietaria. 141 y 265 reverificados con una consulta de solo lectura. Sin código ni despliegues.
 - **Pasada de UX: pantalla de arranque + Intro (2026-11-12), desplegada en pruebas y en producción.** Código en `src/launch/` y `src/screens/intro/`; entidad nueva `UserFlag` (marca `intro_seen`, aprobada por la propietaria; ver especificación, sección 7), aplicada en producción junto con el código con `scripts/deploy-production.mjs --allow-production`. Comprobación mínima en producción: arranque, Intro la primera vez, Home al recargar, Hearings carga y sin errores de consola. En no-jurors, el arranque ofrece copiar el nombre de inicio de sesión para pasárselo a un admin. Desde ahora, los cambios solo de interfaz se verifican en local y van directos a producción en un lote (ver `AGENTS.md`, "Token and capacity discipline").
 - **I1a, I1b e I1c están terminadas y desplegadas en producción** (`FabricApp-AgentJury`). Última revisión: I1c, aprobada con correcciones (commit "agent-jury: I1c review fixes, production deploy").
 - **Despliegue de pruebas** en su propio workspace, en la misma capacidad. Es el destino por defecto de las comprobaciones. Con la versión de producción: I1a 46/46, I1b 23/23 e I1c 19/19.
