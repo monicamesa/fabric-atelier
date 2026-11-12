@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/docket/button";
+import { ExportCaseLaw } from "@/components/docket/export-case-law";
 import { Deliberating } from "@/components/docket/gavel";
 import { Objection } from "@/components/docket/objection";
 import { Segmented } from "@/components/docket/segmented";
@@ -49,7 +50,7 @@ export function CasesScreen({ client, agents, agent, docket, viewer, filter, que
     const waiting = data?.cases.filter((item) => item.needsMyVote).length ?? 0;
 
     const header = (
-        <div className="grid gap-5 border-b-[6px] border-double border-ink pb-5 min-[900px]:grid-cols-[minmax(0,1fr)_auto] min-[900px]:items-end">
+        <div className="grid grid-cols-[minmax(0,1fr)] gap-5 border-b-[6px] border-double border-ink pb-5 min-[900px]:grid-cols-[minmax(0,1fr)_auto] min-[900px]:items-end">
             <div className="flex flex-col gap-2">
                 <span className="text-[13px] font-bold uppercase tracking-[0.14em] text-action-text">
                     {t("cases.kicker", { agent: agent.name, count: data?.cases.length ?? 0 })}
@@ -61,6 +62,7 @@ export function CasesScreen({ client, agents, agent, docket, viewer, filter, que
             </div>
             <div className="flex flex-col items-start gap-3 min-[900px]:items-end">
                 <AgentTabs agents={agents} current={agent.id} onChange={(agentId) => onRouteChange({ agentId })} />
+                <ExportCaseLaw agentName={agent.name} docket={data} />
                 {viewer.canAct && !proposing && (
                     <Button variant="primary" onClick={() => setProposing(true)}>
                         {t("docket.propose")}

@@ -49,6 +49,18 @@ describe("translation files", () => {
         expect(esEntries.filter(([key, value]) => key.startsWith("ticker.") && /veredicto/i.test(String(value)))).toEqual([]);
     });
 
+    it("have the case-law export keys, and Spanish calls the judge's unclear verdict 'dudosa' everywhere", () => {
+        const required = ["caseLaw.export", "caseLaw.help_one", "caseLaw.help_other", "caseLaw.empty", "caseLaw.reviewsUnavailable", "caseLaw.loading", "caseLaw.done_one", "caseLaw.done_other"];
+        const enKeys = new Map(enEntries);
+        const esKeys = new Map(esEntries);
+        expect(required.filter((key) => !enKeys.has(key) || !esKeys.has(key))).toEqual([]);
+        expect(esKeys.get("caseLaw.export")).toBe("Exportar jurisprudencia");
+        expect(esEntries.filter(([, value]) => /sin claro/i.test(String(value)))).toEqual([]);
+        expect(esKeys.get("hearings.verdicts.unclear")).toBe("Dudosa");
+        expect(esKeys.get("ticker.status.unclear")).toBe("Dudosa");
+        expect(enKeys.get("hearings.verdicts.unclear")).toBe("Unclear");
+    });
+
     it("have only non-empty string values", () => {
         for (const [key, value] of [...enEntries, ...esEntries]) {
             expect(typeof value, key).toBe("string");

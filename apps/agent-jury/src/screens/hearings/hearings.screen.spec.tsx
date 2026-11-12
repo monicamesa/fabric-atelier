@@ -105,8 +105,8 @@ describe("HearingsScreen", () => {
     it("says 1 correcta / 1 incorrecta and 2 correctas in Spanish", async () => {
         await i18n.changeLanguage("es");
         renderHearings();
-        expect(await screen.findByText(/1 correcta · 1 incorrecta · 0 sin claro/)).toBeInTheDocument();
-        expect(screen.getByText(/2 correctas · 0 incorrectas · 0 sin claro/)).toBeInTheDocument();
+        expect(await screen.findByText(/1 correcta · 1 incorrecta · 0 dudosas/)).toBeInTheDocument();
+        expect(screen.getByText(/2 correctas · 0 incorrectas · 0 dudosas/)).toBeInTheDocument();
         await i18n.changeLanguage("en");
     });
 

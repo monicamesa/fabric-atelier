@@ -72,6 +72,16 @@
         "countingVotes": "Counting votes…",
         "readingRecord": "Reading the court record…"
     },
+    "caseLaw": {
+        "export": "Export case law",
+        "help_one": "Download the {{count}} ruled case as a CSV for Quality Lab.",
+        "help_other": "Download the {{count}} ruled cases as a CSV for Quality Lab.",
+        "empty": "No ruled cases to export yet: the jury has to agree on an answer first. Example data is never exported.",
+        "reviewsUnavailable": "Reviews couldn't be loaded, so reopened cases can't be ruled out. Try again later.",
+        "loading": "The cases are still loading.",
+        "done_one": "Exported {{count}} case.",
+        "done_other": "Exported {{count}} cases."
+    },
     "ticker": {
         "label": "Latest on the docket",
         "title": "Latest on the docket",

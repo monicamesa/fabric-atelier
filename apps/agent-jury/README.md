@@ -137,6 +137,13 @@ One production deploy per finished block of work. UI-only changes are verified l
 - **Judge trust** is computed per agent and per critic-prompt version (a different prompt is a different judge): the current version prominently, earlier ones as history. Rows with a `source` ("seed" demo rows, "check" script rows) never count. Home keeps loading, without the trust line and the judge lines of the ticker, if the verdicts/reviews cannot be read.
 - Plan and decisions: [docs/iteraciones/I3b.md](docs/iteraciones/I3b.md). Demo story in the test deployment: `rayfin/seed/i3b-story-1-ruled-case.sql`, one real hearing (`scripts/i3b-run-hearing.mjs`), `rayfin/seed/i3b-story-2-appeal.sql`, then `scripts/i3b-checks.mjs`.
 
+## Case law export (I3c)
+
+- **"Export case law"** on Cases downloads the agent's ruled cases as a CSV for Quality Lab, built in the browser from data already loaded (no new queries, Functions or schema). Header, exactly: `question,expected_answer,category,tags`.
+- **Which rows:** ruled cases of that agent whose author is an active juror, not dismissed and **not reopened** (R9), and never example or seeded data (`example-` user ids, `example.com` addresses). The button is disabled, with the reason as a tooltip, when there is nothing to export or when the reviews could not be loaded (reopened cases cannot be ruled out then).
+- **Mapping:** `question` = the case text; `expected_answer` = the ruled answer; `category` = the case category; `tags` = the case tags (typed with commas) plus the ruled answer's structured definition as `criterion: …`, `time window: …`, `population: …`, `source: …`, joined with `;`.
+- **Safety:** RFC 4180 quoting, UTF-8 with BOM, CRLF; cells that start with `=`, `+`, `-`, `@` or a tab get a leading `'` (a plain number such as `-5` is left alone); no authors, emails or ids. File name: `agent-jury-<agent-slug>-case-law-<yyyy-mm-dd>.csv`. Code: `src/data/case-law-csv.ts`.
+
 ## Security model
 
 - **Records are insert-only.** Cases, testimonies, dismissals, votes, verdict reviews and per-user flags are never updated or deleted; every entry keeps its author and date.
