@@ -1,10 +1,8 @@
 import type { AppRayfinClient } from "@/lib/rayfin-client";
 import {
     analyzeCase,
-    caseEvents,
     needsMyVote,
     type CaseAnalysis,
-    type CaseEvent,
     type CaseRecords,
     type JurorRecord,
     type Me,
@@ -23,6 +21,7 @@ import {
     type TestimonyRow,
     type VoteRow,
 } from "./cases.service";
+import { buildTicker, type TickerEvent } from "./ticker-events";
 
 type DataClient = Pick<AppRayfinClient, "data" | "auth">;
 
@@ -44,20 +43,12 @@ export interface DocketCase {
     records: CaseRecords;
 }
 
-export interface TickerEvent {
-    caseId: string;
-    caseText: string;
-    event: CaseEvent;
-}
-
 export interface Docket {
     cases: DocketCase[];
     categories: string[];
+    /** The latest news of the docket, derived from the records already loaded (see ticker-events.ts). */
     ticker: TickerEvent[];
 }
-
-/** The ticker shows verdicts only (appeals join in I4); proposals and returns to review stay in the court record. */
-const VERDICT_STATES = new Set<string>(["ruled", "disputed", "dismissed"]);
 
 /** D8: trims and collapses spaces; categories compare without case. */
 export function normalizeCategory(value: string): string {
@@ -95,15 +86,7 @@ export function buildDocket(raw: DocketRecords, jurors: readonly JurorRecord[], 
         const category = normalizeCategory(docketCase.record.category);
         if (category && !categories.some((existing) => existing.toLowerCase() === category.toLowerCase())) categories.push(category);
     }
-    const ticker = cases
-        .flatMap((docketCase) =>
-            caseEvents(docketCase.records)
-                .filter((event) => event.kind === "state" && VERDICT_STATES.has(event.state))
-                .map((event) => ({ caseId: docketCase.record.id, caseText: docketCase.record.text, event })),
-        )
-        .sort((a, b) => b.event.at.localeCompare(a.event.at))
-        .slice(0, 12);
-    return { cases, categories: categories.sort((a, b) => a.localeCompare(b)), ticker };
+    return { cases, categories: categories.sort((a, b) => a.localeCompare(b)), ticker: buildTicker(cases) };
 }
 
 /** Keeps only the testimonies, votes and dismissals that belong to `cases`. */

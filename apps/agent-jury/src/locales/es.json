@@ -73,8 +73,22 @@
         "readingRecord": "Leyendo el acta…"
     },
     "ticker": {
-        "label": "Últimas resoluciones",
-        "title": "Últimas resoluciones"
+        "label": "Último en el jurado",
+        "title": "Último en el jurado",
+        "short": "Último",
+        "pause": "Pausar la cinta",
+        "status": {
+            "new": "Nuevo",
+            "disputed": "En disputa",
+            "ruled": "Resuelto"
+        },
+        "detail": {
+            "new": "esperando los votos del jurado",
+            "disputed": "los jurados no se ponen de acuerdo en la respuesta",
+            "ruledAll_one": "1 jurado está de acuerdo",
+            "ruledAll_other": "los {{count}} jurados están de acuerdo",
+            "ruledSome": "{{agreed}} de {{total}} jurados están de acuerdo"
+        }
     },
     "glossary": {
         "case": {

@@ -3,16 +3,14 @@ import { useTranslation } from "react-i18next";
 import { Masthead, type NavItem } from "@/components/docket/masthead";
 import { Objection } from "@/components/docket/objection";
 import { Deliberating } from "@/components/docket/gavel";
-import { caseNumber } from "@/screens/docket/docket-views";
-import { Ticker, type TickerItem } from "@/components/docket/ticker";
+import { Ticker } from "@/components/docket/ticker";
 import { listAgents, listJurors, type AgentRow, type JurorRow } from "@/data/directory.service";
-import type { Docket } from "@/data/docket";
 import { hasUserFlag, setUserFlag, USER_FLAGS } from "@/data/user-flags.service";
 import { useAsync } from "@/hooks/use-async";
 import { LaunchGate } from "@/launch/launch-gate";
 import { docketStage, routeAfterLaunch, sessionStage } from "@/launch/launch-stages";
 import { getRayfinClient, type AppRayfinClient } from "@/lib/rayfin-client";
-import { formatRoute, useRoute, type Route } from "@/lib/route";
+import { useRoute, type Route } from "@/lib/route";
 import { CaseDetail } from "@/screens/case-detail/case-detail.screen";
 import { CasesScreen } from "@/screens/cases/cases.screen";
 import { ClerksOffice } from "@/screens/clerks-office/clerks-office.screen";
@@ -51,22 +49,6 @@ function WithDocket({
 }) {
     const docket = useDocket(client, requestedAgentId, agentId, jurors, viewer.me);
     return <>{children(docket)}</>;
-}
-
-function tickerItems(docket: Docket | undefined, t: (key: string) => string): TickerItem[] {
-    return (docket?.ticker ?? []).map(({ caseId, caseText, event }, index) => {
-        const text = caseText.length > 70 ? `${caseText.slice(0, 69)}…` : caseText;
-        const label = event.kind === "state" ? t(`caseState.${event.state}`) : "";
-        return {
-            key: `${caseId}-${index}`,
-            href: formatRoute({ page: "case", caseId }),
-            content: (
-                <>
-                    <b className="font-bold uppercase text-overruled">{label}</b> · {caseNumber(caseId)} “{text}”
-                </>
-            ),
-        };
-    });
 }
 
 function App() {
@@ -121,8 +103,8 @@ function App() {
     function layout(content: ReactNode, ticker?: ReactNode) {
         return (
             <div className="min-h-full bg-paper text-text">
-                {ticker}
                 <Masthead items={items} current={current} onNavigate={go} />
+                {ticker}
                 <main className="mx-auto flex w-full max-w-[1360px] flex-col gap-6 px-4 pb-10 pt-5 sm:px-6">{content}</main>
             </div>
         );
@@ -281,7 +263,7 @@ function App() {
                 }
                 if (intro) return intro;
                 return ready && agent
-                    ? layout(renderPage(docket), route.page === "home" ? <Ticker items={tickerItems(docket.data, t)} /> : undefined)
+                    ? layout(renderPage(docket), route.page === "home" ? <Ticker events={docket.data?.ticker ?? []} /> : undefined)
                     : layout(<Deliberating />);
             }}
         </WithDocket>

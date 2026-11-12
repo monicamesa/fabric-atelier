@@ -162,7 +162,7 @@
   --color-highlight: var(--highlight);
 }
 
-/* Verdict ticker: 48 s per loop over a duplicated list, paused on hover and focus (design guide, section 7). */
+/* Latest-on-the-docket ticker: 48 s per loop over a duplicated list; paused on hover, on keyboard focus of a link and with the pause button (design guide, section 7). Under reduced motion the component renders a static list instead. */
 @keyframes docket-ticker {
   from { transform: translateX(0); }
   to { transform: translateX(-50%); }
@@ -173,7 +173,8 @@
 }
 
 .docket-ticker:hover .docket-ticker-track,
-.docket-ticker:focus-within .docket-ticker-track {
+.docket-ticker:has(.docket-ticker-track :focus-visible) .docket-ticker-track,
+.docket-ticker[data-paused="true"] .docket-ticker-track {
   animation-play-state: paused;
 }
 

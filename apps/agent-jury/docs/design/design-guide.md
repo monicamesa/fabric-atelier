@@ -41,8 +41,8 @@ Define them as CSS custom properties on `:root` and override them under `[data-t
 | `--review-text` | `#3D5A7A` | `#A9B8D6` | Under review (text) |
 | `--overruled` | `#FFD27A` | `#FFD27A` | "Judge overruled" chip (text always `#14110D`) |
 | `--highlight` | `#FF8A62` | `#C8502B` | Underline that draws in under a word of a hero headline (launch, intro) |
-| `--ticker-bg` | `#14110D` | `#0A0806` | Verdict ticker |
-| `--ticker-text` | `#F3EEE4` | `#F3EEE4` | Verdict ticker text (light on the dark band in both themes) |
+| `--ticker-bg` | `#14110D` | `#0A0806` | Ticker band |
+| `--ticker-text` | `#F3EEE4` | `#F3EEE4` | Ticker text (light on the dark band in both themes) |
 | `--focus` | `#0F6E5C` | `#7FE0C4` | Focus outline |
 
 Contrast: all text pairs above meet WCAG AA (4.5:1) at the sizes used. Don't introduce new colours without checking contrast.
@@ -92,7 +92,7 @@ Load fonts from npm (`@fontsource-variable/fraunces`, `@fontsource-variable/inte
 
 **Masthead** — wordmark "Agent Jury" (Fraunces 900, 22 px) · nav (Home, Cases, Hearings, Case law, How it works) with a coral 2 px underline on the current page (`aria-current="page"`) · EN/ES segmented buttons (`aria-pressed`) · theme button with an `aria-label`.
 
-**Verdict ticker** (Home only) — fixed coral label "LATEST VERDICTS" + scrolling list, monospace 14 px, plain words ("all 3 jurors agree", not "3–0"). Pauses on hover and focus; static under reduced motion. Data comes from verdict events only: ruled, disputed and dismissed (appeals later), never new cases.
+**Latest-on-the-docket ticker** (Home only, a full-width dark band under the header) — fixed coral label (EN "LATEST ON THE DOCKET" · ES "ÚLTIMO EN EL JURADO"; on a phone an icon + "LATEST" / "ÚLTIMO") + a scrolling list, monospace 14 px. One line per case, newest first, at most 8, built from records already loaded at startup (no queries, no polling, no timer): `[STATUS] · #case Question (about 50 characters) · plain words`. Statuses: NEW ("waiting for jury votes"), DISPUTED ("jurors don't agree on the answer"), RULED / RESUELTO ("all 3 jurors agree" or "2 of 3"). Status is text on a token fill (`--ruled-fill`, `--action`) or an outline, never colour alone; dismissed cases and cases by non-jurors don't appear. Each line links to its case. Pauses on hover, on keyboard focus of a link and with a visible pause/play button (`aria-pressed`); under reduced motion it is a static, wrapping list without the button. The loop copy is `aria-hidden`; the band is a labelled region with no live region. Hidden when there are fewer than 2 lines. Judge verdicts ("CORRECT / INCORRECT / UNCLEAR", "AI judge") and won appeals join in I3b, when verdicts are part of the startup load.
 
 **Buttons**
 - Primary: `--ink` background, `--ink-inverse` text, 700, min-height 52 px (44 px when compact), `box-shadow: 5px 5px 0 var(--action)`.
@@ -163,7 +163,7 @@ Shown from the first paint until the app knows who the user is and has the docke
 | Stamp in | ~0.5 s | Verdicts, story card |
 | Highlight underline draws in | 1 s | Hero headline |
 | Intro step change | 0.55 s rise | Intro |
-| Ticker | 48 s per loop | Home |
+| Ticker | 48 s per loop; pauses on hover, keyboard focus and the pause button; static list under reduced motion | Home |
 | Clipping hover lift | 0.15 s | Cards |
 | Page → detail | View Transitions API (morph the question) | Docket row → case detail |
 

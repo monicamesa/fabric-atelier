@@ -73,8 +73,22 @@
         "readingRecord": "Reading the court record…"
     },
     "ticker": {
-        "label": "Latest verdicts",
-        "title": "Latest verdicts"
+        "label": "Latest on the docket",
+        "title": "Latest on the docket",
+        "short": "Latest",
+        "pause": "Pause the ticker",
+        "status": {
+            "new": "New",
+            "disputed": "Disputed",
+            "ruled": "Ruled"
+        },
+        "detail": {
+            "new": "waiting for jury votes",
+            "disputed": "jurors don't agree on the answer",
+            "ruledAll_one": "1 juror agrees",
+            "ruledAll_other": "all {{count}} jurors agree",
+            "ruledSome": "{{agreed}} of {{total}} jurors agree"
+        }
     },
     "glossary": {
         "case": {

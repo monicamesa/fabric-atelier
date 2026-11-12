@@ -38,6 +38,17 @@ describe("translation files", () => {
         expect(required.filter((key) => !esKeys.has(key))).toEqual([]);
     });
 
+    it("have the ticker keys in both languages, with the guide's labels", () => {
+        const required = ["ticker.label", "ticker.title", "ticker.short", "ticker.pause", "ticker.status.new", "ticker.status.disputed", "ticker.status.ruled", "ticker.detail.new", "ticker.detail.disputed", "ticker.detail.ruledAll_one", "ticker.detail.ruledAll_other", "ticker.detail.ruledSome"];
+        const enKeys = new Map(enEntries);
+        const esKeys = new Map(esEntries);
+        expect(required.filter((key) => !enKeys.has(key) || !esKeys.has(key))).toEqual([]);
+        expect(enKeys.get("ticker.title")).toBe("Latest on the docket");
+        expect(esKeys.get("ticker.title")).toBe("Último en el jurado");
+        // In Spanish the jury "resuelve"; "veredicto" belongs to the AI judge only.
+        expect(esEntries.filter(([key, value]) => key.startsWith("ticker.") && /veredicto/i.test(String(value)))).toEqual([]);
+    });
+
     it("have only non-empty string values", () => {
         for (const [key, value] of [...enEntries, ...esEntries]) {
             expect(typeof value, key).toBe("string");
