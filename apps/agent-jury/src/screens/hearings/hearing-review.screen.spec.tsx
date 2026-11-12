@@ -174,4 +174,14 @@ describe("reviewing the verdicts of a hearing", () => {
         expect(document.body.textContent).toContain("The jury agrees with the judge on 1 of 2 reviewed verdicts in this hearing.");
         expect(document.body.textContent).toContain("Judge prompt: default");
     });
+
+    it("does not count demo ('seed') or script ('check') reviews in the card's summary", async () => {
+        const reviews = [
+            { id: "r1", verdict_id: "v1", humanVerdict: "correct", reason: null, comment: null, reviewerUserId: BRUNO.id, reviewerEmail: BRUNO.email, source: "seed", createdAt: ago(100) },
+            { id: "r2", verdict_id: "v1", humanVerdict: "correct", reason: null, comment: null, reviewerUserId: ANA.id, reviewerEmail: ANA.email, source: "check", createdAt: ago(90) },
+        ];
+        renderHearing(ANA, reviews);
+        const summaries = await screen.findAllByTestId("review-summary");
+        expect(summaries[0]).toHaveTextContent("No juror has reviewed this verdict yet.");
+    });
 });

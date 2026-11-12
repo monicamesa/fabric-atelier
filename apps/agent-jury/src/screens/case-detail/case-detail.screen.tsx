@@ -146,6 +146,7 @@ export function CaseDetail({ client, caseId, agents, jurors, viewer }: CaseDetai
                                 <CaseNumber id={record.id} className="text-[15px] text-text" /> · {agent?.name ?? t("caseDetail.unknownAgent")}
                             </span>
                             <StatusChip state={analysis.state} />
+                            {item && records.data?.reviews?.available === false && <span className="text-[14px] text-text-muted">{t("caseDetail.reviewsUnavailable")}</span>}
                             {!analysis.verified && <UnverifiedChip />}
                         </div>
                         <h1 className="m-0 max-w-[960px] font-serif text-[36px] font-black leading-[1.02] tracking-[-0.02em] text-ink min-[900px]:text-[56px]">

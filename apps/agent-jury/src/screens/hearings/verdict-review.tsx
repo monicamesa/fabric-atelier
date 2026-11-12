@@ -31,7 +31,7 @@ export function VerdictReviewPanel({ verdict, reviews, jurors, viewer, appealing
     const [commentError, setCommentError] = useState<string>();
 
     const link = { id: verdict.id, hearing_id: verdict.hearing_id, case_id: verdict.case_id, judgeVerdict: verdict.judgeVerdict };
-    const standing = validReviews({ verdicts: [link], hearingCases: [], reviews: reviews.filter((review) => review.verdict_id === verdict.id) }, jurors, new Date()).map((item) => item.review);
+    const standing = validReviews({ verdicts: [link], hearingCases: [], reviews: reviews.filter((review) => review.verdict_id === verdict.id && !review.source) }, jurors, new Date()).map((item) => item.review);
     const agreed = standing.filter((review) => !isAppeal(review, link)).length;
     const appeals = standing.length - agreed;
     const mine = standing.find((review) => review.reviewerUserId === viewer.me?.userId);
@@ -64,10 +64,10 @@ export function VerdictReviewPanel({ verdict, reviews, jurors, viewer, appealing
             {viewer.canAct && !appealing && (
                 <div className="flex flex-wrap items-center gap-3">
                     <Button variant="secondary" compact disabled={saving} onClick={onAgree} aria-keyshortcuts="A">
-                        {t("hearings.review.agree")} <kbd className="font-mono text-[12px] text-text-muted">A</kbd>
+                        {t("hearings.review.agree")} <kbd className="hidden font-mono text-[12px] text-text-muted min-[900px]:inline">A</kbd>
                     </Button>
                     <Button variant="secondary" compact disabled={saving} onClick={() => onAppealingChange(true)} aria-keyshortcuts="X">
-                        {t("hearings.review.appeal")} <kbd className="font-mono text-[12px] text-text-muted">X</kbd>
+                        {t("hearings.review.appeal")} <kbd className="hidden font-mono text-[12px] text-text-muted min-[900px]:inline">X</kbd>
                     </Button>
                 </div>
             )}

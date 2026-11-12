@@ -1,5 +1,5 @@
 // I3b post-deploy checks on the TEST deployment, as the `rayfin login` user (an active admin). Prints only pass/fail lines.
-// No hearing is launched. The one positive write is a review marked source "check", which judge trust ignores.
+// No hearing is launched. The one positive write is a review marked source "check" (judge trust ignores it), made on the first run only; later runs reuse that row.
 //   node scripts/i3b-checks.mjs      (refuses production)
 import { getAuthenticatedToken } from "@microsoft/rayfin-cli/auth";
 import { RayfinClient } from "@microsoft/rayfin-client";
@@ -46,7 +46,15 @@ async function tries(input) {
 const target1 = verdicts.find((item) => item.case_id.toLowerCase() !== SPAIN_CASE) ?? verdicts[0];
 record("R.4", "a review in someone else's name (other user id) is rejected", !(await tries({ verdict_id: target1.id, reviewerUserId: "someone-else", reviewerEmail: me.email })));
 record("R.5", "a review with someone else's email is rejected", !(await tries({ verdict_id: target1.id, reviewerUserId: me.id, reviewerEmail: "someone.else@example.com" })));
-record("R.6", "a review of my own is accepted (marked source 'check')", await tries({ verdict_id: target1.id, reviewerUserId: me.id, reviewerEmail: me.email, source: "check" }));
+// The positive write happens once: later runs reuse the existing "check" row instead of adding another.
+const existing = (await client.data.VerdictReview.select(["id", "verdict_id", "source", "reviewerUserId"]).first(200).execute()).find(
+    (row) => row.source === "check" && row.reviewerUserId === me.id,
+);
+if (existing) {
+    record("R.6", "a review of my own was accepted earlier (reusing the 'check' row; nothing is added)", true);
+} else {
+    record("R.6", "a review of my own is accepted (marked source 'check')", await tries({ verdict_id: target1.id, reviewerUserId: me.id, reviewerEmail: me.email, source: "check" }));
+}
 
 let updated = true;
 try {

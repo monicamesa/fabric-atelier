@@ -171,6 +171,7 @@
             "approverAgainst": "An approver voted against the leading answer.",
             "reopened": "Reopened: an approver challenged the expected answer after a hearing. The jury votes again."
         },
+        "reviewsUnavailable": "Reviews couldn't be loaded; this status may be out of date.",
         "reopenedBy": "{{who}} challenged answer {{letter}} after a hearing.",
         "reopenedVotes_one": "The {{count}} earlier vote stays in the court record, marked “before the review”, but no longer counts: jurors who voted must vote again.",
         "reopenedVotes_other": "The {{count}} earlier votes stay in the court record, marked “before the review”, but no longer count: jurors who voted must vote again.",

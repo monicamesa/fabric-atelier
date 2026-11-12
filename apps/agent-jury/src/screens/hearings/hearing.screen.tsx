@@ -55,7 +55,7 @@ function VerdictCard({
     const position = asked?.position ?? 0;
     return (
         <article aria-current={active ? "true" : undefined} data-verdict-id={verdict.id} className={cn("flex flex-col gap-4 border bg-paper-raised p-5", active ? "border-2 border-ink" : "border-ink")}>
-            <header className="flex flex-wrap items-center justify-between gap-3">
+            <header className="flex flex-wrap items-center justify-between gap-x-3 gap-y-6 pb-1">
                 <span className="text-[13px] font-bold uppercase tracking-[0.14em] text-text-muted">
                     {t("hearings.verdicts.position", { position, total: view.total, number: "" })}
                     <CaseNumber id={verdict.case_id} className="ml-1" />
@@ -375,7 +375,7 @@ export function HearingScreen({ client, hearingId, agents, jurors, viewer, onBac
                     return null;
                 })}
                 {view.verdicts.length > 0 && (
-                    <p className="m-0 text-[14px] text-text-muted">
+                    <p className="m-0 hidden text-[14px] text-text-muted min-[900px]:block">
                         {t("hearings.review.keys")}
                         {showKeys && <span> {t("hearings.review.keysHelp")}</span>}
                     </p>

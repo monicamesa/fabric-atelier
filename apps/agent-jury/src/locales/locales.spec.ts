@@ -30,7 +30,7 @@ describe("translation files", () => {
             "launch.errors.session", "launch.errors.signIn", "launch.errors.notJuror", "launch.errors.busy", "launch.errors.unknown",
             "intro.pageLabel", "intro.gavelLabel", "intro.stepsLabel", "intro.skip", "intro.back", "intro.begin", "intro.next", "intro.enter", "intro.footer",
             ...["step1", "step2", "step3"].flatMap((step) => ["nav", "kicker", "titleStart", "titleHighlight", "body"].map((part) => `intro.${step}.${part}`)),
-            "home.howItWorks", "states.objection", "states.technicalDetails", "common.retry",
+            "home.howItWorks", "caseDetail.reviewsUnavailable", "states.objection", "states.technicalDetails", "common.retry",
         ];
         const enKeys = new Set(enEntries.map(([key]) => key));
         const esKeys = new Set(esEntries.map(([key]) => key));

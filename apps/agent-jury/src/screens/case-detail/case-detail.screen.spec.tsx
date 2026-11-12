@@ -16,7 +16,7 @@ const recent = new Date(Date.now() - 3_600_000).toISOString();
 const CASE = { id: CASE_ID, agent_id: AGENT.id, text: "Active customers in October?", category: "Sales", tags: null, authorUserId: "sub-ana", authorEmail: "ana.expert@example.com", createdAt: recent };
 const ANSWER = { id: "t1", case_id: CASE_ID, answer: "2310", definition: "Customers with an order in the last 90 days.", authorUserId: "sub-ana", authorEmail: "ana.expert@example.com", createdAt: recent };
 
-function fakeClient(testimonies: object[], user: { id: string; email: string }) {
+function fakeClient(testimonies: object[], user: { id: string; email: string }, failing: string[] = []) {
     const page = (items: unknown[]) => {
         const builder: Record<string, unknown> = {};
         for (const name of ["where", "orderBy", "first", "after"]) builder[name] = () => builder;
@@ -24,6 +24,15 @@ function fakeClient(testimonies: object[], user: { id: string; email: string }) 
         builder.execute = async () => items;
         return builder;
     };
+    const failingPage = () => {
+        const builder: Record<string, unknown> = {};
+        for (const name of ["where", "orderBy", "first", "after"]) builder[name] = () => builder;
+        builder.executePaginated = async () => {
+            throw new Error("Entity is not part of the schema");
+        };
+        return builder;
+    };
+    const pick = (name: string, items: unknown[]) => ({ select: () => (failing.includes(name) ? failingPage() : page(items)) });
     const createVote = vi.fn(async (input: object) => ({ id: "v-new", ...input }));
     const client = {
         data: {
@@ -31,18 +40,18 @@ function fakeClient(testimonies: object[], user: { id: string; email: string }) 
             Testimony: { select: () => page(testimonies) },
             Vote: { select: () => page([]), create: createVote },
             CaseDismissal: { select: () => page([]) },
-            Verdict: { select: () => page([]) },
+            Verdict: pick("Verdict", []),
             HearingCase: { select: () => page([]) },
             Hearing: { select: () => page([]) },
-            VerdictReview: { select: () => page([]) },
+            VerdictReview: pick("VerdictReview", []),
         },
         auth: { getSession: () => ({ isAuthenticated: true, user }) },
     } as unknown as AppRayfinClient;
     return { client, createVote };
 }
 
-function renderCase(testimonies: object[], user: { id: string; email: string }) {
-    const { client, createVote } = fakeClient(testimonies, user);
+function renderCase(testimonies: object[], user: { id: string; email: string }, failing: string[] = []) {
+    const { client, createVote } = fakeClient(testimonies, user, failing);
     const viewer = viewerFor({ isAuthenticated: true, user }, JURORS);
     render(<CaseDetail client={client} caseId={CASE_ID} agents={[AGENT]} jurors={JURORS} viewer={viewer} />);
     return { createVote };
@@ -86,5 +95,21 @@ describe("CaseDetail", () => {
         await screen.findByRole("article", { name: /Answer A/ });
         expect(screen.queryByRole("button", { name: /Vote|Propose|Dismiss/ })).not.toBeInTheDocument();
         expect(screen.getByText(/Only active jurors can propose cases/)).toBeInTheDocument();
+    });
+});
+
+describe("CaseDetail without the review data", () => {
+    it("shows a neutral notice next to the status when the reviews cannot be read, and still loads", async () => {
+        const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+        renderCase([ANSWER], { id: "sub-elena", email: "elena.expert@example.com" }, ["VerdictReview"]);
+        expect(await screen.findByRole("article", { name: /Answer A/ })).toBeInTheDocument();
+        expect(screen.getByText("Reviews couldn't be loaded; this status may be out of date.")).toBeInTheDocument();
+        warn.mockRestore();
+    });
+
+    it("shows no notice when the reviews load", async () => {
+        renderCase([ANSWER], { id: "sub-elena", email: "elena.expert@example.com" });
+        await screen.findByRole("article", { name: /Answer A/ });
+        expect(screen.queryByText(/Reviews couldn't be loaded/)).not.toBeInTheDocument();
     });
 });

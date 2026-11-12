@@ -171,6 +171,7 @@
             "approverAgainst": "Un aprobador votó en contra de la respuesta con más votos.",
             "reopened": "Reabierto: un aprobador cuestionó la respuesta esperada tras una vista. El jurado vota de nuevo."
         },
+        "reviewsUnavailable": "No se han podido cargar las revisiones; este estado puede estar desactualizado.",
         "reopenedBy": "{{who}} cuestionó la respuesta {{letter}} tras una vista.",
         "reopenedVotes_one": "El {{count}} voto anterior sigue en el acta, marcado “antes de la revisión”, pero ya no cuenta: quien votó tiene que votar de nuevo.",
         "reopenedVotes_other": "Los {{count}} votos anteriores siguen en el acta, marcados “antes de la revisión”, pero ya no cuentan: quien votó tiene que votar de nuevo.",

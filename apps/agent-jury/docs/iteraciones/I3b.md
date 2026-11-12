@@ -6,7 +6,7 @@
 
 - **Entra:** entidad `VerdictReview`, recursos por jurados, confianza en el juez y R9 (un case `ruled` con una revisión válida `expected_answer_wrong` de un **aprobador activo** vuelve a `under_review`).
 - **No entra:** export (I3c), pantalla de conflictos (I2).
-- **Recurso de demostración, verificado hoy** con una sola consulta DAX de solo lectura contra `SalesModel` (2026-11-12): clientes de España por `Customer[Country]` (facturación) = **141**; por `Customer[ShipToCountry]` (envío) = **265**. Coinciden con I3 §10 y §17. No se ha vuelto a preguntar al agente (cuesta capacidad).
+- **Recurso de demostración, verificado el 2026-11-12** con consultas DAX de solo lectura contra `SalesModel`: clientes de España por `Customer[Country]` (facturación) = **141**; por `Customer[ShipToCountry]` (envío) = **265**; **cualquiera de los dos = 292** (`Country = "Spain"` o `ShipToCountry = "Spain"`). **No determinismo del agente:** en la prueba anterior (I3a) respondió 141; en la vista real de pruebas de I3b respondió **292** ("cuenta clientes cuyo Country o ShipToCountry es Spain"), con la misma versión publicada. El juez dio `incorrect` (esperado 141). Es parte de la historia de la demo: las tres cifras son defendibles según la definición, y por eso la respuesta esperada necesita una definición.
 
 ## 2. Entidades y políticas
 
@@ -80,7 +80,7 @@
 - **Datos y entidades:** `entities.spec` (solo inserción; ambas condiciones de `create`), servicio `createVerdictReview` con la sesión.
 - **Pantallas:** botones y atajos, comentario obligatorio en el recurso, estado vacío de la confianza, "pending review"; claves EN/ES iguales y sin la familia "fall…" en español.
 - **Home sin datos de revisión:** `home.screen.spec.tsx` (la lectura de `VerdictReview` o `Verdict` falla y Home carga, sin confianza ni líneas del juez).
-- **Contra pruebas (`scripts/i3b-checks.mjs`, 8 comprobaciones + R.9):** veredicto real y versión del prompt guardada; revisión sembrada legible y marcada; rechaza otro `sub` u otro email; acepta la propia (marcada `check`); no se actualiza ni borra; R9 en el servidor (`launchHearing` rechaza el case reabierto). Sin vistas nuevas ni polling.
+- **Contra pruebas (`scripts/i3b-checks.mjs`, 8 comprobaciones + R.9):** veredicto real y versión del prompt guardada; revisión sembrada legible y marcada; rechaza otro `sub` u otro email; acepta la propia (marcada `check`, solo la primera vez; las siguientes ejecuciones reutilizan esa fila y no añaden otra); no se actualiza ni borra; R9 en el servidor (`launchHearing` rechaza el case reabierto). Sin vistas nuevas ni polling.
 
 ## 8. Qué va a pruebas y qué a producción (reglas de capacidad de AGENTS.md)
 
