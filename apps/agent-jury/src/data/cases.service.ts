@@ -10,6 +10,8 @@ export interface CaseRow {
     text: string;
     category: string;
     tags?: string | null;
+    /** The UI language when the case was written; missing on older cases. */
+    language?: "en" | "es" | null;
     authorUserId: string;
     authorEmail: string;
     createdAt: Date | string;
@@ -53,6 +55,7 @@ export interface NewCase {
     text: string;
     category: string;
     tags?: string;
+    language?: "en" | "es";
 }
 
 export interface NewTestimony {
@@ -76,7 +79,7 @@ export interface NewCaseDismissal {
     reason: string;
 }
 
-const CASE_FIELDS = ["id", "agent_id", "text", "category", "tags", "authorUserId", "authorEmail", "createdAt"] as const;
+const CASE_FIELDS = ["id", "agent_id", "text", "category", "tags", "language", "authorUserId", "authorEmail", "createdAt"] as const;
 const TESTIMONY_FIELDS = [
     "id",
     "case_id",
@@ -173,6 +176,19 @@ export function listCaseDismissals(client: DataClient, caseIds: readonly string[
     ).then((pages) => pages.flat() as CaseDismissalRow[]);
 }
 
+/** The language each of these cases was written in (cases without one are left out). Used by pages that don't load the docket. */
+export async function loadCaseLanguages(client: DataClient, caseIds: readonly string[]): Promise<Record<string, "en" | "es">> {
+    const languages: Record<string, "en" | "es"> = {};
+    if (caseIds.length === 0) return languages;
+    const pages = await Promise.all(
+        chunks(caseIds).map((ids) => client.data.Case.select(["id", "language"]).where({ id: { in: ids } }).first(ID_CHUNK).execute()),
+    );
+    for (const row of pages.flat() as { id: string; language?: string | null }[]) {
+        if (row.language === "en" || row.language === "es") languages[row.id.toLowerCase()] = row.language;
+    }
+    return languages;
+}
+
 export async function createCase(client: DataClient, input: NewCase): Promise<CaseRow> {
     const author = getSessionAuthor(client);
     const created = await client.data.Case.create({
@@ -180,6 +196,7 @@ export async function createCase(client: DataClient, input: NewCase): Promise<Ca
         text: input.text,
         category: input.category,
         tags: input.tags,
+        language: input.language,
         authorUserId: author.userId,
         authorEmail: author.email,
         createdAt: new Date(),

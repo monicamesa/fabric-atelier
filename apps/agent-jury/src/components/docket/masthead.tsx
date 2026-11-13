@@ -15,6 +15,8 @@ interface MastheadProps<T extends string> {
     items: NavItem<T>[];
     current: T;
     onNavigate: (id: T) => void;
+    /** "Give feedback" link, on every page that shows the header. */
+    feedbackHref?: string;
 }
 
 export function LanguageToggle() {
@@ -50,7 +52,7 @@ export function ThemeToggle() {
 }
 
 /** Wordmark, main navigation, EN/ES and theme toggles, over a 1 px ink rule. */
-export function Masthead<T extends string>({ items, current, onNavigate }: MastheadProps<T>) {
+export function Masthead<T extends string>({ items, current, onNavigate, feedbackHref }: MastheadProps<T>) {
     const { t } = useTranslation();
     return (
         <header className="mx-auto w-full max-w-[1360px] px-4 pt-3.5 sm:px-6">
@@ -75,9 +77,16 @@ export function Masthead<T extends string>({ items, current, onNavigate }: Masth
                         </a>
                     ))}
                 </nav>
-                <div className="flex items-center gap-2">
-                    <LanguageToggle />
-                    <ThemeToggle />
+                <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
+                    {feedbackHref && (
+                        <a href={feedbackHref} className="inline-flex min-h-9 items-center text-[14px] font-semibold text-action-text underline underline-offset-2 hover:text-ink">
+                            {t("feedback.link")}
+                        </a>
+                    )}
+                    <div className="flex items-center gap-2">
+                        <LanguageToggle />
+                        <ThemeToggle />
+                    </div>
                 </div>
             </div>
         </header>

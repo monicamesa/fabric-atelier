@@ -4,6 +4,7 @@ import { Button } from "@/components/docket/button";
 import { Chip } from "@/components/docket/chip";
 import { Deliberating } from "@/components/docket/gavel";
 import { ExampleAgentNote } from "@/components/docket/example-agent-note";
+import { LanguageBadge } from "@/components/docket/language-badge";
 import { SelectField } from "@/components/docket/field";
 import { Objection } from "@/components/docket/objection";
 import { PageHeader } from "@/components/docket/page-header";
@@ -20,24 +21,21 @@ import { formatDateTime } from "@/lib/format";
 import type { AppRayfinClient } from "@/lib/rayfin-client";
 import { HEARING_MAX_CASES, HEARING_STAGES, SECONDS_PER_QUESTION, estimateSeconds, type HearingStage } from "../../../rayfin/functions/src/hearing-rules";
 import { ClerkError } from "../clerks-office/clerk-feedback";
-import { AgentTabs } from "../docket/agent-tabs";
 import type { DocketState } from "../docket/use-docket";
 import { personName, type Viewer } from "../docket/viewer";
 import { anyInSession, scoreboard, viewHearings } from "./hearing-view";
 
 interface HearingsScreenProps {
     client: AppRayfinClient;
-    agents: AgentRow[];
     agent: AgentRow;
     docket: DocketState;
     jurors: JurorRow[] | undefined;
     viewer: Viewer;
-    onChangeAgent: (agentId: string) => void;
     onOpenHearing: (hearingId: string) => void;
 }
 
-/** Hearings of one agent, newest first, and (for admins) the form that starts the next one. */
-export function HearingsScreen({ client, agents, agent, docket, jurors, viewer, onChangeAgent, onOpenHearing }: HearingsScreenProps) {
+/** Hearings of one agent, newest first, and (for admins) the form that starts the next one. The agent is chosen in the selector above. */
+export function HearingsScreen({ client, agent, docket, jurors, viewer, onOpenHearing }: HearingsScreenProps) {
     const { t, i18n } = useTranslation();
     const language: AppLanguage = isAppLanguage(i18n.language) ? i18n.language : "en";
     const records = useAsync(() => loadHearingRecords(client));
@@ -78,11 +76,6 @@ export function HearingsScreen({ client, agents, agent, docket, jurors, viewer, 
                 kicker={t("hearings.kicker")}
                 title={t("hearings.title")}
                 help={t("hearings.help")}
-                aside={
-                    <div className="flex flex-col items-start gap-3 min-[900px]:items-end">
-                        <AgentTabs agents={agents} current={agent.id} onChange={onChangeAgent} />
-                    </div>
-                }
             />
 
             <ExampleAgentNote agent={agent} />
@@ -116,6 +109,7 @@ export function HearingsScreen({ client, agents, agent, docket, jurors, viewer, 
                                             <span className="flex min-w-0 flex-1 flex-wrap items-baseline gap-x-3 gap-y-1">
                                                 <CaseNumber id={item.record.id} />
                                                 <span className="font-serif text-[18px] font-bold text-ink">{item.record.text}</span>
+                                                <LanguageBadge language={item.record.language} />
                                             </span>
                                             {expected && (
                                                 <span title={expected} className="max-w-full shrink-0 truncate font-mono text-[15px] text-text min-[640px]:max-w-[16rem]">

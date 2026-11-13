@@ -13,7 +13,7 @@ export function AgentTabs({ agents, current, onChange }: { agents: AgentRow[]; c
     const label = (agent: AgentRow) => (isExampleAgent(agent) ? `${plainAgentName(agent)} · ${t("docket.example")}` : agent.name);
     if (agents.length > MAX_TABS) {
         return (
-            <SelectField label={t("docket.agent")} value={current} onChange={onChange}>
+            <SelectField label={t("docket.agent")} hiddenLabel value={current} onChange={onChange}>
                 {agents.map((agent) => (
                     <option key={agent.id} value={agent.id}>
                         {label(agent)}

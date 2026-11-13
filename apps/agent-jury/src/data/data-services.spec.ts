@@ -129,6 +129,14 @@ describe("create services", () => {
         });
     });
 
+    it("stores the UI language of the case when it is given, and nothing when it is not", async () => {
+        const { client, created } = fakeClient({});
+        await createCase(client, { agentId: "agent-1", text: "¿Cuántos clientes hay?", category: "Clientes", language: "es" });
+        await createCase(client, { agentId: "agent-1", text: "How many?", category: "Customers" });
+        expect(created[0].input).toMatchObject({ language: "es" });
+        expect((created[1].input as { language?: string }).language).toBeUndefined();
+    });
+
     it("takes the authorship of testimonies and dismissals from the session", async () => {
         const { client, created } = fakeClient({});
         await createTestimony(client, { caseId: "c1", answer: "42", definition: "Orders in the last 90 days" });

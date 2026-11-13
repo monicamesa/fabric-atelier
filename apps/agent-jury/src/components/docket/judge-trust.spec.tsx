@@ -45,10 +45,29 @@ describe("judge trust on Home", () => {
     it("shows the current prompt version prominently and earlier ones as history", () => {
         render(<JudgeTrustPanel trust={trust(version("v2", true, counts(3, 1)), [version("default", false, counts(1, 1))])} />);
         expect(screen.getByText("Judge prompt: v2")).toBeInTheDocument();
+        expect(screen.queryByText(/standard evaluation criteria/)).not.toBeInTheDocument();
         const history = screen.getByText("Earlier judge prompts").closest("details")!;
         expect(history).not.toHaveAttribute("open");
-        expect(history).toHaveTextContent("default");
+        expect(history).toHaveTextContent("Standard criteria");
         expect(history).toHaveTextContent("1 of 2");
+    });
+
+    it("says 'standard criteria' with one explanatory line instead of 'Judge prompt: default'", () => {
+        render(<JudgeTrustPanel trust={trust(version("default", true, counts(0, 0)))} />);
+        expect(screen.getByText("Judge: standard criteria")).toBeInTheDocument();
+        expect(screen.getByText("The AI judge uses Fabric's standard evaluation criteria. If the criteria change, trust starts again.")).toBeInTheDocument();
+        expect(screen.queryByText(/Judge prompt/)).not.toBeInTheDocument();
+    });
+
+    it("says it in Spanish", async () => {
+        await i18n.changeLanguage("es");
+        try {
+            render(<JudgeTrustPanel trust={trust(version("default", true, counts(0, 0)))} />);
+            expect(screen.getByText("Juez: criterio estándar")).toBeInTheDocument();
+            expect(screen.getByText("El juez de IA usa el criterio estándar de Fabric. Si cambia el criterio, la confianza empieza de cero.")).toBeInTheDocument();
+        } finally {
+            await i18n.changeLanguage("en");
+        }
     });
 
     it("has a compact phone line with the same numbers", () => {

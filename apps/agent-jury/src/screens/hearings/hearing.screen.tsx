@@ -20,8 +20,12 @@ import type { AppRayfinClient } from "@/lib/rayfin-client";
 import { formatRoute } from "@/lib/route";
 import { cn } from "@/lib/utils";
 import { criticPromptVersionOf, judgeTrust } from "@/rules/judge-trust";
+import { isStandardCriteria } from "@/components/docket/judge-criteria";
 import { ClerkError } from "../clerks-office/clerk-feedback";
 import { personName, type Viewer } from "../docket/viewer";
+import { LanguageBadge } from "@/components/docket/language-badge";
+import { useCaseLanguages } from "@/hooks/use-case-languages";
+import { VerdictTracePanel } from "./verdict-trace";
 import { questionFor, scoreboard, viewHearing, type HearingView } from "./hearing-view";
 import { AgentAnswer } from "./agent-answer";
 import { agreementFor, type AppealInput } from "./review-choices";
@@ -38,15 +42,19 @@ const STATE_TONE: Record<HearingView["state"], { tone: ChipTone; filled: boolean
 };
 
 function VerdictCard({
+    client,
     view,
     verdict,
     language,
+    caseLanguage,
     active,
     children,
 }: {
+    client: AppRayfinClient;
     view: HearingView;
     verdict: VerdictRow;
     language: AppLanguage;
+    caseLanguage?: string;
     active: boolean;
     children?: ReactNode;
 }) {
@@ -62,7 +70,9 @@ function VerdictCard({
                 </span>
                 <Stamp tone={verdict.judgeVerdict}>{t(`hearings.verdicts.${verdict.judgeVerdict}`)}</Stamp>
             </header>
-            <h3 className="m-0 font-serif text-[22px] font-bold leading-snug text-ink">{asked?.question}</h3>
+            <h3 className="m-0 font-serif text-[22px] font-bold leading-snug text-ink">
+                {asked?.question} <LanguageBadge language={caseLanguage} />
+            </h3>
             <div className="grid gap-4 min-[700px]:grid-cols-2">
                 <div className="flex flex-col gap-1 border-l-4 border-ruled pl-3">
                     <span className="text-[12px] font-bold uppercase tracking-[0.12em] text-text-muted">{t("hearings.verdicts.expects")}</span>
@@ -81,6 +91,7 @@ function VerdictCard({
                     })}
                 </p>
             )}
+            <VerdictTracePanel client={client} verdictId={verdict.id} />
             {children}
         </article>
     );
@@ -108,6 +119,7 @@ export function HearingScreen({ client, hearingId, agents, jurors, viewer, onBac
         // The page is re-derived whenever new records arrive.
     }, [records.data, hearingId]);
     const running = view?.state === "in_progress";
+    const caseLanguages = useCaseLanguages(client, view ? view.cases.map((row) => row.case_id) : []);
     const reload = () => {
         setReadAt(new Date());
         records.reload();
@@ -332,7 +344,7 @@ export function HearingScreen({ client, hearingId, agents, jurors, viewer, onBac
                             ? t("hearings.review.hearingTrust", { agreed: hearingTrust.agreed, decided: hearingTrust.decided })
                             : t("hearings.review.hearingTrustNone")}
                         {hearingTrust.pending > 0 && <span className="text-text-muted"> · {t("hearings.review.hearingPending", { count: hearingTrust.pending })}</span>}
-                        <span className="text-text-muted"> · {t("hearings.review.judgePrompt", { version: criticPromptVersionOf(view.hearing) })}</span>
+                        <span className="text-text-muted"> · {isStandardCriteria(criticPromptVersionOf(view.hearing)) ? t("home.trustStandard") : t("hearings.review.judgePrompt", { version: criticPromptVersionOf(view.hearing) })}</span>
                     </p>
                 )}
                 {view.verdicts.length === 0 && <EmptyState message={t("hearings.verdicts.empty")} />}
@@ -340,7 +352,15 @@ export function HearingScreen({ client, hearingId, agents, jurors, viewer, onBac
                     const verdict = view.verdicts.find((item) => item.case_id.toLowerCase() === row.case_id.toLowerCase());
                     if (verdict) {
                         return (
-                            <VerdictCard key={row.id} view={view} verdict={verdict} language={language} active={verdict.id === activeId}>
+                            <VerdictCard
+                                key={row.id}
+                                client={client}
+                                view={view}
+                                verdict={verdict}
+                                language={language}
+                                caseLanguage={caseLanguages[row.case_id.toLowerCase()]}
+                                active={verdict.id === activeId}
+                            >
                                 <VerdictReviewPanel
                                     verdict={verdict}
                                     reviews={records.data?.reviews ?? []}
@@ -368,7 +388,8 @@ export function HearingScreen({ client, hearingId, agents, jurors, viewer, onBac
                     if (running && nextWaiting?.id === row.id) {
                         return (
                             <p key={row.id} role="status" className="m-0 border border-dashed border-text-muted p-4 text-[15px] text-text-muted">
-                                {t("hearings.verdicts.waiting")} <span className="font-serif font-bold text-ink">{row.question}</span>
+                                {t("hearings.verdicts.waiting")} <span className="font-serif font-bold text-ink">{row.question}</span>{" "}
+                                <LanguageBadge language={caseLanguages[row.case_id.toLowerCase()]} />
                             </p>
                         );
                     }

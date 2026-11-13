@@ -7,7 +7,6 @@ interface YourTurnPanelProps {
     agentId: string;
     agentName: string;
     turn: YourTurn;
-    onPropose: () => void;
     className?: string;
 }
 
@@ -23,7 +22,7 @@ const LINK = "font-bold text-action-text underline underline-offset-2 hover:text
  * "Your turn": an editorial sidebar, not a card. Small-caps heading with the agent on the right, a 1 px rule, then plain
  * lines of text with one link each (at most four, most urgent first).
  */
-export function YourTurnPanel({ agentId, agentName, turn, onPropose, className }: YourTurnPanelProps) {
+export function YourTurnPanel({ agentId, agentName, turn, className }: YourTurnPanelProps) {
     const { t } = useTranslation();
     if (turn.lines.length === 0 && !turn.upToDate) return null;
     return (
@@ -41,9 +40,12 @@ export function YourTurnPanel({ agentId, agentName, turn, onPropose, className }
                         {t("turn.nobodyWaiting")}
                         {turn.othersWaiting > 0 && ` ${t("turn.othersWaiting", { count: turn.othersWaiting })}`}
                     </p>
-                    <button type="button" onClick={onPropose} className={cn(LINK, "min-h-11 w-fit cursor-pointer border-0 bg-transparent p-0 text-left text-[15px]")}>
-                        {t("turn.propose")} →
-                    </button>
+                    <a
+                        href={formatRoute({ page: "cases", agentId, filter: "all", query: "" })}
+                        className={cn(LINK, "inline-flex min-h-11 w-fit items-center text-[15px]")}
+                    >
+                        {t("turn.seeOpen")} →
+                    </a>
                 </div>
             ) : (
                 <ul className="m-0 flex list-none flex-col gap-3 p-0">

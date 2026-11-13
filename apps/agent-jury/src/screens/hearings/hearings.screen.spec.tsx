@@ -78,12 +78,10 @@ function renderHearings() {
     render(
         <HearingsScreen
             client={fakeClient()}
-            agents={[AGENT, OTHER_AGENT]}
             agent={AGENT}
             docket={docket}
             jurors={JURORS}
             viewer={viewer}
-            onChangeAgent={() => {}}
             onOpenHearing={() => {}}
         />,
     );
@@ -122,12 +120,11 @@ describe("HearingsScreen", () => {
         expect(expected).toHaveClass("min-[640px]:max-w-[16rem]");
     });
 
-    it("keeps agent names on one line and lets the tab group scroll", async () => {
+    it("has no agent switcher of its own: the agent is chosen in the selector at the top of the page", async () => {
         await i18n.changeLanguage("en");
         renderHearings();
-        const group = await screen.findByRole("group", { name: /agent/i });
-        expect(group).toHaveClass("overflow-x-auto");
-        for (const button of within(group).getAllByRole("button")) expect(button).toHaveClass("whitespace-nowrap");
+        await screen.findByRole("checkbox", { name: /How many orders were placed/ });
+        expect(screen.queryByRole("group", { name: /agent/i })).not.toBeInTheDocument();
     });
 
     it("lists every hearing of the agent, newest first, and none of another agent's", async () => {

@@ -7,6 +7,7 @@ import { ExampleAgentNote } from "@/components/docket/example-agent-note";
 import { ProgressStrip } from "@/components/docket/progress-strip";
 import { YourTurnPanel } from "@/components/docket/your-turn-panel";
 import { JudgeTrustPanel } from "@/components/docket/judge-trust";
+import { LanguageBadge } from "@/components/docket/language-badge";
 import { Objection } from "@/components/docket/objection";
 import { CaseNumber, StatusChip, UnverifiedChip } from "@/components/docket/status-chip";
 import { EmptyState, Skeleton } from "@/components/docket/states";
@@ -17,7 +18,7 @@ import type { AppRayfinClient } from "@/lib/rayfin-client";
 import { formatRoute } from "@/lib/route";
 import { cn } from "@/lib/utils";
 import { CONSENSUS_MIN_VOTES } from "@/rules/consensus";
-import { AgentTabs } from "../docket/agent-tabs";
+import { focusAgentSelector } from "../docket/agent-selector-focus";
 import { homeRows } from "../docket/docket-views";
 import { nextStep, type TurnContext } from "../docket/next-step";
 import { gameProgress, yourTurn } from "../docket/your-turn";
@@ -31,12 +32,11 @@ interface HomeScreenProps {
     agent?: AgentRow;
     docket?: DocketState;
     viewer: Viewer;
-    onAgentChange: (agentId: string) => void;
     onOpenCase: (caseId: string) => void;
     onOpenClerk: () => void;
 }
 
-export function HomeScreen({ client, agents, agent, docket, viewer, onAgentChange, onOpenCase, onOpenClerk }: HomeScreenProps) {
+export function HomeScreen({ client, agents, agent, docket, viewer, onOpenCase, onOpenClerk }: HomeScreenProps) {
     const { t } = useTranslation();
     const [proposing, setProposing] = useState(false);
     const data = docket?.data;
@@ -90,7 +90,7 @@ export function HomeScreen({ client, agents, agent, docket, viewer, onAgentChang
                 </div>
                 {hasSidebar && (
                     <aside className="flex flex-col gap-8 border-t border-rule pt-6 min-[900px]:border-l min-[900px]:border-t-0 min-[900px]:border-ink min-[900px]:pl-7 min-[900px]:pt-0">
-                        {showTurn && agent && turn && <YourTurnPanel agentId={agent.id} agentName={agent.name} turn={turn} onPropose={() => setProposing(true)} />}
+                        {showTurn && agent && turn && <YourTurnPanel agentId={agent.id} agentName={agent.name} turn={turn} />}
                         {showTrust && <JudgeTrustPanel trust={data?.trust} />}
                     </aside>
                 )}
@@ -106,6 +106,7 @@ export function HomeScreen({ client, agents, agent, docket, viewer, onAgentChang
                     categories={data?.categories ?? []}
                     onCancel={() => setProposing(false)}
                     onSaved={onOpenCase}
+                    onChangeAgent={agents.length > 1 ? focusAgentSelector : undefined}
                 />
             )}
 
@@ -121,7 +122,6 @@ export function HomeScreen({ client, agents, agent, docket, viewer, onAgentChang
                         </h2>
                         <p className="m-0 text-[15px] text-text">{t("home.docketHelp")}</p>
                     </div>
-                    {agent && <AgentTabs agents={agents} current={agent.id} onChange={onAgentChange} />}
                 </div>
                 {!viewer.canAct && <p className="m-0 border-l-4 border-review pl-3 text-[15px] text-text">{t("docket.readOnly")}</p>}
                 {!agent ? (
@@ -202,9 +202,12 @@ function DocketRow({ item, ctx, onOpen }: { item: DocketCase; ctx: TurnContext; 
                 <CaseNumber id={record.id} />
             </span>
             <span role="cell" className="flex min-w-0 flex-col gap-1">
-                <a href={href} onClick={go} className="font-serif text-[21px] leading-tight text-ink no-underline hover:underline">
-                    {record.text}
-                </a>
+                <span className="flex min-w-0 items-baseline gap-2">
+                    <a href={href} onClick={go} className="min-w-0 font-serif text-[21px] leading-tight text-ink no-underline hover:underline">
+                        {record.text}
+                    </a>
+                    <LanguageBadge language={record.language} />
+                </span>
                 <span className="line-clamp-2 text-[14px] text-text min-[700px]:line-clamp-1">{helper}</span>
             </span>
             <span role="cell" className="col-start-2 flex flex-wrap items-center gap-2 min-[700px]:col-start-3 min-[700px]:flex-col min-[700px]:items-end">

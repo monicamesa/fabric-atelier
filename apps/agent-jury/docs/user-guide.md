@@ -32,23 +32,27 @@ Words of the game:
 
 A game goes from a business question to an agreed answer, and from there to measuring the agent and the judge.
 
-**Not sure what to do? Start at Home: "Your turn" is in the right-hand column, next to the headline.** It lists, in order of urgency and with one link each, what needs you right now: cases waiting for your vote, disputes where you can give your opinion, cases that need an approver's vote (approvers), judge verdicts to review and, for admins, ruled cases ready for a hearing. When nothing is pending it says "You're up to date" and links to propose a new case. Under the headline, "The game" line (proposed · open for votes · ruled · in a hearing · reviewed) shows how many cases are at each step and marks, in coral, where work is piling up. Every case in the lists also says what happens next *for you*.
+**Not sure what to do? Start at Home: "Your turn" is in the right-hand column, next to the headline.** It lists, in order of urgency and with one link each, what needs you right now: cases waiting for your vote, disputes where you can give your opinion, cases that need an approver's vote (approvers), judge verdicts to review and, for admins, ruled cases ready for a hearing. When nothing is pending it says "You're up to date" and links to the open cases. Under the headline, "The game" line (proposed · open for votes · ruled · in a hearing · reviewed) shows how many cases are at each step and marks, in coral, where work is piling up. Every case in the lists also says what happens next *for you*.
 
-1. **Set up the courtroom (admin).** In the **Clerk's office**, add the jurors (the email they use to sign in to Fabric, and a role) and register the agent to evaluate: its name, the **Workspace ID** and the **Agent ID**, copied from the agent's address in Fabric. Admins can also edit their own display name (Clerk's office → **Jurors** tab → **Edit details**) and, on the **Agents** tab, switch **Show example data** on or off (off by default; nothing is deleted).
+**Choose the agent first.** At the top of Home, Cases and Hearings, "1 · Choose the agent" is the one place to switch agents: everything you see and propose is for that agent.
+
+Something confusing, or an idea? **Give feedback** (top right, on every page) sends a short note to the admins.
+
+1. **Set up the courtroom (admin).** In the **Clerk's office**, add the jurors (the email they use to sign in to Fabric, and a role) and register the agent to evaluate: its name, the **Workspace ID** and the **Agent ID**, copied from the agent's address in Fabric. Admins can also edit their own display name (Clerk's office → **Jurors** tab → **Edit details**), read the notes jurors sent in the **Feedback** tab (newest first, without names or emails) and, on the **Agents** tab, switch **Show example data** on or off (off by default; nothing is deleted).
 2. **Propose a case.** Any juror presses **+ Propose a case** on Cases, writes the question the way a business user would ask it ("How many customers do we have in Spain?"), a category, optional tags and **their answer** with a one-sentence definition. The optional details (criterion, time window, population, source) help show where two answers differ. Proposing a case **does not count as a vote**: your own answer starts with no votes, and your vote on it never counts.
 3. **Vote.** The rest of the jury opens the case and presses **Vote for answer A**, or **Vote against** (a reason is required), or proposes another answer with **Propose another answer** and its own definition. You can change your mind: the latest vote of each person stands. **What you vote on:** the answer the agent *should* give. You don't judge style or re-calculate the number; you check that the definition is the right one for this question (each answer shows what counts, the time window, who counts and the source table). If you'd define it differently, propose another answer.
 4. **Rule or dispute.** A case is *ruled* when one answer has two valid votes in favour, at least one from an approver, and no approver against (details below). If two different answers have support, the case becomes a **dispute**, which is where the definitions each team uses without knowing show up (for example billing country versus shipping country).
-5. **Hold a hearing (admin).** On **Hearings**, **Start a hearing**: choose the ruled questions (up to 5 for now) and the version of the agent (published or draft), and see a time estimate. A notebook in Fabric asks the agent the questions and the AI judge gives one verdict per case. The hearing page shows progress and the verdicts as they arrive.
+5. **Hold a hearing (admin).** On **Hearings**, **Start a hearing**: choose the ruled questions (up to 5 for now) and the version of the agent (published or draft), and see a time estimate. A notebook in Fabric asks the agent the questions and the AI judge gives one verdict per case. The hearing page shows progress and the verdicts as they arrive. Under each verdict, **How the agent got there** (closed by default) shows the steps the agent took: where it looked and the query it generated (DAX, SQL or KQL). It never shows the data the query returned.
 6. **Review the judge.** Each juror reviews each verdict: **Yes, agree** or **No, appeal** (on desktop, keys A and X; J/K to move). An appeal needs a comment. When the jury's majority corrects the judge, the ticker announces it as "Judge overruled".
 7. **Reopen if needed.** If an approver, while reviewing a verdict, picks the reason "The expected answer is wrong", the case reopens: earlier votes stay in the court record marked "before the review" but stop counting, and the jury votes again.
-8. **Measure trust in the judge.** Home shows how often the jury agrees with the judge ("n of m"), per agent and per judge prompt version.
+8. **Measure trust in the judge.** Home shows how often the jury agrees with the judge ("n of m"), per agent and per set of judge criteria. By default the label reads "Judge: standard criteria": the AI judge uses Fabric's standard evaluation criteria. If the criteria change, trust starts again.
 9. **Export the case law.** On Cases, **Export case law** downloads a CSV (`question,expected_answer,category,tags`) of the agent's ruled cases, to reuse in other evaluations.
 
 The first time, the app shows a three-step Intro; you can replay it from Home with **How it works**.
 
 ### Language of the questions
 
-Questions, answers and definitions are **never translated**: the question is sent to the agent exactly as written, so translating it would change the test. Write each question in the language you want the agent tested in; the language of the screens (EN | ES) only changes the app's own texts.
+Questions, answers and definitions are **never translated**: the question is sent to the agent exactly as written, so translating it would change the test. Write each question in the language you want the agent tested in; the language of the screens (EN | ES) only changes the app's own texts. Each case shows a small **EN** or **ES** badge next to its question, taken from the screen language when it was written; older cases have no badge.
 
 ## The rules, precisely
 
@@ -91,7 +95,7 @@ An active approver, while reviewing a hearing verdict, picks the reason "The exp
 
 ### Trust in the judge
 
-- It is computed **per agent and per judge prompt version** (a different prompt is a different judge): the current version prominently and earlier ones as history.
+- It is computed **per agent and per set of judge criteria** (different criteria are a different judge; a custom prompt shows its version name): the current one prominently and earlier ones as history.
 - For each verdict the **majority** of valid reviews decides; a tie stays "pending" and does not count.
 - It is an agreement when the jury says the same as the judge (if the judge says "Unclear", agreement is "Ambiguous").
 - Reviews with the reason "The expected answer is wrong" do not count (the judge compared well with a bad answer).

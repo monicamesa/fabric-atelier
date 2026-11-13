@@ -16,11 +16,12 @@ import type { AppRayfinClient } from "@/lib/rayfin-client";
 import { AdminLogPanel, LatestChanges, type LogState } from "./admin-log";
 import { AgentsPanel } from "./agents-panel";
 import { ClerkError, ClerkNotice } from "./clerk-feedback";
+import { FeedbackPanel } from "./feedback-panel";
 import { JurorsPanel } from "./jurors-panel";
 import { describeLogEntry } from "./log-entry";
 import { SwearInForm } from "./swear-in-form";
 
-type Tab = "jurors" | "agents" | "log";
+type Tab = "jurors" | "agents" | "log" | "feedback";
 const LOG_SIZE = 200;
 
 interface ClerksOfficeProps {
@@ -199,6 +200,7 @@ function AdminDesk({
                     { id: "jurors", label: t("clerk.tabs.jurors", { count: visibleJurors.length }) },
                     { id: "agents", label: visibleAgentRows ? t("clerk.tabs.agents", { count: visibleAgentRows.length }) : t("clerk.tabs.agentsPlain") },
                     { id: "log", label: t(isPhone ? "clerk.tabs.logShort" : "clerk.tabs.log") },
+                    { id: "feedback", label: t("clerk.tabs.feedback") },
                 ]}
             />
             <ClerkNotice message={notice} />
@@ -235,6 +237,7 @@ function AdminDesk({
                         </div>
                     ))}
                 {tab === "log" && <AdminLogPanel log={logState} />}
+                {tab === "feedback" && <FeedbackPanel client={client} />}
             </div>
         </div>
     );

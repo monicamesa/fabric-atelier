@@ -43,6 +43,15 @@ const vote = (testimonyId: string, voter: string, minutesAgo: number, value: "fo
 });
 
 describe("buildTicker", () => {
+    it("carries the question language of each case, so the band can show its badge", () => {
+        const spanish = docketCase("c-es", 30);
+        (spanish.record as { language?: string }).language = "es";
+        expect(buildTicker([spanish, docketCase("c-old", 40)]).map((event) => [event.caseId, event.caseLanguage])).toEqual([
+            ["c-es", "es"],
+            ["c-old", undefined],
+        ]);
+    });
+
     it("says NEW for a case waiting for votes, dated when it was proposed", () => {
         expect(buildTicker([docketCase("c-new", 30)])).toEqual([{ caseId: "c-new", caseText: "Question c-new", status: "new", at: at(-30) }]);
     });

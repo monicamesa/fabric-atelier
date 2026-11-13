@@ -13,6 +13,7 @@ export const CLERK_ACTIONS = [
   'registerAgent',
   'setAgentActive',
   'readAdminLog',
+  'readFeedback',
   'launchHearing',
   'cancelHearing',
   'checkWithFabric',
@@ -28,6 +29,8 @@ export type ClerkCommand =
   | { action: 'registerAgent'; name: string; workspaceId: string; itemId: string }
   | { action: 'setAgentActive'; agentId: string; active: boolean }
   | { action: 'readAdminLog'; limit: number }
+  // The juror feedback (newest first). Only admins reach it: the Feedback entity is not readable by other users.
+  | { action: 'readFeedback'; limit: number }
   // Starts a hearing over the chosen ruled cases of one agent (limits and cooldown enforced by the Function).
   | { action: 'launchHearing'; agentId: string; stage: HearingStage; caseIds: string[] }
   | { action: 'cancelHearing'; hearingId: string }
@@ -67,12 +70,22 @@ export interface AdminLogEntry {
   automatedCheck: boolean;
 }
 
+export interface FeedbackEntry {
+  id: string;
+  type: 'idea' | 'confusing' | 'bug' | 'other';
+  message: string;
+  page: string;
+  canContact: boolean;
+  createdAt: string;
+}
+
 export interface ClerkResult {
   code: ClerkCode;
   outcome: 'done' | 'rejected';
   reason: ClerkReason;
   detail: string;
   log?: AdminLogEntry[];
+  feedback?: FeedbackEntry[];
   /** launchHearing: the new hearing. cancelHearing and checkWithFabric: the hearing asked about. */
   hearingId?: string;
   /** checkWithFabric: the job status Fabric reported. */
@@ -200,6 +213,13 @@ export function parseCommand(action: string, payloadText: string): ParseResult {
           throw new PayloadError(`limit must be a whole number from 1 to ${MAX_LOG_ENTRIES}.`);
         }
         return { ok: true, command: { action: 'readAdminLog', limit } };
+      }
+      case 'readFeedback': {
+        const limit = fields.limit ?? DEFAULT_LOG_ENTRIES;
+        if (typeof limit !== 'number' || !Number.isInteger(limit) || limit < 1 || limit > MAX_LOG_ENTRIES) {
+          throw new PayloadError(`limit must be a whole number from 1 to ${MAX_LOG_ENTRIES}.`);
+        }
+        return { ok: true, command: { action: 'readFeedback', limit } };
       }
       case 'launchHearing': {
         const stage = fields.stage;

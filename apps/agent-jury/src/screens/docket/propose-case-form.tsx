@@ -1,10 +1,11 @@
 import { useId, useState, type FormEvent } from "react";
-import { useTranslation } from "react-i18next";
+import { Trans, useTranslation } from "react-i18next";
 import { Button } from "@/components/docket/button";
 import { TextAreaField, TextField } from "@/components/docket/field";
 import { Objection } from "@/components/docket/objection";
 import { createCase, createTestimony } from "@/data/cases.service";
 import { canonicalCategory } from "@/data/docket";
+import { isAppLanguage } from "@/i18n/language-preference";
 import type { AppRayfinClient } from "@/lib/rayfin-client";
 import { AnswerFields } from "./answer-form";
 import { EMPTY_ANSWER, trimDraft, validateAnswer, type AnswerDraft, type AnswerErrors } from "./answer-draft";
@@ -16,6 +17,8 @@ interface ProposeCaseFormProps {
     categories: string[];
     onSaved: (caseId: string) => void;
     onCancel: () => void;
+    /** Shown as "change" in the header when there is more than one agent to pick from. */
+    onChangeAgent?: () => void;
 }
 
 type CaseErrors = Partial<Record<"text" | "category", string>> & AnswerErrors;
@@ -24,8 +27,8 @@ type CaseErrors = Partial<Record<"text" | "category", string>> & AnswerErrors;
  * A case is saved with its first answer. If the case saves and the answer doesn't, the form keeps
  * what was typed and the retry only adds the answer, so no second case is created.
  */
-export function ProposeCaseForm({ client, agentId, agentName, categories, onSaved, onCancel }: ProposeCaseFormProps) {
-    const { t } = useTranslation();
+export function ProposeCaseForm({ client, agentId, agentName, categories, onSaved, onCancel, onChangeAgent }: ProposeCaseFormProps) {
+    const { t, i18n } = useTranslation();
     const listId = useId();
     const [text, setText] = useState("");
     const [category, setCategory] = useState("");
@@ -53,6 +56,7 @@ export function ProposeCaseForm({ client, agentId, agentName, categories, onSave
                     text: text.trim(),
                     category: canonicalCategory(category, categories),
                     tags: tags.trim() || undefined,
+                    language: isAppLanguage(i18n.language) ? i18n.language : undefined,
                 });
                 caseId = created.id;
                 setSavedCaseId(caseId);
@@ -69,7 +73,17 @@ export function ProposeCaseForm({ client, agentId, agentName, categories, onSave
     return (
         <form onSubmit={(event) => void submit(event)} noValidate className="flex flex-col gap-4 border border-ink bg-paper-raised p-5">
             <div className="flex flex-col gap-1">
-                <h2 className="m-0 font-serif text-[28px] font-bold text-ink">{t("proposeCase.title", { agent: agentName })}</h2>
+                <h2 className="m-0 font-serif text-[28px] font-bold text-ink">
+                    <Trans i18nKey="proposeCase.title" values={{ agent: agentName }} components={{ agent: <strong className="font-black" /> }} />
+                    {onChangeAgent && !savedCaseId && (
+                        <>
+                            {" · "}
+                            <button type="button" onClick={onChangeAgent} className="cursor-pointer border-0 bg-transparent p-0 font-sans text-[16px] font-bold text-action-text underline underline-offset-2 hover:text-ink">
+                                {t("proposeCase.change")}
+                            </button>
+                        </>
+                    )}
+                </h2>
                 <p className="m-0 text-[15px] text-text">{t("proposeCase.help")}</p>
             </div>
             <TextAreaField

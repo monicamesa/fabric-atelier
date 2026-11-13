@@ -11,11 +11,13 @@ import { useAsync } from "@/hooks/use-async";
 import { LaunchGate } from "@/launch/launch-gate";
 import { docketStage, routeAfterLaunch, sessionStage } from "@/launch/launch-stages";
 import { getRayfinClient, type AppRayfinClient } from "@/lib/rayfin-client";
-import { useRoute, type Route } from "@/lib/route";
+import { useRoute, formatRoute, type Route } from "@/lib/route";
 import { CaseDetail } from "@/screens/case-detail/case-detail.screen";
 import { CasesScreen } from "@/screens/cases/cases.screen";
 import { ClerksOffice } from "@/screens/clerks-office/clerks-office.screen";
 import { GuideScreen } from "@/screens/guide/guide.screen";
+import { FeedbackScreen } from "@/screens/feedback/feedback.screen";
+import { AgentSelector } from "@/screens/docket/agent-selector";
 import { useDocket, type DocketState } from "@/screens/docket/use-docket";
 import { viewerFor, type Viewer } from "@/screens/docket/viewer";
 import { HomeScreen } from "@/screens/home/home.screen";
@@ -90,7 +92,7 @@ function App() {
 
     // A #clerk link waits for the jury list; non-admins then land on Home. clerkExecute is the real check.
     const page: Page | "case" | "hearing" =
-        route.page === "clerk" ? (isAdmin || !jury.data ? "clerk" : "home") : route.page === "intro" || route.page === "guide" ? "home" : route.page;
+        route.page === "clerk" ? (isAdmin || !jury.data ? "clerk" : "home") : route.page === "intro" || route.page === "guide" || route.page === "feedback" ? "home" : route.page;
     const current: Page = page === "case" ? "cases" : page === "hearing" ? "hearings" : page;
 
     const items: NavItem<Page>[] = [
@@ -107,11 +109,13 @@ function App() {
         else navigate({ page: "home", agentId: agent?.id });
     }
     const openCase = (caseId: string) => navigate({ page: "case", caseId });
+    // "Give feedback" remembers the page it was opened from (a screen name, never a case or hearing id).
+    const feedbackHref = formatRoute({ page: "feedback", from: route.page === "feedback" ? route.from : route.page });
 
     function layout(content: ReactNode, ticker?: ReactNode) {
         return (
             <div className="min-h-full bg-paper text-text">
-                <Masthead items={items} current={current} onNavigate={go} />
+                <Masthead items={items} current={current} onNavigate={go} feedbackHref={feedbackHref} />
                 {ticker}
                 <main className="mx-auto flex w-full max-w-[1360px] flex-col gap-6 px-4 pb-10 pt-5 sm:px-6">{content}</main>
             </div>
@@ -176,8 +180,12 @@ function App() {
         );
     }
     // The guide needs no data: jurors read it here, never on an external site. Back returns to where they came from (the Intro or Home).
+    const goBack = () => (window.history.length > 1 ? window.history.back() : navigate({ page: "home", agentId: agent?.id }));
     if (route.page === "guide") {
-        return layout(<GuideScreen onBack={() => (window.history.length > 1 ? window.history.back() : navigate({ page: "home", agentId: agent?.id }))} />);
+        return layout(<GuideScreen onBack={goBack} />);
+    }
+    if (route.page === "feedback") {
+        return layout(jury.data ? <FeedbackScreen client={client} viewer={viewer} from={route.from} onBack={goBack} /> : <Deliberating />);
     }
 
     if (directoryFailed) {
@@ -211,17 +219,21 @@ function App() {
         );
     }
 
-    const renderPage = (docket?: DocketState) => {
+    const changeAgent = (agentId: string) => {
+        if (route.page === "hearings") navigate({ page: "hearings", agentId });
+        else if (route.page === "cases") navigate({ page: "cases", agentId, filter: route.filter, query: route.query });
+        else navigate({ page: "home", agentId });
+    };
+
+    const pageFor = (docket?: DocketState) => {
         if (route.page === "hearings" && agent && docket) {
             return (
                 <HearingsScreen
                     client={client}
-                    agents={activeAgents}
                     agent={agent}
                     docket={docket}
                     jurors={jury.data}
                     viewer={viewer}
-                    onChangeAgent={(agentId) => navigate({ page: "hearings", agentId })}
                     onOpenHearing={(hearingId) => navigate({ page: "hearing", hearingId })}
                 />
             );
@@ -257,12 +269,19 @@ function App() {
                 agent={agent}
                 docket={docket}
                 viewer={viewer}
-                onAgentChange={(agentId) => navigate({ page: "home", agentId })}
                 onOpenCase={openCase}
                 onOpenClerk={() => navigate({ page: "clerk" })}
             />
         );
     };
+
+    // One agent selector, at the top of Home, Cases and Hearings, always in the same place.
+    const renderPage = (docket?: DocketState) => (
+        <>
+            {agent && <AgentSelector agents={activeAgents} current={agent} onChange={changeAgent} />}
+            {pageFor(docket)}
+        </>
+    );
 
     // The docket loads in the same round as the jury and agent lists: by agent when the URL names a
     // valid one, otherwise every agent's records, scoped once the first active agent is known.

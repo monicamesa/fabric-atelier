@@ -8,7 +8,7 @@ const entityFiles = readdirSync(dataDir).filter((name) => name.endsWith(".ts") &
 const sources = Object.fromEntries(entityFiles.map((name) => [name, readFileSync(join(dataDir, name), "utf8")]));
 
 const INSERT_ONLY = ["Case.ts", "Testimony.ts", "CaseDismissal.ts", "Vote.ts", "VerdictReview.ts"];
-const READ_ONLY = ["Juror.ts", "Agent.ts", "Hearing.ts", "HearingCase.ts", "HearingEvent.ts", "Verdict.ts"];
+const READ_ONLY = ["Juror.ts", "Agent.ts", "Hearing.ts", "HearingCase.ts", "HearingEvent.ts", "Verdict.ts", "VerdictTrace.ts"];
 
 describe("entity definitions", () => {
     it("cover the I1a–I3a entities", () => {
@@ -18,6 +18,7 @@ describe("entity definitions", () => {
             "Agent.ts",
             "Case.ts",
             "CaseDismissal.ts",
+            "Feedback.ts",
             "Hearing.ts",
             "HearingCase.ts",
             "HearingEvent.ts",
@@ -26,8 +27,31 @@ describe("entity definitions", () => {
             "UserFlag.ts",
             "Verdict.ts",
             "VerdictReview.ts",
+            "VerdictTrace.ts",
             "Vote.ts",
         ]);
+    });
+
+    it("Feedback is insert-only, owner-only for the client, and stores no email or name", () => {
+        const source = sources["Feedback.ts"];
+        const actions = [...source.matchAll(/@authenticated\('([^']+)'/g)].map((match) => match[1]);
+        expect(actions.sort()).toEqual(["create", "read"]);
+        expect(source.match(/claims\.sub\.eq\(item\.userId\)/g)).toHaveLength(2);
+        expect(source).toMatch(/@text\(\{ max: 2000 \}\) message!/);
+        expect(source).not.toMatch(/@(anonymous|role|email)\(/);
+        expect(source).not.toMatch(/\b\w*(email|name)\w*!/i);
+    });
+
+    it("VerdictTrace is written only by the notebook, holds steps and no results", () => {
+        const source = sources["VerdictTrace.ts"];
+        expect([...source.matchAll(/@authenticated\('([^']+)'/g)].map((match) => match[1])).toEqual(["read"]);
+        expect(source).toMatch(/@text\(\{ max: 4000 \}\) steps!/);
+        expect(source).toMatch(/@uuid\(\) verdict_id/);
+        expect(source).not.toMatch(/\b(result|output|rows|url)\w*!/i);
+    });
+
+    it("Case.language is an optional closed set", () => {
+        expect(sources["Case.ts"]).toMatch(/@set\(\{ optional: true \}, 'en', 'es'\) language\?/);
     });
 
     it("AdminRequestResult is written only by the admin Function and readable only by the requester", () => {

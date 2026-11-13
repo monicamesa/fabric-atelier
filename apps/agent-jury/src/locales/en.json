@@ -8,7 +8,8 @@
         "en": "EN",
         "es": "ES",
         "enName": "English",
-        "esName": "Spanish"
+        "esName": "Spanish",
+        "questionIn": "Question language: {{language}}"
     },
     "screens": {
         "agents": {
@@ -303,7 +304,8 @@
         "saving": "Saving…"
     },
     "proposeCase": {
-        "title": "Propose a case for {{agent}}",
+        "title": "Propose a case for <agent>{{agent}}</agent>",
+        "change": "change",
         "help": "A good case has one right answer that a business expert can check.",
         "question": "Question",
         "questionHint":"Write the question as business would ask it. It is sent to the agent exactly as written, in this language.",
@@ -357,6 +359,9 @@
         "trustPendingCount_other": "{{count}} split verdicts are not counted yet.",
         "trustHistory": "Earlier judge prompts",
         "trustPrompt": "Judge prompt: {{version}}",
+        "trustStandard": "Judge: standard criteria",
+        "trustStandardHelp": "The AI judge uses Fabric's standard evaluation criteria. If the criteria change, trust starts again.",
+        "trustVersionStandard": "Standard criteria",
         "docketTitle": "Today's docket",
         "docketHelp": "Cases for the agent you pick. Cases waiting for your vote come first.",
         "columns": {
@@ -381,6 +386,14 @@
         "notAdmin": "Only active admins can use the clerk's office. Ask an admin if you need access.",
         "showExamples": "Show example data",
         "showExamplesHelp": "Off by default. Example agents and jurors (example addresses) are demo data: they never count in hearings, judge trust or the case-law export, and nothing is deleted. The choice resets when the page reloads.",
+        "feedback": {
+            "title": "Feedback from jurors",
+            "help": "What jurors sent through \"Give feedback\", newest first. It shows no names or emails.",
+            "empty": "No feedback yet.",
+            "loadError": "The feedback could not be loaded.",
+            "about": "About: {{page}}",
+            "canContact": "OK to contact"
+        },
         "loading": "The clerk is fetching the records…",
         "tabs": {
             "label": "Clerk's office sections",
@@ -388,7 +401,8 @@
             "agents": "Agents · {{count}}",
             "agentsPlain": "Agents",
             "log": "Admin log",
-            "logShort": "Log"
+            "logShort": "Log",
+            "feedback": "Feedback"
         },
         "jurors": {
             "title": "The jury",
@@ -514,6 +528,7 @@
                 "retireAgent": "{{who}} retired the agent {{target}}",
                 "reinstateAgent": "{{who}} reinstated the agent {{target}}",
                 "readAdminLog": "{{who}} opened the admin log",
+                "readFeedback": "{{who}} opened the feedback",
                 "probe": "{{who}} sent a test request",
                 "unknown": "{{who}} sent a request the office doesn't know"
             },
@@ -527,6 +542,7 @@
                 "retireAgent": "{{who}} tried to retire the agent {{target}}",
                 "reinstateAgent": "{{who}} tried to reinstate the agent {{target}}",
                 "readAdminLog": "{{who}} tried to open the admin log",
+                "readFeedback": "{{who}} tried to open the feedback",
                 "probe": "{{who}} sent a test request",
                 "unknown": "{{who}} sent a request the office doesn't know"
             },
@@ -748,6 +764,72 @@
             "unknown": "Something went wrong while opening the court. Your cases are safe."
         }
     },
+    "selector": {
+        "label": "1 · Choose the agent ▸",
+        "help": "Everything you see and propose is for this agent."
+    },
+    "feedback": {
+        "link": "Give feedback",
+        "kicker": "Help us improve",
+        "title": "Give feedback",
+        "help": "Tell the admins what to improve. Please don't include personal data or secrets.",
+        "type": "What kind of feedback is it?",
+        "types": {
+            "idea": "An idea",
+            "confusing": "Something is confusing",
+            "bug": "A bug",
+            "other": "Other"
+        },
+        "message": "Your message",
+        "messageHint": "Up to 2000 characters.",
+        "messageRequired": "Write a message.",
+        "page": "Which page is it about? (optional)",
+        "pages": {
+            "none": "Not about a page",
+            "home": "Home",
+            "cases": "Cases",
+            "case": "A case page",
+            "hearings": "Hearings",
+            "hearing": "A hearing page",
+            "clerk": "Clerk's office",
+            "guide": "User guide",
+            "intro": "How it works",
+            "feedback": "This form"
+        },
+        "canContact": "You can contact me about this",
+        "submit": "Send feedback",
+        "sending": "Sending…",
+        "failed": "Your feedback wasn't sent. Nothing was lost on the page: try again.",
+        "thanks": "Thank you. Your feedback was sent.",
+        "thanksHelp": "The admins read every message.",
+        "jurorsOnly": "Only active jurors can send feedback.",
+        "back": "Back"
+    },
+    "trace": {
+        "title": "How the agent got there",
+        "help": "This is what the agent did to answer. It doesn't include the data it returned.",
+        "loading": "Loading the trace…",
+        "failed": "The trace couldn't be loaded.",
+        "none": "No trace was recorded for this verdict.",
+        "truncated": "The trace was shortened to fit.",
+        "summary_one": "The agent used its tools and wrote {{count}} query ({{languages}}).",
+        "summary_other": "The agent used its tools and wrote {{count}} queries ({{languages}}).",
+        "summaryNone": "The agent used its tools; no query was recorded.",
+        "step": {
+            "source": "Source",
+            "query": "Query ({{language}})",
+            "answer": "Answer"
+        },
+        "tools": {
+            "semanticModel": "Looked in the semantic model",
+            "toQuery": "Turned the question into a query",
+            "other": "Used the tool {{tool}}"
+        },
+        "asked": "Asked: {{request}}",
+        "answerNote": "Then the agent wrote the answer shown above.",
+        "copy": "Copy query",
+        "copied": "Copied"
+    },
     "turn": {
         "title": "Your turn",
         "lines": {
@@ -773,7 +855,7 @@
         "nobodyWaiting": "Nobody is waiting for your vote.",
         "othersWaiting_one": "{{count}} case is waiting for other jurors.",
         "othersWaiting_other": "{{count}} cases are waiting for other jurors.",
-        "propose": "Propose a new case",
+        "seeOpen": "See open cases",
         "hearingBusy": "A hearing started recently: it may still be in session, or resting (ten minutes between hearings). Hearings shows the exact state."
     },
     "progress": {

@@ -172,7 +172,8 @@ describe("reviewing the verdicts of a hearing", () => {
         expect(summaries[0]).toHaveTextContent("You agreed with the judge");
         expect(summaries[1]).toHaveTextContent("Jurors so far: 0 agree, 1 appeal.");
         expect(document.body.textContent).toContain("The jury agrees with the judge on 1 of 2 reviewed verdicts in this hearing.");
-        expect(document.body.textContent).toContain("Judge prompt: default");
+        expect(document.body.textContent).toContain("Judge: standard criteria");
+        expect(document.body.textContent).not.toContain("Judge prompt: default");
     });
 
     it("does not count demo ('seed') or script ('check') reviews in the card's summary", async () => {

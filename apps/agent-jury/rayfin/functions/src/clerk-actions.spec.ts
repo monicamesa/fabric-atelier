@@ -36,6 +36,8 @@ describe('parseCommand', () => {
     ['editJurorDetails', { jurorId: OTHER, displayName: 42 }],
     ['readAdminLog', { limit: 201 }],
     ['readAdminLog', { limit: 1.5 }],
+    ['readFeedback', { limit: 201 }],
+    ['readFeedback', { limit: 0 }],
   ])('rejects an invalid %s payload', (action, payload) => {
     const result = parseCommand(action, JSON.stringify(payload));
     expect(result).toMatchObject({ ok: false, reason: 'invalid_payload' });
@@ -58,6 +60,8 @@ describe('parseCommand', () => {
       active: false,
     });
     expect(command('readAdminLog', {})).toEqual({ action: 'readAdminLog', limit: 50 });
+    expect(command('readFeedback', {})).toEqual({ action: 'readFeedback', limit: 50 });
+    expect(command('readFeedback', { limit: 200 })).toEqual({ action: 'readFeedback', limit: 200 });
   });
 });
 

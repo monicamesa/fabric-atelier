@@ -8,7 +8,8 @@
         "en": "EN",
         "es": "ES",
         "enName": "Inglés",
-        "esName": "Español"
+        "esName": "Español",
+        "questionIn": "Idioma de la pregunta: {{language}}"
     },
     "screens": {
         "agents": {
@@ -303,7 +304,8 @@
         "saving": "Guardando…"
     },
     "proposeCase": {
-        "title": "Proponer un caso para {{agent}}",
+        "title": "Proponer un caso para <agent>{{agent}}</agent>",
+        "change": "cambiar",
         "help": "Un buen caso tiene una única respuesta correcta que un experto de negocio puede comprobar.",
         "question": "Pregunta",
         "questionHint": "Escribe la pregunta como la haría negocio. Se envía al agente tal cual, en este idioma.",
@@ -357,6 +359,9 @@
         "trustPendingCount_other": "{{count}} veredictos divididos aún no se cuentan.",
         "trustHistory": "Prompts anteriores del juez",
         "trustPrompt": "Prompt del juez: {{version}}",
+        "trustStandard": "Juez: criterio estándar",
+        "trustStandardHelp": "El juez de IA usa el criterio estándar de Fabric. Si cambia el criterio, la confianza empieza de cero.",
+        "trustVersionStandard": "Criterio estándar",
         "docketTitle": "Casos de hoy",
         "docketHelp": "Casos del agente que elijas. Primero, los que esperan tu voto.",
         "columns": {
@@ -381,6 +386,14 @@
         "notAdmin": "Solo los admins activos pueden usar la secretaría. Pídele acceso a un admin si lo necesitas.",
         "showExamples": "Mostrar datos de ejemplo",
         "showExamplesHelp": "Desactivado por defecto. Los agentes y jurados de ejemplo (direcciones de ejemplo) son datos de demostración: nunca cuentan en las vistas, en la confianza en el juez ni en la exportación de jurisprudencia, y no se borra nada. La elección se restablece al recargar la página.",
+        "feedback": {
+            "title": "Opiniones de los jurados",
+            "help": "Lo que los jurados enviaron con «Danos tu opinión», lo más reciente primero. No muestra nombres ni correos.",
+            "empty": "Todavía no hay opiniones.",
+            "loadError": "No se pudieron cargar las opiniones.",
+            "about": "Sobre: {{page}}",
+            "canContact": "Se puede contactar"
+        },
         "loading": "La secretaría está buscando los expedientes…",
         "tabs": {
             "label": "Secciones de la secretaría",
@@ -388,7 +401,8 @@
             "agents": "Agentes · {{count}}",
             "agentsPlain": "Agentes",
             "log": "Registro de admin",
-            "logShort": "Registro"
+            "logShort": "Registro",
+            "feedback": "Opiniones"
         },
         "jurors": {
             "title": "El jurado",
@@ -514,6 +528,7 @@
                 "retireAgent": "{{who}} retiró el agente {{target}}",
                 "reinstateAgent": "{{who}} reactivó el agente {{target}}",
                 "readAdminLog": "{{who}} abrió el registro de admin",
+                "readFeedback": "{{who}} abrió las opiniones",
                 "probe": "{{who}} envió una petición de prueba",
                 "unknown": "{{who}} envió una petición que la secretaría no conoce"
             },
@@ -527,6 +542,7 @@
                 "retireAgent": "{{who}} intentó retirar el agente {{target}}",
                 "reinstateAgent": "{{who}} intentó reactivar el agente {{target}}",
                 "readAdminLog": "{{who}} intentó abrir el registro de admin",
+                "readFeedback": "{{who}} intentó abrir las opiniones",
                 "probe": "{{who}} envió una petición de prueba",
                 "unknown": "{{who}} envió una petición que la secretaría no conoce"
             },
@@ -748,6 +764,72 @@
             "unknown": "Algo ha ido mal al abrir la sala. Tus casos están a salvo."
         }
     },
+    "selector": {
+        "label": "1 · Elige el agente ▸",
+        "help": "Todo lo que ves y propones es para este agente."
+    },
+    "feedback": {
+        "link": "Danos tu opinión",
+        "kicker": "Ayúdanos a mejorar",
+        "title": "Danos tu opinión",
+        "help": "Cuéntales a los admins qué mejorar. Por favor, no incluyas datos personales ni secretos.",
+        "type": "¿Qué tipo de opinión es?",
+        "types": {
+            "idea": "Una idea",
+            "confusing": "Algo no se entiende",
+            "bug": "Un error",
+            "other": "Otra"
+        },
+        "message": "Tu mensaje",
+        "messageHint": "Hasta 2000 caracteres.",
+        "messageRequired": "Escribe un mensaje.",
+        "page": "¿De qué página trata? (opcional)",
+        "pages": {
+            "none": "No trata de una página",
+            "home": "Inicio",
+            "cases": "Casos",
+            "case": "Una página de caso",
+            "hearings": "Vistas",
+            "hearing": "Una página de vista",
+            "clerk": "Secretaría",
+            "guide": "Guía de uso",
+            "intro": "Cómo funciona",
+            "feedback": "Este formulario"
+        },
+        "canContact": "Pueden contactarme sobre esto",
+        "submit": "Enviar opinión",
+        "sending": "Enviando…",
+        "failed": "No se envió tu opinión. No se perdió nada en la página: inténtalo de nuevo.",
+        "thanks": "Gracias. Tu opinión se envió.",
+        "thanksHelp": "Los admins leen todos los mensajes.",
+        "jurorsOnly": "Solo los jurados activos pueden enviar su opinión.",
+        "back": "Volver"
+    },
+    "trace": {
+        "title": "Cómo llegó el agente a su respuesta",
+        "help": "Es lo que el agente hizo para responder. No incluye los datos que devolvió.",
+        "loading": "Cargando la traza…",
+        "failed": "No se pudo cargar la traza.",
+        "none": "Este veredicto no tiene traza registrada.",
+        "truncated": "La traza se acortó para que cupiera.",
+        "summary_one": "El agente usó sus herramientas y escribió {{count}} consulta ({{languages}}).",
+        "summary_other": "El agente usó sus herramientas y escribió {{count}} consultas ({{languages}}).",
+        "summaryNone": "El agente usó sus herramientas; no se registró ninguna consulta.",
+        "step": {
+            "source": "Fuente",
+            "query": "Consulta ({{language}})",
+            "answer": "Respuesta"
+        },
+        "tools": {
+            "semanticModel": "Consultó el modelo semántico",
+            "toQuery": "Convirtió la pregunta en una consulta",
+            "other": "Usó la herramienta {{tool}}"
+        },
+        "asked": "Petición: {{request}}",
+        "answerNote": "Después el agente escribió la respuesta que ves arriba.",
+        "copy": "Copiar consulta",
+        "copied": "Copiada"
+    },
     "turn": {
         "title": "Tu turno",
         "lines": {
@@ -773,7 +855,7 @@
         "nobodyWaiting": "Nadie espera tu voto ahora mismo.",
         "othersWaiting_one": "{{count}} caso espera los votos del resto del jurado.",
         "othersWaiting_other": "{{count}} casos esperan los votos del resto del jurado.",
-        "propose": "Proponer un caso nuevo",
+        "seeOpen": "Ver casos abiertos",
         "hearingBusy": "Una vista empezó hace poco: puede seguir en curso o estar en el descanso (diez minutos entre vistas). En Vistas ves el estado exacto."
     },
     "progress": {

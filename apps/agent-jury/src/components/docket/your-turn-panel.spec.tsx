@@ -1,5 +1,5 @@
-import { beforeAll, describe, expect, it, vi } from "vitest";
-import { fireEvent, render, screen, within } from "@testing-library/react";
+import { beforeAll, describe, expect, it } from "vitest";
+import { render, screen, within } from "@testing-library/react";
 import { i18n, initI18n } from "@/i18n/i18n";
 import type { Progress, YourTurn } from "@/screens/docket/your-turn";
 import { ProgressStrip } from "./progress-strip";
@@ -30,7 +30,7 @@ describe("YourTurnPanel", () => {
     };
 
     it("is an editorial sidebar: heading, the agent on the right, then plain lines with one link each", () => {
-        render(<YourTurnPanel agentId={AGENT} agentName="Sales Agent" turn={turn} onPropose={vi.fn()} />);
+        render(<YourTurnPanel agentId={AGENT} agentName="Sales Agent" turn={turn} />);
         expect(screen.getByRole("heading", { name: "Your turn" })).toBeInTheDocument();
         expect(screen.getByText("Sales Agent")).toBeInTheDocument();
         const items = within(screen.getByRole("list")).getAllByRole("listitem");
@@ -46,42 +46,42 @@ describe("YourTurnPanel", () => {
     });
 
     it("tells an admin a hearing may still be busy", () => {
-        render(<YourTurnPanel agentId={AGENT} agentName="Sales Agent" turn={turn} onPropose={vi.fn()} />);
+        render(<YourTurnPanel agentId={AGENT} agentName="Sales Agent" turn={turn} />);
         expect(screen.getByRole("note")).toHaveTextContent(/hearing started recently/);
     });
 
-    it("says you are up to date, gives the context, and offers one text link to propose a case", () => {
-        const onPropose = vi.fn();
-        render(<YourTurnPanel agentId={AGENT} agentName="Sales Agent" turn={{ ...quiet, upToDate: true, othersWaiting: 2 }} onPropose={onPropose} />);
+    it("says you are up to date, gives the context, and links to the open cases (the hero keeps the only Propose button)", () => {
+        render(<YourTurnPanel agentId={AGENT} agentName="Sales Agent" turn={{ ...quiet, upToDate: true, othersWaiting: 2 }} />);
         expect(screen.getByText("You're up to date.")).toBeInTheDocument();
         expect(screen.getByText("Nobody is waiting for your vote. 2 cases are waiting for other jurors.")).toBeInTheDocument();
-        fireEvent.click(screen.getByRole("button", { name: "Propose a new case →" }));
-        expect(onPropose).toHaveBeenCalledTimes(1);
+        expect(screen.getByRole("link", { name: "See open cases →" })).toHaveAttribute("href", `#cases?agent=${AGENT}`);
+        expect(screen.queryByText(/Propose/)).not.toBeInTheDocument();
+        expect(screen.queryByRole("button")).not.toBeInTheDocument();
     });
 
     it("leaves out the context sentence about other jurors when nobody is waiting", () => {
-        render(<YourTurnPanel agentId={AGENT} agentName="Sales Agent" turn={{ ...quiet, upToDate: true }} onPropose={vi.fn()} />);
+        render(<YourTurnPanel agentId={AGENT} agentName="Sales Agent" turn={{ ...quiet, upToDate: true }} />);
         expect(screen.getByText("Nobody is waiting for your vote.")).toBeInTheDocument();
     });
 
     it("renders nothing for someone who cannot act", () => {
-        const { container } = render(<YourTurnPanel agentId={AGENT} agentName="Sales Agent" turn={quiet} onPropose={vi.fn()} />);
+        const { container } = render(<YourTurnPanel agentId={AGENT} agentName="Sales Agent" turn={quiet} />);
         expect(container).toBeEmptyDOMElement();
     });
 
     it("is in Spanish with the jury vocabulary", async () => {
         await i18n.changeLanguage("es");
         try {
-            const { unmount } = render(<YourTurnPanel agentId={AGENT} agentName="Sales Agent" turn={turn} onPropose={vi.fn()} />);
+            const { unmount } = render(<YourTurnPanel agentId={AGENT} agentName="Sales Agent" turn={turn} />);
             expect(screen.getByRole("heading", { name: "Tu turno" })).toBeInTheDocument();
             expect(screen.getByText("3 casos esperan tu voto")).toBeInTheDocument();
             expect(screen.getByText("2 veredictos del juez por revisar")).toBeInTheDocument();
             expect(screen.getByText("4 casos resueltos listos para una vista")).toBeInTheDocument();
             unmount();
-            render(<YourTurnPanel agentId={AGENT} agentName="Sales Agent" turn={{ ...quiet, upToDate: true, othersWaiting: 2 }} onPropose={vi.fn()} />);
+            render(<YourTurnPanel agentId={AGENT} agentName="Sales Agent" turn={{ ...quiet, upToDate: true, othersWaiting: 2 }} />);
             expect(screen.getByText("Estás al día.")).toBeInTheDocument();
             expect(screen.getByText("Nadie espera tu voto ahora mismo. 2 casos esperan los votos del resto del jurado.")).toBeInTheDocument();
-            expect(screen.getByRole("button", { name: "Proponer un caso nuevo →" })).toBeInTheDocument();
+            expect(screen.getByRole("link", { name: "Ver casos abiertos →" })).toBeInTheDocument();
         } finally {
             await i18n.changeLanguage("en");
         }

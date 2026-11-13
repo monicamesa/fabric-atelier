@@ -12,6 +12,7 @@ describe("notebook SQL policy", () => {
 cursor.execute("SELECT id, question FROM dbo.[HearingCases] WHERE hearing_id = ?", hearing_id)
 cursor.execute("select id from dbo.Hearings where id = ?", hearing_id)
 cursor.execute("INSERT INTO dbo.[Verdicts] (id, hearing_id) VALUES (NEWID(), ?)", hearing_id)
+cursor.execute("INSERT INTO dbo.[VerdictTraces] (id, verdict_id) VALUES (NEWID(), ?)", verdict_id)
 cursor.execute('''
     INSERT INTO dbo.HearingEvents (id, hearing_id, kind)
     VALUES (NEWID(), ?, 'progress')
@@ -28,6 +29,7 @@ cursor.execute('''
         ["UPDATE dbo.Verdicts SET judgeVerdict = 'correct'", "UPDATE is not allowed"],
         ["delete from dbo.Verdicts", "DELETE is not allowed"],
         ["MERGE dbo.Verdicts AS t USING x ON 1=1", "MERGE is not allowed"],
+        ["UPDATE dbo.VerdictTraces SET steps = ''", "UPDATE is not allowed"],
         ["EXEC sp_executesql N'select 1'", "EXEC is not allowed"],
         ["GRANT SELECT ON dbo.Cases TO public", "GRANT is not allowed"],
     ])("rejects %s", (statement, rule) => {
@@ -44,7 +46,7 @@ cursor.execute('''
 
     it("rejects several statements in one call and computed table names", () => {
         expect(rules(`cursor.execute("INSERT INTO dbo.Verdicts (id) VALUES (NEWID()); DROP TABLE dbo.Verdicts")`)).toContain("one statement per call");
-        expect(rules(`cursor.execute(f"INSERT INTO dbo.{table} (id) VALUES (NEWID())")`)).toEqual([expect.stringContaining("only Verdicts, HearingEvents are allowed")]);
+        expect(rules(`cursor.execute(f"INSERT INTO dbo.{table} (id) VALUES (NEWID())")`)).toEqual([expect.stringContaining("only Verdicts, HearingEvents, VerdictTraces are allowed")]);
     });
 
     it("rejects other ways of writing to the database", () => {

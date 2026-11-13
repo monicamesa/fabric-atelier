@@ -5,6 +5,7 @@ import { TextAreaField } from "@/components/docket/field";
 import { Deliberating } from "@/components/docket/gavel";
 import { Objection } from "@/components/docket/objection";
 import { CaseNumber, StatusChip, UnverifiedChip } from "@/components/docket/status-chip";
+import { LanguageBadge } from "@/components/docket/language-badge";
 import { EmptyState, Skeleton } from "@/components/docket/states";
 import { createCaseDismissal, createVote } from "@/data/cases.service";
 import type { AgentRow, JurorRow } from "@/data/directory.service";
@@ -153,7 +154,7 @@ export function CaseDetail({ client, caseId, agents, jurors, viewer }: CaseDetai
                             {!analysis.verified && <UnverifiedChip />}
                         </div>
                         <h1 className="m-0 max-w-[960px] font-serif text-[36px] font-black leading-[1.02] tracking-[-0.02em] text-ink min-[900px]:text-[56px]">
-                            {record.text}
+                            {record.text} <LanguageBadge language={record.language} className="ml-2 align-middle" />
                         </h1>
                         <p className="m-0 max-w-[760px] text-[17px] text-text">
                             {t(`caseDetail.reason.${analysis.reason === "needsVotes" && leadingNeedsApprover(leading) ? "needsVotesApprover" : analysis.reason}`, {

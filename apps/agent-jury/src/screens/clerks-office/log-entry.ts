@@ -90,6 +90,7 @@ export function describeLogEntry(entry: AdminLogEntry, jurors: JurorRow[], agent
             target = agentName();
             break;
         case "readAdminLog":
+        case "readFeedback":
         case "probe":
             key = entry.action;
             break;

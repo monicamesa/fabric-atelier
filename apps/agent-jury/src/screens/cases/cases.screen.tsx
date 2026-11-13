@@ -7,6 +7,7 @@ import { Deliberating } from "@/components/docket/gavel";
 import { Objection } from "@/components/docket/objection";
 import { Segmented } from "@/components/docket/segmented";
 import { CaseNumber, UnverifiedChip } from "@/components/docket/status-chip";
+import { LanguageBadge } from "@/components/docket/language-badge";
 import { EmptyState, Skeleton } from "@/components/docket/states";
 import { VoteBar } from "@/components/docket/vote-bar";
 import type { AgentRow } from "@/data/directory.service";
@@ -17,7 +18,7 @@ import { formatRoute, type CasesFilter } from "@/lib/route";
 import { isValidDismissal, type CaseState } from "@/rules/case-validity";
 import { CONSENSUS_MIN_VOTES } from "@/rules/consensus";
 import { cn } from "@/lib/utils";
-import { AgentTabs } from "../docket/agent-tabs";
+import { focusAgentSelector } from "../docket/agent-selector-focus";
 import { applyFilter } from "../docket/docket-views";
 import { nextStep, type TurnContext } from "../docket/next-step";
 import { ProposeCaseForm } from "../docket/propose-case-form";
@@ -65,7 +66,6 @@ export function CasesScreen({ client, agents, agent, docket, viewer, filter, que
                 <p className="m-0 max-w-[700px] text-[17px] text-text">{t("cases.help")}</p>
             </div>
             <div className="flex flex-col items-start gap-3 min-[900px]:items-end">
-                <AgentTabs agents={agents} current={agent.id} onChange={(agentId) => onRouteChange({ agentId })} />
                 <ExportCaseLaw agentName={agent.name} docket={data} isExample={isExampleAgent(agent)} />
                 {viewer.canAct && !proposing && (
                     <Button variant="primary" onClick={() => setProposing(true)}>
@@ -89,6 +89,7 @@ export function CasesScreen({ client, agents, agent, docket, viewer, filter, que
                     categories={data?.categories ?? []}
                     onCancel={() => setProposing(false)}
                     onSaved={(caseId) => onOpenCase(caseId)}
+                    onChangeAgent={agents.length > 1 ? focusAgentSelector : undefined}
                 />
             )}
             <div className="flex flex-col gap-3 border-b border-ink pb-4 min-[900px]:flex-row min-[900px]:items-center">
@@ -212,7 +213,7 @@ function Clipping({ item, ctx, onOpen }: { item: DocketCase; ctx: TurnContext; o
                 {!analysis.verified && <UnverifiedChip />}
             </span>
             <span className={cn("font-serif text-[20px] font-bold leading-tight", state === "dismissed" && "text-text-muted line-through")}>
-                {record.text}
+                {record.text} <LanguageBadge language={record.language} />
             </span>
             {state === "under_review" && (
                 <>

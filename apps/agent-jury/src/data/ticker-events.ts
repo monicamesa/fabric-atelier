@@ -12,6 +12,8 @@ export type TickerStatus = "new" | "disputed" | "ruled" | "correct" | "incorrect
 export interface TickerEvent {
     caseId: string;
     caseText: string;
+    /** The language the question was written in; missing on older cases. */
+    caseLanguage?: string | null;
     status: TickerStatus;
     /** When the case reached this status, or when the judge ruled. */
     at: string;
@@ -25,7 +27,7 @@ export const TICKER_MAX_ITEMS = 8;
 export const TICKER_MIN_ITEMS = 2;
 
 interface TickerCase {
-    record: { id: string; text: string; createdAt?: Date | string };
+    record: { id: string; text: string; language?: string | null; createdAt?: Date | string };
     analysis: CaseAnalysis;
     records: CaseRecords;
 }
@@ -70,7 +72,7 @@ export function buildTicker(cases: readonly TickerCase[], judge?: TickerJudgeDat
         const lastState = [...timeline].reverse().find((event) => event.kind === "state");
         const proposed = timeline.find((event) => event.kind === "proposed");
         const at = (lastState && lastState.state === analysis.state ? lastState.at : proposed?.at) ?? new Date(record.createdAt ?? 0).toISOString();
-        const event: TickerEvent = { caseId: record.id, caseText: record.text, status, at };
+        const event: TickerEvent = { caseId: record.id, caseText: record.text, caseLanguage: record.language, status, at };
         if (status === "ruled") {
             const ruling = analysis.tallies.find((tally) => tally.testimony.id === analysis.rulingTestimonyId);
             if (ruling) {
@@ -83,12 +85,12 @@ export function buildTicker(cases: readonly TickerCase[], judge?: TickerJudgeDat
     if (judge) {
         for (const verdict of latestVerdicts(judge, new Set(shown.keys()))) {
             const item = shown.get(verdict.case_id)!;
-            events.push({ caseId: verdict.case_id, caseText: item.record.text, status: verdict.judgeVerdict, at: new Date(time(verdict.createdAt)).toISOString() });
+            events.push({ caseId: verdict.case_id, caseText: item.record.text, caseLanguage: item.record.language, status: verdict.judgeVerdict, at: new Date(time(verdict.createdAt)).toISOString() });
         }
         const latestIds = new Set(latestVerdicts(judge, new Set(shown.keys())).map((verdict) => verdict.id));
         for (const overruled of judge.overruled) {
             const item = shown.get(overruled.caseId);
-            if (item && latestIds.has(overruled.verdictId)) events.push({ caseId: overruled.caseId, caseText: item.record.text, status: "overruled", at: overruled.at });
+            if (item && latestIds.has(overruled.verdictId)) events.push({ caseId: overruled.caseId, caseText: item.record.text, caseLanguage: item.record.language, status: "overruled", at: overruled.at });
         }
     }
     return events.sort((a, b) => b.at.localeCompare(a.at)).slice(0, TICKER_MAX_ITEMS);

@@ -8,6 +8,7 @@ import {
   type ClerkCommand,
   type ClerkReason,
   type ClerkResult,
+  type FeedbackEntry,
 } from './clerk-actions.js';
 import { cancelHearing, checkWithFabric, launchHearing, type HearingRuntime } from './hearing-actions.js';
 
@@ -30,6 +31,7 @@ interface Outcome {
   reason: ClerkReason;
   detail: string;
   log?: AdminLogEntry[];
+  feedback?: FeedbackEntry[];
   hearingId?: string;
   jobStatus?: string;
 }
@@ -154,7 +156,7 @@ async function runCommand(
                   THEN 1 ELSE 0 END AS BIT) AS automatedCheck
            FROM dbo.[AdminRequestResults] AS r
            LEFT JOIN dbo.[AdminRequests] AS q ON q.id = r.requestId
-           WHERE NOT (q.action = N'readAdminLog' AND r.outcome = N'done')
+           WHERE NOT (q.action IN (N'readAdminLog', N'readFeedback') AND r.outcome = N'done')
            ORDER BY r.processedAt DESC`,
         );
       const log = rows.recordset.map((row) => ({
@@ -163,6 +165,22 @@ async function runCommand(
         processedAt: new Date(row.processedAt).toISOString(),
       }));
       return { ...done(`${log.length} entries.`), log };
+    }
+    case 'readFeedback': {
+      const rows = await request()
+        .input('limit', sql.Int, command.limit)
+        .query<Omit<FeedbackEntry, 'createdAt'> & { createdAt: Date }>(
+          `SELECT TOP (@limit)
+             LOWER(CONVERT(NVARCHAR(36), id)) AS id, type, message, COALESCE(page, N'') AS page, canContact, createdAt
+           FROM dbo.[Feedbacks]
+           ORDER BY createdAt DESC`,
+        );
+      const feedback = rows.recordset.map((row) => ({
+        ...row,
+        canContact: Boolean(row.canContact),
+        createdAt: new Date(row.createdAt).toISOString(),
+      }));
+      return { ...done(`${feedback.length} entries.`), feedback };
     }
   }
 }

@@ -72,7 +72,7 @@ describe("Home without the review data", () => {
         const data = buildDocket(records, JURORS, undefined, NOW, "agent-1");
         const docket = { status: "success", data, reload: () => {} } as unknown as DocketState;
         const viewer = viewerFor({ isAuthenticated: true, user: { id: "sub-ana", email: "ana.expert@example.com" } }, JURORS);
-        render(<HomeScreen client={client} agents={[AGENT]} agent={AGENT} docket={docket} viewer={viewer} onAgentChange={() => {}} onOpenCase={() => {}} onOpenClerk={() => {}} />);
+        render(<HomeScreen client={client} agents={[AGENT]} agent={AGENT} docket={docket} viewer={viewer} onOpenCase={() => {}} onOpenClerk={() => {}} />);
         expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent("Who judges the judge?");
         expect(screen.queryByText("Judge trust")).not.toBeInTheDocument();
         expect(screen.getAllByText(/How many customers do we have in Spain\?/).length).toBeGreaterThan(0);

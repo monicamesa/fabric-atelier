@@ -1,10 +1,10 @@
 // Static check for the real evaluate_agent notebook. The notebook runs as the app owner, who could do anything in the app
-// database, so the code itself is limited: it only reads Hearings and HearingCases, and only inserts into Verdicts and
-// HearingEvents. No DDL, no UPDATE or DELETE, no scratch tables, no other tables, one statement per call.
+// database, so the code itself is limited: it only reads Hearings and HearingCases, and only inserts into Verdicts,
+// HearingEvents and VerdictTraces. No DDL, no UPDATE or DELETE, no scratch tables, no other tables, one statement per call.
 // Rayfin pluralizes table names (Verdict -> dbo.Verdicts).
 
 export const ALLOWED_READ_TABLES = ["Hearings", "HearingCases"];
-export const ALLOWED_WRITE_TABLES = ["Verdicts", "HearingEvents"];
+export const ALLOWED_WRITE_TABLES = ["Verdicts", "HearingEvents", "VerdictTraces"];
 
 const FORBIDDEN_PYTHON = [
     [/\.to_sql\s*\(/, "DataFrame.to_sql writes tables"],

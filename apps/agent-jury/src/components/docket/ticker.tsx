@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Newspaper, Pause, Play } from "lucide-react";
+import { LanguageBadge } from "@/components/docket/language-badge";
 import { TICKER_MIN_ITEMS, type TickerEvent, type TickerStatus } from "@/data/ticker-events";
 import { useMediaQuery } from "@/hooks/use-media-query";
 import { cn } from "@/lib/utils";
@@ -49,6 +50,7 @@ function Line({ event, hidden }: { event: TickerEvent; hidden?: boolean }) {
             <span>
                 {caseNumber(event.caseId)} {truncate(event.caseText)}
             </span>{" "}
+            <LanguageBadge language={event.caseLanguage} className="border-ticker-text text-ticker-text" />{" "}
             <span aria-hidden="true">·</span>{" "}
             <span>
                 <Detail event={event} />

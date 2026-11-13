@@ -61,6 +61,29 @@ describe("translation files", () => {
         expect(enKeys.get("hearings.verdicts.unclear")).toBe("Unclear");
     });
 
+    it("have the selector, judge-criteria, feedback, trace and language-badge keys, with the requested wording", () => {
+        const enKeys = new Map(enEntries);
+        const esKeys = new Map(esEntries);
+        const required = [
+            "selector.label", "selector.help", "home.trustStandard", "home.trustStandardHelp", "turn.seeOpen", "proposeCase.change",
+            "language.questionIn", "feedback.link", "feedback.title", "feedback.message", "feedback.submit", "feedback.thanks",
+            ...["idea", "confusing", "bug", "other"].map((type) => `feedback.types.${type}`),
+            "clerk.tabs.feedback", "clerk.feedback.title", "clerk.feedback.empty",
+            "trace.title", "trace.help", "trace.none", "trace.failed", "trace.summary_one", "trace.summary_other", "trace.copy",
+        ];
+        expect(required.filter((key) => !enKeys.has(key) || !esKeys.has(key))).toEqual([]);
+        expect(enKeys.get("selector.label")).toBe("1 · Choose the agent ▸");
+        expect(esKeys.get("selector.label")).toBe("1 · Elige el agente ▸");
+        expect(enKeys.get("selector.help")).toBe("Everything you see and propose is for this agent.");
+        expect(esKeys.get("selector.help")).toBe("Todo lo que ves y propones es para este agente.");
+        expect(enKeys.get("home.trustStandard")).toBe("Judge: standard criteria");
+        expect(esKeys.get("home.trustStandard")).toBe("Juez: criterio estándar");
+        expect(enKeys.get("home.trustStandardHelp")).toBe("The AI judge uses Fabric's standard evaluation criteria. If the criteria change, trust starts again.");
+        expect(esKeys.get("home.trustStandardHelp")).toBe("El juez de IA usa el criterio estándar de Fabric. Si cambia el criterio, la confianza empieza de cero.");
+        expect(esKeys.get("feedback.link")).toBe("Danos tu opinión");
+        expect(enKeys.get("turn.seeOpen")).toBe("See open cases");
+    });
+
     it("have only non-empty string values", () => {
         for (const [key, value] of [...enEntries, ...esEntries]) {
             expect(typeof value, key).toBe("string");

@@ -30,7 +30,9 @@ The app uses a trial metaphor. Each term is also explained in the app.
 - [User guide](docs/user-guide.md) (EN) / [Guía de usuario](docs/user-guide.es.md) (ES): how to play, roles and the rules (when a case is ruled, disputes, hearings, reopening, judge trust). The Intro's last step and Home link to the in-app copy (`#guide`, rendered from these files at build time with `marked`), because jurors may not have access to the repository.
 - Manual test script: [English](docs/manual-test.md) / [Español](docs/manual-test.es.md): end-to-end checklist for one person (Test A) and for an admin plus two jurors (Test B).
 - **Start at Home, in "Your turn":** an editorial sidebar next to the headline, above Judge trust. It lists what needs the signed-in person now (votes, disputes, approver votes, judge verdicts to review and, for admins, ruled cases ready for a hearing), computed from data already loaded. Under the hero, "The game" index line (proposed · open for votes · ruled · in a hearing · reviewed) shows the bottleneck. Lists and the case page say what happens next for that person (`src/screens/docket/next-step.ts`, `your-turn.ts`, with tests).
-- **Language of the content:** questions, answers and definitions are never translated, because the question is sent to the agent exactly as written. The language badge needs a schema change and waits for approval ([backlog](docs/iteraciones/backlog.md)).
+- **Language of the content:** questions, answers and definitions are never translated, because the question is sent to the agent exactly as written. Each case carries a small EN/ES badge (the screen language when it was written; older cases have none).
+- **One agent selector** at the top of Home, Cases and Hearings, and a **Give feedback** link in the header of every page (admins read the notes in the Clerk's office → Feedback).
+- **How the agent got there:** under each judge verdict, an accordion with the steps the agent took and the query it generated (DAX, SQL or KQL), written by the hearing notebook. Query results and data rows are never stored or shown ([I4 plan](docs/iteraciones/I4.md)).
 
 ## Status
 
@@ -44,7 +46,7 @@ In development, in use by a first group of jurors. Progress and next steps are t
 - Judge trust per agent and per critic-prompt version, and the case law CSV export.
 - English and Spanish, light and dark themes, a launch screen, a three-step Intro and the in-app user guide. See [Launch screen and Intro](#launch-screen-and-intro).
 
-**Next:** see the backlog and iteration plans in `docs/iteraciones/` (for example, showing how the agent reached its answer: [I4 trace spike](docs/iteraciones/I4-trace-spike.md)).
+**Next:** see the backlog and iteration plans in `docs/iteraciones/`.
 
 ## Requirements
 
@@ -122,7 +124,7 @@ The check scripts target the test deployment by default and refuse production un
 One production deploy per finished block of work. UI-only changes are verified locally (tests, `tsc`, lint, port 5180) and then go straight to production; schema, Functions or notebook changes go to the test deployment first.
 
 1. Tests, `tsc` and lint pass; the work is committed (hooks pass) and pushed to `main`. `deploy-production.mjs` refuses unless the tree is clean and `HEAD` is `origin/main`.
-2. **Schema first, or together with the code:** the `UserFlag` entity (per-user flags such as `intro_seen`) must exist in production before, or in the same deploy as, the code that reads it. The app tolerates a missing entity (the Intro counts as seen), but it would never show the Intro or remember it. The same goes for **`VerdictReview`** (and the `Hearing.criticPromptVersion` column) with the I3b code: apply the schema (`npx rayfin up db apply`) before or with that deploy. Home tolerates a missing review/verdict query (the judge-trust line and the judge items of the ticker hide), but appeals, R9 and judge trust do nothing without it.
+2. **Schema first, or together with the code:** the `UserFlag` entity (per-user flags such as `intro_seen`) must exist in production before, or in the same deploy as, the code that reads it. The app tolerates a missing entity (the Intro counts as seen), but it would never show the Intro or remember it. The same goes for **`VerdictReview`** (and the `Hearing.criticPromptVersion` column) with the I3b code: apply the schema (`npx rayfin up db apply`) before or with that deploy. Home tolerates a missing review/verdict query (the judge-trust line and the judge items of the ticker hide), but appeals, R9 and judge trust do nothing without it. **I4:** apply `VerdictTrace`, `Feedback` and the `Case.language` column **before** the code (`npx rayfin up db apply`): `language` is read in the initial load, and a missing column would stop Home from loading. The trace and the feedback fail open, but the production notebook can only write traces once `VerdictTrace` exists (upload the notebook after the schema: `node scripts/deploy-notebook.mjs --target=production --allow-production`).
 3. `node scripts/deploy-production.mjs --allow-production` (add `--set-secrets` only when secrets change). It runs the full `rayfin up` (schema included) and then restores `rayfin/rayfin.yml`.
 4. Minimal check: launch, Intro the first time and Home on reload, Hearings loads, no console errors. No hearings are launched and nothing polls.
 5. Never commit tenant, workspace or item ids, emails or app URLs (they live in `.private/values.env`).
