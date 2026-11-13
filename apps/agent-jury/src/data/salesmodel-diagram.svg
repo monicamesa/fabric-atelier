@@ -1,0 +1,74 @@
+<svg xmlns="http://www.w3.org/2000/svg" class="source-model-diagram" viewBox="0 0 770 490" role="img" aria-labelledby="source-diagram-title" aria-describedby="source-diagram-description" font-family="Inter, system-ui, sans-serif">
+  <title id="source-diagram-title">SalesModel</title>
+  <desc id="source-diagram-description">Star schema: SalesOrder in the centre, related to Customer, Product and Calendar; Contract related to Customer.</desc>
+  <style>
+    .source-model-diagram .box{fill:var(--raised);stroke:currentColor;stroke-width:1.5}
+    .source-model-diagram .fact{fill:var(--raised);stroke:var(--action);stroke-width:2.5}
+    .source-model-diagram .head{font:700 15px var(--font-sans);fill:currentColor}
+    .source-model-diagram .kind{font:700 10px var(--font-sans);letter-spacing:.12em;fill:var(--muted)}
+    .source-model-diagram .col{font:12px var(--font-mono);fill:var(--muted)}
+    .source-model-diagram .key{font:600 12px var(--font-mono);fill:currentColor}
+    .source-model-diagram .hl{font:600 12px var(--font-mono);fill:var(--action-text)}
+    .source-model-diagram .line{stroke:currentColor;stroke-width:1.5;fill:none}
+    .source-model-diagram .card{font:700 12px var(--font-sans);fill:currentColor}
+  </style>
+
+  <!-- Calendar (top) -->
+  <rect class="box" x="290" y="10" width="190" height="112"/>
+  <text class="kind" x="304" y="30">DIMENSION</text>
+  <text class="head" x="304" y="48">Calendar</text>
+  <text class="key" x="304" y="68">Date</text>
+  <text class="hl" x="304" y="85">Year  ← fiscal (Jul–Jun)</text>
+  <text class="col" x="304" y="102">CalendarYear</text>
+  <text class="col" x="304" y="117">MonthName, Quarter</text>
+
+  <!-- SalesOrder (fact, centre) -->
+  <rect class="fact" x="270" y="180" width="230" height="170"/>
+  <text class="kind" x="284" y="200">FACT · 1 ROW PER ORDER</text>
+  <text class="head" x="284" y="218">SalesOrder</text>
+  <text class="key" x="284" y="238">OrderID, OrderDate</text>
+  <text class="col" x="284" y="255">CustomerID, ProductID</text>
+  <text class="col" x="284" y="272">Quantity</text>
+  <text class="hl" x="284" y="292">NetAmount     ← net</text>
+  <text class="col" x="284" y="309">TaxAmount (8%)</text>
+  <text class="col" x="284" y="326">FreightAmount (2.5%)</text>
+  <text class="hl" x="284" y="343">TotalAmount   ← gross</text>
+
+  <!-- Customer (left) -->
+  <rect class="box" x="20" y="200" width="200" height="122"/>
+  <text class="kind" x="34" y="220">DIMENSION</text>
+  <text class="head" x="34" y="238">Customer</text>
+  <text class="key" x="34" y="258">CustomerID</text>
+  <text class="col" x="34" y="275">CompanyName</text>
+  <text class="hl" x="34" y="292">Country  ← billing</text>
+  <text class="hl" x="34" y="309">ShipToCountry ← ship</text>
+
+  <!-- Product (right) -->
+  <rect class="box" x="550" y="200" width="210" height="106"/>
+  <text class="kind" x="564" y="220">DIMENSION</text>
+  <text class="head" x="564" y="238">Product</text>
+  <text class="key" x="564" y="258">ProductID</text>
+  <text class="col" x="564" y="275">ProductName, Category</text>
+  <text class="col" x="564" y="292">ListPrice</text>
+
+  <!-- Contract (bottom left) -->
+  <rect class="box" x="20" y="380" width="200" height="100"/>
+  <text class="kind" x="34" y="400">FACT</text>
+  <text class="head" x="34" y="418">Contract</text>
+  <text class="key" x="34" y="438">ContractID, CustomerID</text>
+  <text class="col" x="34" y="455">StartDate, EndDate</text>
+  <text class="col" x="34" y="472" style="font-size:10px">EndDate empty = open</text>
+
+  <!-- Relationships: many (*) on the fact side, 1 on the dimension side -->
+  <path class="line" d="M385 180 V122"/>
+  <text class="card" x="391" y="174">*</text><text class="card" x="391" y="136">1</text>
+
+  <path class="line" d="M270 265 H220"/>
+  <text class="card" x="256" y="259">*</text><text class="card" x="224" y="259">1</text>
+
+  <path class="line" d="M500 248 H550"/>
+  <text class="card" x="504" y="242">*</text><text class="card" x="540" y="242">1</text>
+
+  <path class="line" d="M115 380 V322"/>
+  <text class="card" x="121" y="374">*</text><text class="card" x="121" y="336">1</text>
+</svg>

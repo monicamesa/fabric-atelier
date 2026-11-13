@@ -36,7 +36,7 @@ A game goes from a business question to an agreed answer, and from there to meas
 
 **Choose the agent first.** At the top of Home, Cases and Hearings, "1 · Choose the agent" is the one place to switch agents: everything you see and propose is for that agent.
 
-**The source** shows a dated SalesModel snapshot, reference figures, definitions and question ideas; it does not query the model.
+**The source** helps you choose definitions and figures for cases, with question ideas and a dated SalesModel diagram; it does not query the model.
 
 Something confusing, or an idea? **Give feedback** (top right, on every page) sends a short note to the admins.
 

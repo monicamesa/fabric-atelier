@@ -36,7 +36,7 @@ Una partida va de una pregunta de negocio a una respuesta acordada, y de ahí a 
 
 **Elige primero el agente.** Arriba de Home, Casos y Vistas, "1 · Elige el agente" es el único sitio donde se cambia de agente: todo lo que ves y propones es para ese agente.
 
-**La fuente** muestra una instantánea fechada de SalesModel, cifras de referencia, definiciones e ideas de preguntas; no consulta el modelo.
+**La fuente** ayuda a elegir definiciones y cifras para los casos, con ideas de preguntas y un diagrama fechado de SalesModel; no consulta el modelo.
 
 ¿Algo confuso o una idea? **Danos tu opinión** (arriba a la derecha, en todas las páginas) envía una nota corta a los admins.
 

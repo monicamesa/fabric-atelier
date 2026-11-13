@@ -17,9 +17,10 @@ describe("translation files", () => {
         expect(esEntries.map(([key]) => key).sort()).toEqual(enEntries.map(([key]) => key).sort());
     });
 
-    it("never use the 'fall…' family in Spanish (fallo, falla, fallado, fallida): it reads as 'failed' (ruled = resuelto, ruling = resolución)", () => {
-        const offenders = esEntries.filter(([, value]) => typeof value === "string" && /fall/i.test(value)).map(([key]) => key);
+    it("avoids the 'fall…' family in Spanish except when describing the agent getting an answer wrong", () => {
+        const offenders = esEntries.filter(([key, value]) => key !== "source.measuresHelp" && typeof value === "string" && /fall/i.test(value)).map(([key]) => key);
         expect(offenders).toEqual([]);
+        expect(es.source.measuresHelp).toContain("el agente probablemente fallará");
     });
 
     it("have the launch screen, intro and how-it-works keys in both languages", () => {
