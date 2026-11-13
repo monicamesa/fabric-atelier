@@ -1,5 +1,15 @@
 import { describe, expect, it } from 'vitest';
-import { jurorActionsFor, parseCommand, parseLegacyCheckCutoff, selfProtectionViolation, type ClerkCommand } from './clerk-actions';
+import { contactName, jurorActionsFor, parseCommand, parseLegacyCheckCutoff, selfProtectionViolation, type ClerkCommand } from './clerk-actions';
+describe('contactName', () => {
+  it('shows the display name, else the part of the email before the @, and never the email', () => {
+    expect(contactName('  Ana E. ', 'ana.expert@example.com')).toBe('Ana E.');
+    expect(contactName(null, 'ana.expert@example.com')).toBe('ana.expert');
+    expect(contactName('', ' bruno@example.com ')).toBe('bruno');
+    expect(contactName(undefined, undefined)).toBeUndefined();
+    expect(contactName(' ', '')).toBeUndefined();
+  });
+});
+
 
 const ME = '00000000-0000-4000-8000-000000000014';
 const OTHER = '00000000-0000-4000-8000-000000000011';

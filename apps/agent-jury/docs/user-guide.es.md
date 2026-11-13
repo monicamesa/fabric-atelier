@@ -30,7 +30,7 @@ Palabras del juego:
 
 ## Cómo se juega
 
-Una partida va de una pregunta de negocio a una respuesta acordada, y de ahí a medir al agente y al juez.
+Una partida va de una pregunta de negocio a una respuesta acordada, y de ahí a medir al agente y al juez. En la app, **Cómo se juega** (un enlace en Home y el último paso de la Intro) muestra las cinco etapas (Proponer · Votar · Resuelto · Vista · Revisar) como un recorrido dibujado con una ilustración para cada una, un ejemplo y las preguntas más frecuentes; este texto es su versión detallada.
 
 **¿No sabes qué hacer? Empieza en Home: "Tu turno" está en la columna de la derecha, junto al titular.** Enumera, por orden de urgencia y con un enlace cada una, lo que te necesita ahora: casos que esperan tu voto, disputas en las que puedes dar tu opinión, casos que necesitan el voto de una aprobadora (aprobadores), veredictos del juez por revisar y, para los admins, casos resueltos listos para una vista. Si no hay nada pendiente dice "Estás al día" y enlaza a los casos abiertos. Bajo el titular, la línea "La partida" (propuestos · abiertos a votación · resueltos · en vista · revisados) muestra cuántos casos hay en cada paso y marca en coral dónde se acumula el trabajo. Cada caso de las listas indica además qué pasa ahora *para ti*.
 

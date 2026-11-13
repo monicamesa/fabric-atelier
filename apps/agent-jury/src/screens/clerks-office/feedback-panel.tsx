@@ -48,7 +48,9 @@ export function FeedbackPanel({ client }: { client: AppRayfinClient }) {
                                 </time>
                                 <Chip tone="muted">{t(`feedback.types.${entry.type}`)}</Chip>
                                 {isFeedbackPage(entry.page) && <span>{t("clerk.feedback.about", { page: t(`feedback.pages.${entry.page}`) })}</span>}
-                                {entry.canContact && <Chip tone="ruled">{t("clerk.feedback.canContact")}</Chip>}
+                                {entry.canContact && (
+                                    <Chip tone="ruled">{entry.authorName ? t("clerk.feedback.contactName", { name: entry.authorName }) : t("clerk.feedback.contactUnknown")}</Chip>
+                                )}
                             </div>
                             <p className="m-0 max-w-[820px] whitespace-pre-wrap break-words text-[16px] leading-normal text-ink">{entry.message}</p>
                         </li>

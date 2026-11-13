@@ -30,7 +30,7 @@ Words of the game:
 
 ## How to play
 
-A game goes from a business question to an agreed answer, and from there to measuring the agent and the judge.
+A game goes from a business question to an agreed answer, and from there to measuring the agent and the judge. In the app, **How to play** (a link on Home, and the last step of the Intro) shows the five stages (Propose · Vote · Ruled · Hearing · Review) as a drawn journey with an illustration for each, a worked example and the most common questions; this text is its detailed version.
 
 **Not sure what to do? Start at Home: "Your turn" is in the right-hand column, next to the headline.** It lists, in order of urgency and with one link each, what needs you right now: cases waiting for your vote, disputes where you can give your opinion, cases that need an approver's vote (approvers), judge verdicts to review and, for admins, ruled cases ready for a hearing. When nothing is pending it says "You're up to date" and links to the open cases. Under the headline, "The game" line (proposed · open for votes · ruled · in a hearing · reviewed) shows how many cases are at each step and marks, in coral, where work is piling up. Every case in the lists also says what happens next *for you*.
 

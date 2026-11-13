@@ -3,9 +3,10 @@ import { Trans, useTranslation } from "react-i18next";
 import { Button } from "@/components/docket/button";
 import { TextAreaField, TextField } from "@/components/docket/field";
 import { Objection } from "@/components/docket/objection";
+import { Segmented } from "@/components/docket/segmented";
 import { createCase, createTestimony } from "@/data/cases.service";
 import { canonicalCategory } from "@/data/docket";
-import { isAppLanguage } from "@/i18n/language-preference";
+import { isAppLanguage, type AppLanguage } from "@/i18n/language-preference";
 import type { AppRayfinClient } from "@/lib/rayfin-client";
 import { AnswerFields } from "./answer-form";
 import { EMPTY_ANSWER, trimDraft, validateAnswer, type AnswerDraft, type AnswerErrors } from "./answer-draft";
@@ -29,6 +30,10 @@ type CaseErrors = Partial<Record<"text" | "category", string>> & AnswerErrors;
  */
 export function ProposeCaseForm({ client, agentId, agentName, categories, onSaved, onCancel, onChangeAgent }: ProposeCaseFormProps) {
     const { t, i18n } = useTranslation();
+    const uiLanguage: AppLanguage = isAppLanguage(i18n.language) ? i18n.language : "en";
+    // Defaults to the screen language; the juror can say the question is in the other one.
+    const [chosenLanguage, setChosenLanguage] = useState<AppLanguage>();
+    const language = chosenLanguage ?? uiLanguage;
     const listId = useId();
     const [text, setText] = useState("");
     const [category, setCategory] = useState("");
@@ -56,7 +61,7 @@ export function ProposeCaseForm({ client, agentId, agentName, categories, onSave
                     text: text.trim(),
                     category: canonicalCategory(category, categories),
                     tags: tags.trim() || undefined,
-                    language: isAppLanguage(i18n.language) ? i18n.language : undefined,
+                    language,
                 });
                 caseId = created.id;
                 setSavedCaseId(caseId);
@@ -97,6 +102,23 @@ export function ProposeCaseForm({ client, agentId, agentName, categories, onSave
                 disabled={Boolean(savedCaseId)}
                 error={errors.text && t(errors.text)}
             />
+            <div className="flex flex-col gap-1.5">
+                <span id={`${listId}-language`} className="text-[14px] font-semibold text-ink">
+                    {t("proposeCase.language")}
+                </span>
+                <div className={savedCaseId ? "pointer-events-none w-fit opacity-60" : "w-fit"}>
+                    <Segmented<AppLanguage>
+                        label={t("proposeCase.language")}
+                        value={language}
+                        onChange={setChosenLanguage}
+                        options={[
+                            { value: "en", label: t("language.en"), ariaLabel: t("language.enName"), lang: "en" },
+                            { value: "es", label: t("language.es"), ariaLabel: t("language.esName"), lang: "es" },
+                        ]}
+                    />
+                </div>
+                <span className="text-[14px] text-text-muted">{t("proposeCase.languageHint")}</span>
+            </div>
             <div className="grid gap-4 min-[700px]:grid-cols-2">
                 <TextField
                     label={t("proposeCase.category")}

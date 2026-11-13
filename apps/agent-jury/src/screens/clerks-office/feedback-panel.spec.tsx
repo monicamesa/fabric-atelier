@@ -48,6 +48,21 @@ describe("Clerk's office feedback tab", () => {
         expect(document.body.textContent).not.toContain("@");
     });
 
+    it("shows a name only for notes whose author agreed to be contacted, and 'not known yet' when it can't be told", async () => {
+        const { client } = clientReturning({
+            code: 200,
+            outcome: "done",
+            reason: "ok",
+            detail: "",
+            feedback: [entry("f3", { canContact: true, authorName: "Ana E." }), entry("f2", { canContact: true }), entry("f1", { authorName: "Should not show" })],
+        });
+        render(<FeedbackPanel client={client} />);
+        const items = within(await screen.findByRole("list")).getAllByRole("listitem");
+        expect(items[0]).toHaveTextContent("OK to contact: Ana E.");
+        expect(items[1]).toHaveTextContent("OK to contact (name not known yet)");
+        expect(items[2]).not.toHaveTextContent(/OK to contact|Should not show/);
+    });
+
     it("says there is no feedback yet", async () => {
         const { client } = clientReturning({ code: 200, outcome: "done", reason: "ok", detail: "", feedback: [] });
         render(<FeedbackPanel client={client} />);
@@ -67,7 +82,7 @@ describe("Clerk's office feedback tab", () => {
             const { client } = clientReturning({ code: 200, outcome: "done", reason: "ok", detail: "", feedback: [entry("f1", { canContact: true })] });
             render(<FeedbackPanel client={client} />);
             expect(await screen.findByRole("heading", { name: "Opiniones de los jurados" })).toBeInTheDocument();
-            expect(await screen.findByText("Se puede contactar")).toBeInTheDocument();
+            expect(await screen.findByText("Se puede contactar (nombre aún desconocido)")).toBeInTheDocument();
         } finally {
             await i18n.changeLanguage("en");
         }

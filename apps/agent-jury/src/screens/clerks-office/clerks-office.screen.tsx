@@ -19,7 +19,6 @@ import { ClerkError, ClerkNotice } from "./clerk-feedback";
 import { FeedbackPanel } from "./feedback-panel";
 import { JurorsPanel } from "./jurors-panel";
 import { describeLogEntry } from "./log-entry";
-import { SwearInForm } from "./swear-in-form";
 
 type Tab = "jurors" | "agents" | "log" | "feedback";
 const LOG_SIZE = 200;
@@ -207,15 +206,12 @@ function AdminDesk({
 
             <div id={`clerk-panel-${tab}`} role="tabpanel" aria-labelledby={`clerk-tab-${tab}`} tabIndex={0}>
                 {tab === "jurors" && (
-                    <div className="grid grid-cols-[minmax(0,1fr)] items-start gap-10 min-[1440px]:grid-cols-[minmax(0,1fr)_380px]">
+                    <div className="flex flex-col gap-8">
                         <div className="flex flex-col gap-3">
                             <ClerkError view={rowClerk.error} />
-                            <JurorsPanel jurors={visibleJurors} me={me} activity={activity.data} clerk={rowClerk} onNotice={showNotice} />
+                            <JurorsPanel jurors={visibleJurors} me={me} activity={activity.data} clerk={rowClerk} swearInClerk={swearInClerk} onNotice={showNotice} />
                         </div>
-                        <aside className="flex flex-col gap-6">
-                            <SwearInForm clerk={swearInClerk} onNotice={showNotice} />
-                            <LatestChanges log={logState} onOpenLog={() => setTab("log")} />
-                        </aside>
+                        <LatestChanges log={logState} onOpenLog={() => setTab("log")} />
                     </div>
                 )}
                 {tab === "agents" &&

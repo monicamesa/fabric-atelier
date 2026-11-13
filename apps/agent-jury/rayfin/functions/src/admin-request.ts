@@ -1,6 +1,7 @@
 import sql from 'mssql';
 import { findActiveAdmin } from './app-sql.js';
 import {
+  contactName,
   parseCommand,
   selfProtectionViolation,
   type AdminLogEntry,
@@ -167,18 +168,45 @@ async function runCommand(
       return { ...done(`${log.length} entries.`), log };
     }
     case 'readFeedback': {
+      // Anonymous by default. Only for notes marked canContact, the author's display name is looked up from the stored
+      // userId: the same subject claim is kept with an email on cases, answers, votes, reviews and dismissals, and that
+      // email is matched to the juror row. Nothing new is stored, and no email leaves this function.
       const rows = await request()
         .input('limit', sql.Int, command.limit)
-        .query<Omit<FeedbackEntry, 'createdAt'> & { createdAt: Date }>(
+        .query<Omit<FeedbackEntry, 'createdAt' | 'authorName'> & { createdAt: Date; userId: string }>(
           `SELECT TOP (@limit)
-             LOWER(CONVERT(NVARCHAR(36), id)) AS id, type, message, COALESCE(page, N'') AS page, canContact, createdAt
+             LOWER(CONVERT(NVARCHAR(36), id)) AS id, userId, type, message, COALESCE(page, N'') AS page, canContact, createdAt
            FROM dbo.[Feedbacks]
            ORDER BY createdAt DESC`,
         );
-      const feedback = rows.recordset.map((row) => ({
+      const wanted = [...new Set(rows.recordset.filter((row) => row.canContact).map((row) => row.userId))];
+      const names = new Map<string, string>();
+      if (wanted.length > 0) {
+        const known = await request()
+          .input('ids', sql.NVarChar(sql.MAX), JSON.stringify(wanted))
+          .query<{ uid: string; displayName: string | null; email: string | null }>(
+            `SELECT e.uid, j.displayName, j.email
+             FROM (
+               SELECT authorUserId AS uid, authorEmail AS email FROM dbo.[Cases]
+               UNION SELECT authorUserId, authorEmail FROM dbo.[Testimonies]
+               UNION SELECT voterUserId, voterEmail FROM dbo.[Votes]
+               UNION SELECT reviewerUserId, reviewerEmail FROM dbo.[VerdictReviews]
+               UNION SELECT dismissedByUserId, dismissedByEmail FROM dbo.[CaseDismissals]
+             ) AS e
+             JOIN dbo.[Jurors] AS j ON LOWER(LTRIM(RTRIM(j.email))) = LOWER(LTRIM(RTRIM(e.email)))
+             WHERE e.uid IN (SELECT [value] FROM OPENJSON(@ids))
+             ORDER BY j.active DESC`,
+          );
+        for (const row of known.recordset) {
+          const name = contactName(row.displayName, row.email);
+          if (name && !names.has(row.uid)) names.set(row.uid, name);
+        }
+      }
+      const feedback: FeedbackEntry[] = rows.recordset.map(({ userId, ...row }) => ({
         ...row,
         canContact: Boolean(row.canContact),
         createdAt: new Date(row.createdAt).toISOString(),
+        ...(row.canContact && names.has(userId) ? { authorName: names.get(userId) } : {}),
       }));
       return { ...done(`${feedback.length} entries.`), feedback };
     }

@@ -60,9 +60,18 @@ if (!readOnly) {
     const request = await client.data.AdminRequest.create({ requesterEmail: me.email, action: "readFeedback", payload: JSON.stringify({ limit: 50, source: "check" }), createdAt: new Date() });
     const read = await client.functions.clerkExecute.invoke({ requestId: request.id });
     const entries = read.feedback ?? [];
-    const allowed = new Set(["id", "type", "message", "page", "canContact", "createdAt"]);
+    const allowed = new Set(["id", "type", "message", "page", "canContact", "createdAt", "authorName"]);
     record("F.4", "readFeedback returns the notes with no user id or email", read.code === 200 && entries.length > 0 && entries.every((entry) => Object.keys(entry).every((key) => allowed.has(key))), `${read.code} ${read.reason}, ${entries.length} notes`);
     record("F.5", "the '[check]' note is among them", entries.some((entry) => entry.message.startsWith("[check]")));
+    record("F.6", "notes that don't allow contact stay anonymous", entries.filter((entry) => !entry.canContact).every((entry) => entry.authorName === undefined));
+    if (!entries.some((entry) => entry.message.startsWith("[check] contact"))) {
+        await client.data.Feedback.create({ userId: me.id, type: "other", message: "[check] contact allowed, safe to ignore", page: "feedback", canContact: true, createdAt: new Date() }).catch(() => undefined);
+    }
+    const again = await client.functions.clerkExecute.invoke({
+        requestId: (await client.data.AdminRequest.create({ requesterEmail: me.email, action: "readFeedback", payload: JSON.stringify({ limit: 50, source: "check" }), createdAt: new Date() })).id,
+    });
+    const named = (again.feedback ?? []).find((entry) => entry.message.startsWith("[check] contact"));
+    record("F.7", "a note that allows contact shows the author's display name, never an email", Boolean(named?.canContact) && typeof named?.authorName === "string" && named.authorName.length > 0 && !named.authorName.includes("@"), named ? "name resolved" : "note missing");
 
     // Traces are written only by the notebook.
     const sample = traces?.[0];

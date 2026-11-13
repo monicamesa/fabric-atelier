@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, it, vi } from "vitest";
-import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, render, screen, within } from "@testing-library/react";
 import { i18n, initI18n } from "@/i18n/i18n";
 import type { AppRayfinClient } from "@/lib/rayfin-client";
 import { ProposeCaseForm } from "./propose-case-form";
@@ -38,6 +38,34 @@ describe("ProposeCaseForm", () => {
         expect(onChangeAgent).toHaveBeenCalledTimes(1);
         rerender(<ProposeCaseForm client={client} agentId="a1" agentName="Sales Agent" categories={[]} onSaved={vi.fn()} onCancel={vi.fn()} />);
         expect(screen.queryByRole("button", { name: "change" })).not.toBeInTheDocument();
+    });
+
+    it("lets the juror say the question is in the other language, and saves that one", async () => {
+        await i18n.changeLanguage("en");
+        const { client, createCase } = fakeClient();
+        render(<ProposeCaseForm client={client} agentId="a1" agentName="Sales Agent" categories={[]} onSaved={vi.fn()} onCancel={vi.fn()} />);
+        const group = screen.getByRole("group", { name: "Language of the question" });
+        expect(within(group).getByRole("button", { name: "English" })).toHaveAttribute("aria-pressed", "true");
+        fireEvent.click(within(group).getByRole("button", { name: "Spanish" }));
+        expect(within(group).getByRole("button", { name: "Spanish" })).toHaveAttribute("aria-pressed", "true");
+        fill();
+        fireEvent.click(screen.getByRole("button", { name: "Propose the case" }));
+        await vi.waitFor(() => expect(createCase).toHaveBeenCalledTimes(1));
+        expect(createCase).toHaveBeenCalledWith(expect.objectContaining({ language: "es" }));
+    });
+
+    it("defaults to the screen language: Spanish on the Spanish screen, and the choice still wins", async () => {
+        await i18n.changeLanguage("es");
+        try {
+            const { client } = fakeClient();
+            render(<ProposeCaseForm client={client} agentId="a1" agentName="Sales Agent" categories={[]} onSaved={vi.fn()} onCancel={vi.fn()} />);
+            const group = screen.getByRole("group", { name: "Idioma de la pregunta" });
+            expect(within(group).getByRole("button", { name: "Español" })).toHaveAttribute("aria-pressed", "true");
+            fireEvent.click(within(group).getByRole("button", { name: "Inglés" }));
+            expect(within(group).getByRole("button", { name: "Inglés" })).toHaveAttribute("aria-pressed", "true");
+        } finally {
+            await i18n.changeLanguage("en");
+        }
     });
 
     it.each([

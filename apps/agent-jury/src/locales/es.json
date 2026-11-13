@@ -306,6 +306,8 @@
     "proposeCase": {
         "title": "Proponer un caso para <agent>{{agent}}</agent>",
         "change": "cambiar",
+        "language": "Idioma de la pregunta",
+        "languageHint": "Elige el idioma en el que la escribiste. Se muestra como una pequeña insignia junto a la pregunta.",
         "help": "Un buen caso tiene una única respuesta correcta que un experto de negocio puede comprobar.",
         "question": "Pregunta",
         "questionHint": "Escribe la pregunta como la haría negocio. Se envía al agente tal cual, en este idioma.",
@@ -375,7 +377,7 @@
         "noAgents": "Todavía no hay agentes a juicio. Un admin los registra en la secretaría.",
         "openClerk": "Ir a la secretaría",
         "howItWorks": "Cómo funciona",
-        "userGuide": "Guía de usuario"
+        "userGuide": "Cómo se juega"
     },
     "clerk": {
         "kicker": "Solo la ven los admins",
@@ -388,11 +390,13 @@
         "showExamplesHelp": "Desactivado por defecto. Los agentes y jurados de ejemplo (direcciones de ejemplo) son datos de demostración: nunca cuentan en las vistas, en la confianza en el juez ni en la exportación de jurisprudencia, y no se borra nada. La elección se restablece al recargar la página.",
         "feedback": {
             "title": "Opiniones de los jurados",
-            "help": "Lo que los jurados enviaron con «Danos tu opinión», lo más reciente primero. No muestra nombres ni correos.",
+            "help": "Lo que los jurados enviaron con «Danos tu opinión», lo más reciente primero. Las notas son anónimas; solo aparece un nombre cuando el jurado marcó «Pueden contactarme sobre esto».",
             "empty": "Todavía no hay opiniones.",
             "loadError": "No se pudieron cargar las opiniones.",
             "about": "Sobre: {{page}}",
-            "canContact": "Se puede contactar"
+            "canContact": "Se puede contactar",
+            "contactName": "Se puede contactar: {{name}}",
+            "contactUnknown": "Se puede contactar (nombre aún desconocido)"
         },
         "loading": "La secretaría está buscando los expedientes…",
         "tabs": {
@@ -428,6 +432,8 @@
             "changeRole": "Cambiar rol",
             "changeRoleNamed": "Cambiar el rol de {{name}}",
             "editDetails": "Editar datos",
+            "actions": "Acciones",
+            "actionsFor": "Acciones de {{name}}",
             "editDetailsNamed": "Editar los datos de {{name}}",
             "saveDetails": "Guardar datos",
             "cancel": "Cancelar",
@@ -449,6 +455,7 @@
         },
         "swearIn": {
             "title": "Incorporar a un jurado",
+            "open": "+ Incorporar a un jurado",
             "email": "Email de trabajo",
             "emailHint": "Debe ser el email con el que entra en Fabric.",
             "emailInvalid": "Escribe un email de trabajo, como nombre@example.com.",
@@ -910,10 +917,90 @@
         "judged": "Juzgado: no te queda nada por hacer"
     },
     "guide": {
-        "kicker": "Ayuda",
-        "title": "Guía de usuario",
-        "help": "Cómo se juega, quién puede hacer qué y las reglas exactas de resoluciones, disputas, vistas y confianza en el juez.",
-        "back": "Volver"
+        "kicker": "Guía de usuario",
+        "title": "Cómo se juega",
+        "help": "Cinco etapas llevan una pregunta de negocio hasta un agente medido. Las reglas exactas están al final.",
+        "back": "Volver",
+        "journey": {
+            "label": "El juego en cinco etapas: Proponer, Votar, Resuelto, Vista, Revisar.",
+            "stages": {
+                "propose": "Proponer",
+                "vote": "Votar",
+                "ruled": "Resuelto",
+                "hearing": "Vista",
+                "review": "Revisar"
+            }
+        },
+        "labels": {
+            "stage": "Etapa {{number}}",
+            "do": "Qué haces",
+            "see": "Qué ves",
+            "example": "Ejemplo"
+        },
+        "stages": {
+            "propose": {
+                "title": "Proponer un caso",
+                "do": "Escribe la pregunta como la haría negocio, con tu respuesta y una definición de una frase.",
+                "see": "El caso aparece como Abierto a votación, con 0 votos: proponer no es votar.",
+                "example": "Ana propone «¿Cuántos clientes tenemos en España?» con la respuesta 141 (clientes por país de facturación).",
+                "alt": "El formulario para proponer un caso mientras se escribe la pregunta"
+            },
+            "vote": {
+                "title": "Votar",
+                "do": "Vota la respuesta que el agente DEBERÍA dar, o propón otra con su propia definición.",
+                "see": "Cada respuesta muestra qué cuenta, el periodo, a quién cuenta y la tabla de origen, para comparar definiciones de un vistazo.",
+                "example": "Bruno propone 265 para la misma pregunta (contando el país de envío). Dos definiciones, una pregunta.",
+                "alt": "Un caso abierto con dos respuestas, 141 y 265, y los botones de voto"
+            },
+            "ruled": {
+                "title": "Resuelto",
+                "do": "Seguid votando hasta que una respuesta tenga dos votos válidos, uno de un aprobador, y ningún aprobador en contra.",
+                "see": "El caso pasa a Resuelto y el ticker lo anuncia. Si dos respuestas tienen apoyo, es una disputa: se resuelve entre vosotros.",
+                "example": "Carla y Beto apoyan 141. Beto es aprobador, así que el caso de España queda resuelto: 141 es la respuesta esperada.",
+                "alt": "Un caso resuelto con su respuesta ganadora y el acta"
+            },
+            "hearing": {
+                "title": "Vista",
+                "do": "Un admin inicia una vista: el agente responde a las preguntas resueltas y el juez de IA da un veredicto por cada una.",
+                "see": "Los veredictos llegan uno a uno. «Cómo llegó el agente a su respuesta» muestra los pasos y la consulta que generó.",
+                "example": "El agente responde 141 y el juez dice Correcta. En otra ejecución llegó a responder 292: por eso las vistas se repiten.",
+                "alt": "Una vista con un veredicto Correcta y los pasos que dio el agente"
+            },
+            "review": {
+                "title": "Revisar al juez",
+                "do": "Di si estás de acuerdo con cada veredicto, o recúrrelo con un comentario.",
+                "see": "Home muestra cuántas veces coincide el jurado con el juez. Si el jurado corrige al juez, el ticker dice «Juez corregido».",
+                "example": "Si el juez hubiera dado por buena la cifra 292, los jurados recurrirían: la respuesta esperada es 141.",
+                "alt": "Los botones de revisión bajo un veredicto: Sí, de acuerdo y No, recurrir"
+            }
+        },
+        "faq": {
+            "title": "Preguntas frecuentes",
+            "vote": {
+                "q": "¿Por qué no cuenta mi voto?",
+                "a": "Un voto cuenta cuando lo emite un jurado activo que no es el autor de esa respuesta. Un voto en contra necesita un motivo, y vale el último voto de cada persona. Tu propia respuesta empieza sin votos, y tu voto sobre ella nunca cuenta."
+            },
+            "approver": {
+                "q": "¿Qué es un aprobador?",
+                "a": "Un jurado con el rol de aprobador. Un caso solo queda resuelto con al menos un voto a favor de un aprobador y ninguno en contra, y un aprobador puede reabrir un caso al revisar un veredicto. Cada persona tiene un solo rol: un admin vota como experto."
+            },
+            "disagree": {
+                "q": "¿Y si no estoy de acuerdo con el juez?",
+                "a": "En la página de la vista pulsa «No, recurrir» y escribe un comentario. Cuando la mayoría del jurado corrige al juez, el ticker lo anuncia. Si crees que la respuesta esperada era la equivocada y eres aprobador, elige ese motivo y el caso se reabre."
+            },
+            "criteria": {
+                "q": "¿Qué significa «criterio estándar»?",
+                "a": "El juez de IA usa el criterio de evaluación estándar de Fabric. La confianza se cuenta por criterio: si el criterio cambia, la confianza empieza de cero."
+            },
+            "caselaw": {
+                "q": "¿Qué es la jurisprudencia?",
+                "a": "Los casos resueltos de un agente. En Casos, «Exportar jurisprudencia» los descarga como un CSV (question,expected_answer,category,tags) para reutilizarlos en otras evaluaciones."
+            }
+        },
+        "rules": {
+            "title": "Reglas detalladas",
+            "help": "El texto completo de las reglas, para cuando necesitas el detalle exacto."
+        }
     },
     "intro": {
         "pageLabel": "Edición especial · Página {{step}} de 3",

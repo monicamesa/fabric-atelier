@@ -2,6 +2,7 @@ import { useState } from "react";
 import type { TFunction } from "i18next";
 import { useTranslation } from "react-i18next";
 import { JUROR_ROLES, jurorActionsFor, type JurorRole } from "../../../rayfin/functions/src/clerk-actions";
+import { ActionMenu, type ActionMenuItem } from "@/components/docket/action-menu";
 import { AdminCell, AdminRow, AdminTable } from "@/components/docket/admin-table";
 import { Button } from "@/components/docket/button";
 import { RoleChip } from "@/components/docket/chip";
@@ -12,27 +13,29 @@ import { EmptyState } from "@/components/docket/states";
 import type { AuthorActivity, JurorRow } from "@/data/directory.service";
 import { useMediaQuery } from "@/hooks/use-media-query";
 import { jurorLabel } from "@/lib/people";
-import { cn } from "@/lib/utils";
 import type { ClerkRunner } from "./clerk-runner";
+import { SwearInForm } from "./swear-in-form";
 
 interface JurorsPanelProps {
     jurors: JurorRow[];
     me: JurorRow;
     activity?: AuthorActivity;
     clerk: ClerkRunner;
+    swearInClerk: ClerkRunner;
     onNotice: (message: string) => void;
 }
 
 type Filter = "active" | "inactive";
-// Secondary columns give way first on narrower screens, so the row actions always fit on one line.
+// Secondary columns give way first on narrower screens, so the table always fits its container.
 const TEAM_COLUMN = "hidden min-[1024px]:table-cell";
-const ACTIVITY_COLUMN = "hidden min-[1280px]:max-[1439px]:table-cell min-[1600px]:table-cell";
-// The table needs room for its one-line actions: below 900 px the jurors are stacked cards, not a table.
+const ACTIVITY_COLUMN = "hidden min-[1280px]:table-cell";
+// Below 900 px the jurors are stacked cards, not a table.
 const PHONE_QUERY = "(max-width: 899px)";
 
-export function JurorsPanel({ jurors, me, activity, clerk, onNotice }: JurorsPanelProps) {
+export function JurorsPanel({ jurors, me, activity, clerk, swearInClerk, onNotice }: JurorsPanelProps) {
     const { t } = useTranslation();
     const [filter, setFilter] = useState<Filter>("active");
+    const [swearing, setSwearing] = useState(false);
     const isPhone = useMediaQuery(PHONE_QUERY);
     const activeCount = jurors.filter((juror) => juror.active).length;
     const shown = jurors.filter((juror) => juror.active === (filter === "active"));
@@ -44,16 +47,33 @@ export function JurorsPanel({ jurors, me, activity, clerk, onNotice }: JurorsPan
                 <h2 id="clerk-jurors-title" className="m-0 font-serif text-[28px] font-bold text-ink">
                     {t("clerk.jurors.title")}
                 </h2>
-                <Segmented<Filter>
-                    label={t("clerk.jurors.filter")}
-                    value={filter}
-                    onChange={setFilter}
-                    options={[
-                        { value: "active", label: t("clerk.jurors.active", { count: activeCount }) },
-                        { value: "inactive", label: t("clerk.jurors.inactive", { count: jurors.length - activeCount }) },
-                    ]}
-                />
+                <div className="flex flex-wrap items-center gap-3">
+                    <Segmented<Filter>
+                        label={t("clerk.jurors.filter")}
+                        value={filter}
+                        onChange={setFilter}
+                        options={[
+                            { value: "active", label: t("clerk.jurors.active", { count: activeCount }) },
+                            { value: "inactive", label: t("clerk.jurors.inactive", { count: jurors.length - activeCount }) },
+                        ]}
+                    />
+                    <Button variant="secondary" aria-expanded={swearing} aria-controls="clerk-swear-in" onClick={() => setSwearing((value) => !value)}>
+                        {t("clerk.swearIn.open")}
+                    </Button>
+                </div>
             </div>
+            {swearing && (
+                <div id="clerk-swear-in">
+                    <SwearInForm
+                        clerk={swearInClerk}
+                        onCancel={() => setSwearing(false)}
+                        onNotice={(message) => {
+                            onNotice(message);
+                            setSwearing(false);
+                        }}
+                    />
+                </div>
+            )}
             {shown.length === 0 ? (
                 <EmptyState message={t(filter === "active" ? "clerk.jurors.emptyActive" : "clerk.jurors.emptyInactive")} />
             ) : isPhone ? (
@@ -70,13 +90,7 @@ export function JurorsPanel({ jurors, me, activity, clerk, onNotice }: JurorsPan
                         { key: "team", header: t("clerk.jurors.columns.team"), className: TEAM_COLUMN },
                         { key: "role", header: t("clerk.jurors.columns.role"), className: "w-[150px]" },
                         { key: "activity", header: t("clerk.jurors.columns.activity"), className: ACTIVITY_COLUMN },
-                        {
-                            key: "actions",
-                            header: t("clerk.jurors.columns.actions"),
-                            hiddenHeader: true,
-                            align: "right",
-                            className: "w-[340px]",
-                        },
+                        { key: "actions", header: t("clerk.jurors.columns.actions"), hiddenHeader: true, align: "right", className: "w-[150px]" },
                     ]}
                 >
                     {shown.map((juror) => (
@@ -89,7 +103,8 @@ export function JurorsPanel({ jurors, me, activity, clerk, onNotice }: JurorsPan
     );
 }
 
-type RowProps = { juror: JurorRow } & Omit<JurorsPanelProps, "jurors">;
+type RowProps = { juror: JurorRow } & Omit<JurorsPanelProps, "jurors" | "swearInClerk">;
+type Mode = "idle" | "role" | "details";
 
 function JurorIdentity({ juror, me }: Pick<RowProps, "juror" | "me">) {
     const { t } = useTranslation();
@@ -103,42 +118,17 @@ function JurorIdentity({ juror, me }: Pick<RowProps, "juror" | "me">) {
                     {name}
                     {isMe && ` ${t("clerk.jurors.you")}`}
                 </b>
-                <span className="font-mono text-[13px] text-text-muted [overflow-wrap:anywhere] min-[640px]:whitespace-nowrap">
-                    {juror.email}
-                </span>
+                <span className="font-mono text-[13px] text-text-muted [overflow-wrap:anywhere]">{juror.email}</span>
             </span>
         </div>
     );
 }
 
-/** "Edit details", "Change role" and (de)activation. Your own row only offers "Edit details". */
-function JurorActions({ juror, me, clerk, onNotice, stacked = false }: RowProps & { stacked?: boolean }) {
+/** The one "Actions ▾" menu of a juror: Edit details, Change role and (de)activation. Your own row only offers Edit details. */
+function JurorMenu({ juror, me, clerk, onNotice, onMode, fullWidth }: RowProps & { onMode: (mode: Mode) => void; fullWidth?: boolean }) {
     const { t } = useTranslation();
-    const [mode, setMode] = useState<"idle" | "role" | "details">("idle");
-    const [role, setRole] = useState<JurorRole>(juror.role);
-    const [displayName, setDisplayName] = useState(juror.displayName ?? "");
-    const [team, setTeam] = useState(juror.team ?? "");
     const name = jurorLabel(juror);
     const allowed = jurorActionsFor(juror.id, me.id);
-    const full = stacked ? "w-full" : undefined;
-    const layout = cn("flex gap-2", stacked ? "flex-col" : "flex-wrap items-center justify-end");
-    // The idle actions of a table row stay on one line (never clipped, never stacked); the edit forms may wrap.
-    const idleLayout = cn("flex gap-2", stacked ? "flex-col" : "flex-nowrap items-center justify-end whitespace-nowrap");
-
-    async function saveRole() {
-        if (await clerk.run("setJurorRole", { jurorId: juror.id, role })) {
-            setMode("idle");
-            onNotice(t("clerk.jurors.done.roleChanged", { name, role: t(`roles.${role}.label`) }));
-        }
-    }
-
-    async function saveDetails() {
-        const payload = { jurorId: juror.id, displayName: displayName.trim() || undefined, team: team.trim() || undefined };
-        if (await clerk.run("editJurorDetails", payload)) {
-            setMode("idle");
-            onNotice(t("clerk.jurors.done.detailsEdited", { name: payload.displayName ?? name }));
-        }
-    }
 
     async function setActive(active: boolean) {
         if (await clerk.run("setJurorActive", { jurorId: juror.id, active })) {
@@ -146,120 +136,85 @@ function JurorActions({ juror, me, clerk, onNotice, stacked = false }: RowProps 
         }
     }
 
-    function cancel() {
-        setRole(juror.role);
-        setDisplayName(juror.displayName ?? "");
-        setTeam(juror.team ?? "");
-        setMode("idle");
+    const items: ActionMenuItem[] = [
+        { key: "details", label: t("clerk.jurors.editDetails"), ariaLabel: t("clerk.jurors.editDetailsNamed", { name }), onSelect: () => onMode("details") },
+    ];
+    if (allowed.canChangeRole && juror.active) {
+        items.push({ key: "role", label: t("clerk.jurors.changeRole"), ariaLabel: t("clerk.jurors.changeRoleNamed", { name }), onSelect: () => onMode("role") });
+    }
+    if (juror.active && allowed.canDeactivate) {
+        items.push({ key: "deactivate", label: t("clerk.jurors.deactivate"), ariaLabel: t("clerk.jurors.deactivateNamed", { name }), tone: "danger", disabled: clerk.pending, onSelect: () => void setActive(false) });
+    }
+    if (!juror.active) {
+        items.push({ key: "reinstate", label: t("clerk.jurors.reinstate"), ariaLabel: t("clerk.jurors.reinstateNamed", { name }), disabled: clerk.pending, onSelect: () => void setActive(true) });
+    }
+    return (
+        <ActionMenu
+            label={t("clerk.jurors.actions")}
+            ariaLabel={t("clerk.jurors.actionsFor", { name })}
+            items={items}
+            fullWidth={fullWidth}
+            note={!allowed.canChangeRole && !allowed.canDeactivate ? t("clerk.jurors.selfNote") : undefined}
+        />
+    );
+}
+
+/** The forms opened from the menu. They open under the row (or inside the card), so the table never changes its width. */
+function JurorEditor({ juror, clerk, onNotice, mode, onMode }: RowProps & { mode: Exclude<Mode, "idle">; onMode: (mode: Mode) => void }) {
+    const { t } = useTranslation();
+    const [role, setRole] = useState<JurorRole>(juror.role);
+    const [displayName, setDisplayName] = useState(juror.displayName ?? "");
+    const [team, setTeam] = useState(juror.team ?? "");
+    const name = jurorLabel(juror);
+
+    async function saveRole() {
+        if (await clerk.run("setJurorRole", { jurorId: juror.id, role })) {
+            onMode("idle");
+            onNotice(t("clerk.jurors.done.roleChanged", { name, role: t(`roles.${role}.label`) }));
+        }
     }
 
-    const cancelButton = (
-        <Button variant="link" compact={!stacked} className={full} onClick={cancel}>
+    async function saveDetails() {
+        const payload = { jurorId: juror.id, displayName: displayName.trim() || undefined, team: team.trim() || undefined };
+        if (await clerk.run("editJurorDetails", payload)) {
+            onMode("idle");
+            onNotice(t("clerk.jurors.done.detailsEdited", { name: payload.displayName ?? name }));
+        }
+    }
+
+    const cancel = (
+        <Button variant="link" compact onClick={() => onMode("idle")}>
             {t("clerk.jurors.cancel")}
         </Button>
     );
 
     if (mode === "details") {
         return (
-            <div className={cn("flex flex-col gap-2", !stacked && "items-stretch text-left")}>
-                <TextField
-                    label={t("clerk.swearIn.displayName")}
-                    maxLength={100}
-                    value={displayName}
-                    onChange={(event) => setDisplayName(event.target.value)}
-                />
+            <div className="grid items-end gap-3 min-[900px]:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_auto]">
+                <TextField label={t("clerk.swearIn.displayName")} maxLength={100} value={displayName} onChange={(event) => setDisplayName(event.target.value)} />
                 <TextField label={t("clerk.swearIn.team")} maxLength={100} value={team} onChange={(event) => setTeam(event.target.value)} />
-                <div className={layout}>
-                    <Button variant="quiet" compact={!stacked} className={full} disabled={clerk.pending} onClick={() => void saveDetails()}>
+                <div className="flex items-center gap-2">
+                    <Button variant="quiet" disabled={clerk.pending} onClick={() => void saveDetails()}>
                         {t("clerk.jurors.saveDetails")}
                     </Button>
-                    {cancelButton}
+                    {cancel}
                 </div>
             </div>
         );
     }
-
-    if (mode === "role") {
-        return (
-            <div className={layout}>
-                <SelectField
-                    label={t("clerk.jurors.roleFor", { name })}
-                    hiddenLabel
-                    value={role}
-                    onChange={(value) => setRole(value as JurorRole)}
-                    className={full}
-                >
-                    {JUROR_ROLES.map((option) => (
-                        <option key={option} value={option}>
-                            {t(`roles.${option}.label`)}
-                        </option>
-                    ))}
-                </SelectField>
-                <Button
-                    variant="quiet"
-                    compact={!stacked}
-                    className={full}
-                    disabled={clerk.pending || role === juror.role}
-                    onClick={() => void saveRole()}
-                >
-                    {t("clerk.jurors.saveRole")}
-                </Button>
-                {cancelButton}
-            </div>
-        );
-    }
-
-    const textAction = cn(full, !stacked && "text-ink");
     return (
-        <div className={idleLayout}>
-            <Button
-                variant={stacked ? "quiet" : "link"}
-                compact={!stacked}
-                className={textAction}
-                onClick={() => setMode("details")}
-                aria-label={t("clerk.jurors.editDetailsNamed", { name })}
-            >
-                {t("clerk.jurors.editDetails")}
+        <div className="flex flex-wrap items-end gap-3">
+            <SelectField label={t("clerk.jurors.roleFor", { name })} hiddenLabel value={role} onChange={(value) => setRole(value as JurorRole)}>
+                {JUROR_ROLES.map((option) => (
+                    <option key={option} value={option}>
+                        {t(`roles.${option}.label`)}
+                    </option>
+                ))}
+            </SelectField>
+            <Button variant="quiet" disabled={clerk.pending || role === juror.role} onClick={() => void saveRole()}>
+                {t("clerk.jurors.saveRole")}
             </Button>
-            {!allowed.canChangeRole && !allowed.canDeactivate && (
-                <span className="text-[13px] text-text-muted">{t("clerk.jurors.selfNote")}</span>
-            )}
-            {allowed.canChangeRole && juror.active && (
-                <Button
-                    variant={stacked ? "quiet" : "link"}
-                    compact={!stacked}
-                    className={textAction}
-                    onClick={() => setMode("role")}
-                    aria-label={t("clerk.jurors.changeRoleNamed", { name })}
-                >
-                    {t("clerk.jurors.changeRole")}
-                </Button>
-            )}
-            {juror.active
-                ? allowed.canDeactivate && (
-                      <Button
-                          variant="danger-text"
-                          compact={!stacked}
-                          className={cn(full, stacked && "border border-action")}
-                          disabled={clerk.pending}
-                          onClick={() => void setActive(false)}
-                          aria-label={t("clerk.jurors.deactivateNamed", { name })}
-                      >
-                          {t("clerk.jurors.deactivate")}
-                      </Button>
-                  )
-                : (
-                      <Button
-                          variant="quiet"
-                          compact={!stacked}
-                          className={full}
-                          disabled={clerk.pending}
-                          onClick={() => void setActive(true)}
-                          aria-label={t("clerk.jurors.reinstateNamed", { name })}
-                      >
-                          {t("clerk.jurors.reinstate")}
-                      </Button>
-                  )}
+            {cancel}
         </div>
     );
 }
@@ -277,37 +232,49 @@ function activityText(juror: JurorRow, activity: AuthorActivity | undefined, t: 
 function JurorTableRow(props: RowProps) {
     const { t } = useTranslation();
     const { juror, activity } = props;
+    const [mode, setMode] = useState<Mode>("idle");
     return (
-        <AdminRow>
-            <AdminCell>
-                <JurorIdentity juror={juror} me={props.me} />
-            </AdminCell>
-            <AdminCell className={TEAM_COLUMN}>
-                <span className="block max-w-[160px] truncate" title={juror.team ?? undefined}>
-                    {juror.team ?? "—"}
-                </span>
-            </AdminCell>
-            <AdminCell>
-                <RoleChip role={juror.role} />
-            </AdminCell>
-            <AdminCell className={`${ACTIVITY_COLUMN} whitespace-nowrap text-text-muted`}>{activityText(juror, activity, t)}</AdminCell>
-            <AdminCell align="right">
-                <JurorActions {...props} />
-            </AdminCell>
-        </AdminRow>
+        <>
+            <AdminRow>
+                <AdminCell>
+                    <JurorIdentity juror={juror} me={props.me} />
+                </AdminCell>
+                <AdminCell className={TEAM_COLUMN}>
+                    <span className="block max-w-[160px] truncate" title={juror.team ?? undefined}>
+                        {juror.team ?? "—"}
+                    </span>
+                </AdminCell>
+                <AdminCell>
+                    <RoleChip role={juror.role} />
+                </AdminCell>
+                <AdminCell className={`${ACTIVITY_COLUMN} text-text-muted`}>{activityText(juror, activity, t)}</AdminCell>
+                <AdminCell align="right">
+                    <JurorMenu {...props} onMode={setMode} />
+                </AdminCell>
+            </AdminRow>
+            {mode !== "idle" && (
+                <tr className="bg-paper">
+                    <td colSpan={5} className="px-3.5 pb-4 pt-1">
+                        <JurorEditor {...props} mode={mode} onMode={setMode} />
+                    </td>
+                </tr>
+            )}
+        </>
     );
 }
 
-/** Phone layout: identity, role chip, then full-width actions. */
+/** Phone layout: identity, role chip, then a full-width Actions menu. */
 function JurorCard(props: RowProps) {
     const { juror } = props;
+    const [mode, setMode] = useState<Mode>("idle");
     return (
         <li className="flex flex-col gap-3 border border-ink bg-paper-raised p-4">
             <JurorIdentity juror={juror} me={props.me} />
             <div className="flex flex-wrap gap-2">
                 <RoleChip role={juror.role} />
             </div>
-            <JurorActions {...props} stacked />
+            <JurorMenu {...props} onMode={setMode} fullWidth />
+            {mode !== "idle" && <JurorEditor {...props} mode={mode} onMode={setMode} />}
         </li>
     );
 }

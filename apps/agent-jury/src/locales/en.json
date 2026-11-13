@@ -306,6 +306,8 @@
     "proposeCase": {
         "title": "Propose a case for <agent>{{agent}}</agent>",
         "change": "change",
+        "language": "Language of the question",
+        "languageHint": "Pick the language you wrote it in. It shows as a small badge next to the question.",
         "help": "A good case has one right answer that a business expert can check.",
         "question": "Question",
         "questionHint":"Write the question as business would ask it. It is sent to the agent exactly as written, in this language.",
@@ -375,7 +377,7 @@
         "noAgents": "No agents on trial yet. An admin registers them in the clerk's office.",
         "openClerk": "Go to the clerk's office",
         "howItWorks": "How it works",
-        "userGuide": "User guide"
+        "userGuide": "How to play"
     },
     "clerk": {
         "kicker": "Only visible to admins",
@@ -388,11 +390,13 @@
         "showExamplesHelp": "Off by default. Example agents and jurors (example addresses) are demo data: they never count in hearings, judge trust or the case-law export, and nothing is deleted. The choice resets when the page reloads.",
         "feedback": {
             "title": "Feedback from jurors",
-            "help": "What jurors sent through \"Give feedback\", newest first. It shows no names or emails.",
+            "help": "What jurors sent through \"Give feedback\", newest first. Notes are anonymous; a name appears only when the juror ticked \"You can contact me\".",
             "empty": "No feedback yet.",
             "loadError": "The feedback could not be loaded.",
             "about": "About: {{page}}",
-            "canContact": "OK to contact"
+            "canContact": "OK to contact",
+            "contactName": "OK to contact: {{name}}",
+            "contactUnknown": "OK to contact (name not known yet)"
         },
         "loading": "The clerk is fetching the records…",
         "tabs": {
@@ -428,6 +432,8 @@
             "changeRole": "Change role",
             "changeRoleNamed": "Change the role of {{name}}",
             "editDetails": "Edit details",
+            "actions": "Actions",
+            "actionsFor": "Actions for {{name}}",
             "editDetailsNamed": "Edit the details of {{name}}",
             "saveDetails": "Save details",
             "cancel": "Cancel",
@@ -449,6 +455,7 @@
         },
         "swearIn": {
             "title": "Swear in a juror",
+            "open": "+ Swear in a juror",
             "email": "Work email",
             "emailHint": "Must be the email they use to sign in to Fabric.",
             "emailInvalid": "Enter a work email such as name@example.com.",
@@ -910,10 +917,90 @@
         "judged": "Judged: nothing left for you"
     },
     "guide": {
-        "kicker": "Help",
-        "title": "User guide",
-        "help": "How to play, who can do what, and the exact rules for rulings, disputes, hearings and judge trust.",
-        "back": "Back"
+        "kicker": "User guide",
+        "title": "How to play",
+        "help": "Five stages take a business question to a measured agent. The exact rules are at the bottom.",
+        "back": "Back",
+        "journey": {
+            "label": "The game in five stages: Propose, Vote, Ruled, Hearing, Review.",
+            "stages": {
+                "propose": "Propose",
+                "vote": "Vote",
+                "ruled": "Ruled",
+                "hearing": "Hearing",
+                "review": "Review"
+            }
+        },
+        "labels": {
+            "stage": "Stage {{number}}",
+            "do": "What you do",
+            "see": "What you see",
+            "example": "Example"
+        },
+        "stages": {
+            "propose": {
+                "title": "Propose a case",
+                "do": "Write the question the way a business user would ask it, with your answer and a one-sentence definition.",
+                "see": "The case appears as Open for votes, with 0 votes: proposing is not voting.",
+                "example": "Ana proposes “How many customers do we have in Spain?” with the answer 141 (customers by billing country).",
+                "alt": "The propose form while the question is being typed"
+            },
+            "vote": {
+                "title": "Vote",
+                "do": "Vote for the answer the agent SHOULD give, or propose another one with its own definition.",
+                "see": "Each answer shows what counts, the period, who counts and the source table, so definitions compare at a glance.",
+                "example": "Bruno proposes 265 for the same question (counting shipping country instead). Two definitions, one question.",
+                "alt": "An open case with two answers, 141 and 265, and the vote buttons"
+            },
+            "ruled": {
+                "title": "Ruled",
+                "do": "Keep voting until one answer has two valid votes, one from an approver, and no approver against.",
+                "see": "The case turns Ruled and the ticker announces it. If two answers have support, it's a dispute: settle it between you.",
+                "example": "Carla and Beto back 141. Beto is an approver, so the Spain case is ruled: 141 is the expected answer.",
+                "alt": "A ruled case with its ruling answer and the court record"
+            },
+            "hearing": {
+                "title": "Hearing",
+                "do": "An admin starts a hearing: the agent answers the ruled questions and the AI judge gives one verdict each.",
+                "see": "Verdicts arrive one by one. “How the agent got there” shows the steps and the query it generated.",
+                "example": "The agent answers 141 and the judge says Correct. Another run once answered 292: that is why hearings repeat.",
+                "alt": "A hearing with a Correct verdict and the steps the agent took"
+            },
+            "review": {
+                "title": "Review the judge",
+                "do": "Say whether you agree with each verdict, or appeal it with a comment.",
+                "see": "Home shows how often the jury agrees with the judge. If the jury corrects the judge, the ticker says Judge overruled.",
+                "example": "Had the judge accepted 292, the jurors would appeal: the expected answer is 141.",
+                "alt": "The review buttons under a verdict: Yes, agree and No, appeal"
+            }
+        },
+        "faq": {
+            "title": "Questions people ask",
+            "vote": {
+                "q": "Why doesn't my vote count?",
+                "a": "A vote counts when an active juror casts it and they are not the author of that answer. A vote against needs a reason, and the latest vote of each person stands. Your own answer starts with no votes, and your vote on it never counts."
+            },
+            "approver": {
+                "q": "What's an approver?",
+                "a": "A juror with the approver role. A case is ruled only with at least one approver vote in favour and none against, and an approver can reopen a case while reviewing a verdict. Each person has one role: an admin votes as an expert."
+            },
+            "disagree": {
+                "q": "What if I disagree with the judge?",
+                "a": "On the hearing page press “No, appeal” and write a comment. When the jury's majority corrects the judge, the ticker announces it. If you think the expected answer was the wrong one and you are an approver, pick that reason and the case reopens."
+            },
+            "criteria": {
+                "q": "What does “standard criteria” mean?",
+                "a": "The AI judge uses Fabric's standard evaluation criteria. Trust is counted per set of criteria: if the criteria change, trust starts again."
+            },
+            "caselaw": {
+                "q": "What is case law?",
+                "a": "The ruled cases of an agent. On Cases, “Export case law” downloads them as a CSV (question,expected_answer,category,tags) to reuse in other evaluations."
+            }
+        },
+        "rules": {
+            "title": "Detailed rules",
+            "help": "The full text of the rules, for when you need the exact detail."
+        }
     },
     "intro": {
         "pageLabel": "Special edition · Page {{step}} of 3",

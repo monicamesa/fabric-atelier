@@ -45,6 +45,12 @@ function fakeClient(handlers: Partial<Record<string, Handler>>) {
 
 const jury = (jurors: JurorRow[]) => ({ status: "success" as const, data: jurors, reload: vi.fn() });
 
+/** Opens the "Actions ▾" menu of one juror and returns it. */
+function openActions(scope: HTMLElement, name: string) {
+    fireEvent.click(within(scope).getByRole("button", { name: `Actions for ${name}` }));
+    return within(scope).getByRole("menu");
+}
+
 beforeAll(async () => {
     initI18n("en");
     await i18n.changeLanguage("en");
@@ -65,14 +71,14 @@ describe("ClerksOffice", () => {
         render(<ClerksOffice client={client} jury={jury([ANA, DARIO])} me={DARIO} />);
         const table = await screen.findByRole("table", { name: "Jurors" });
         const ownRow = within(table).getByText(/dario\.admin \(you\)/).closest("tr")!;
-        expect(within(ownRow).getByText("You can't remove yourself")).toBeInTheDocument();
-        expect(within(ownRow).getAllByRole("button").map((button) => button.getAttribute("aria-label"))).toEqual([
-            "Edit the details of dario.admin",
-        ]);
+        const ownMenu = openActions(ownRow, "dario.admin");
+        expect(within(ownMenu).getByText("You can't remove yourself")).toBeInTheDocument();
+        expect(within(ownMenu).getAllByRole("menuitem").map((item) => item.getAttribute("aria-label"))).toEqual(["Edit the details of dario.admin"]);
         expect(within(ownRow).queryByRole("combobox")).not.toBeInTheDocument();
         const anaRow = within(table).getByText("Ana E.").closest("tr")!;
-        expect(within(anaRow).getByRole("button", { name: "Deactivate Ana E." })).toBeInTheDocument();
-        expect(within(anaRow).getByRole("button", { name: "Change the role of Ana E." })).toBeInTheDocument();
+        const anaMenu = openActions(anaRow, "Ana E.");
+        expect(within(anaMenu).getByRole("menuitem", { name: "Deactivate Ana E." })).toBeInTheDocument();
+        expect(within(anaMenu).getByRole("menuitem", { name: "Change the role of Ana E." })).toBeInTheDocument();
     });
 
     it("lets an admin edit their own display name and team through clerkExecute", async () => {
@@ -80,11 +86,13 @@ describe("ClerksOffice", () => {
         render(<ClerksOffice client={client} jury={jury([ANA, DARIO])} me={DARIO} />);
         const table = await screen.findByRole("table", { name: "Jurors" });
         const ownRow = within(table).getByText(/dario\.admin \(you\)/).closest("tr")!;
-        fireEvent.click(within(ownRow).getByRole("button", { name: "Edit the details of dario.admin" }));
-        fireEvent.change(within(ownRow).getByLabelText("Display name"), { target: { value: " Dario A. " } });
-        expect(within(ownRow).getByLabelText("Team")).toHaveValue("Data team");
-        fireEvent.change(within(ownRow).getByLabelText("Team"), { target: { value: "" } });
-        fireEvent.click(within(ownRow).getByRole("button", { name: "Save details" }));
+        const menu = openActions(ownRow, "dario.admin");
+        fireEvent.click(within(menu).getByRole("menuitem", { name: "Edit the details of dario.admin" }));
+        // The form opens in its own row under the juror, so the table never changes its width.
+        fireEvent.change(within(table).getByLabelText("Display name"), { target: { value: " Dario A. " } });
+        expect(within(table).getByLabelText("Team")).toHaveValue("Data team");
+        fireEvent.change(within(table).getByLabelText("Team"), { target: { value: "" } });
+        fireEvent.click(within(table).getByRole("button", { name: "Save details" }));
         await waitFor(() =>
             expect([...requests.values()].find((request) => request.action === "editJurorDetails")?.payload).toEqual({
                 jurorId: DARIO.id,
@@ -163,29 +171,66 @@ describe("ClerksOffice", () => {
         const anaRow = within(table).getByText("Ana E.").closest("tr")!;
         expect(within(anaRow).queryByRole("combobox")).not.toBeInTheDocument();
 
-        fireEvent.click(within(anaRow).getByRole("button", { name: "Change the role of Ana E." }));
-        const select = within(anaRow).getByRole("combobox", { name: "Role for Ana E." });
-        fireEvent.click(within(anaRow).getByRole("button", { name: "Cancel" }));
+        fireEvent.click(within(openActions(anaRow, "Ana E.")).getByRole("menuitem", { name: "Change the role of Ana E." }));
+        const select = within(table).getByRole("combobox", { name: "Role for Ana E." });
+        fireEvent.click(within(table).getByRole("button", { name: "Cancel" }));
         expect(select).not.toBeInTheDocument();
 
-        fireEvent.click(within(anaRow).getByRole("button", { name: "Change the role of Ana E." }));
-        fireEvent.change(within(anaRow).getByRole("combobox", { name: "Role for Ana E." }), { target: { value: "approver" } });
-        fireEvent.click(within(anaRow).getByRole("button", { name: "Save role" }));
+        fireEvent.click(within(openActions(anaRow, "Ana E.")).getByRole("menuitem", { name: "Change the role of Ana E." }));
+        fireEvent.change(within(table).getByRole("combobox", { name: "Role for Ana E." }), { target: { value: "approver" } });
+        fireEvent.click(within(table).getByRole("button", { name: "Save role" }));
         await waitFor(() =>
             expect([...requests.values()].find((request) => request.action === "setJurorRole")?.payload).toEqual({ jurorId: ANA.id, role: "approver" }),
         );
     });
 
-    it("keeps the actions of a table row on one line, with their full labels", async () => {
+    it("puts every row action in one 'Actions' menu with full labels, closes it with Escape and gives the focus back", async () => {
         const { client } = fakeClient({});
         render(<ClerksOffice client={client} jury={jury([ANA, DARIO])} me={DARIO} />);
         const table = await screen.findByRole("table", { name: "Jurors" });
         const anaRow = within(table).getByText("Ana E.").closest("tr")!;
-        const edit = within(anaRow).getByRole("button", { name: "Edit the details of Ana E." });
-        expect(edit).toHaveTextContent("Edit details");
-        expect(within(anaRow).getByRole("button", { name: "Change the role of Ana E." })).toHaveTextContent("Change role");
-        expect(within(anaRow).getByRole("button", { name: "Deactivate Ana E." })).toHaveTextContent("Deactivate");
-        expect(edit.parentElement).toHaveClass("flex-nowrap");
+        expect(within(anaRow).getAllByRole("button")).toHaveLength(1);
+        const button = within(anaRow).getByRole("button", { name: "Actions for Ana E." });
+        expect(button).toHaveTextContent("Actions");
+        expect(button).toHaveAttribute("aria-expanded", "false");
+        const menu = openActions(anaRow, "Ana E.");
+        expect(button).toHaveAttribute("aria-expanded", "true");
+        expect(within(menu).getAllByRole("menuitem").map((item) => item.textContent)).toEqual(["Edit details", "Change role", "Deactivate"]);
+        expect(within(menu).getAllByRole("menuitem")[0]).toHaveFocus();
+        fireEvent.keyDown(menu, { key: "ArrowDown" });
+        expect(within(menu).getAllByRole("menuitem")[1]).toHaveFocus();
+        fireEvent.keyDown(menu, { key: "Escape" });
+        expect(screen.queryByRole("menu")).not.toBeInTheDocument();
+        expect(button).toHaveFocus();
+    });
+
+    it("keeps the jurors table at the full content width: no side column, and 'Swear in a juror' opens inline under its button", async () => {
+        const { client } = fakeClient({});
+        render(<ClerksOffice client={client} jury={jury([ANA, DARIO])} me={DARIO} />);
+        const table = await screen.findByRole("table", { name: "Jurors" });
+        expect(screen.queryByRole("complementary")).not.toBeInTheDocument();
+        expect(screen.queryByRole("region", { name: "Swear in a juror" })).not.toBeInTheDocument();
+        const open = screen.getByRole("button", { name: "+ Swear in a juror" });
+        expect(open).toHaveAttribute("aria-expanded", "false");
+        // The button comes before the table; the form comes between them.
+        expect(open.compareDocumentPosition(table) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+        fireEvent.click(open);
+        const form = screen.getByRole("region", { name: "Swear in a juror" });
+        expect(open).toHaveAttribute("aria-expanded", "true");
+        expect(form.compareDocumentPosition(table) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+        expect(table.parentElement).not.toContainElement(form);
+        fireEvent.click(within(form).getByRole("button", { name: "Cancel" }));
+        expect(screen.queryByRole("region", { name: "Swear in a juror" })).not.toBeInTheDocument();
+    });
+
+    it("closes the swear-in form and says so after a juror is added", async () => {
+        const { client, requests } = fakeClient({});
+        render(<ClerksOffice client={client} jury={jury([ANA, DARIO])} me={DARIO} />);
+        fireEvent.click(await screen.findByRole("button", { name: "+ Swear in a juror" }));
+        fireEvent.change(screen.getByLabelText("Work email"), { target: { value: "new.juror@example.com" } });
+        fireEvent.click(screen.getByRole("button", { name: "Add to the jury" }));
+        await waitFor(() => expect([...requests.values()].some((request) => request.action === "swearInJuror")).toBe(true));
+        await waitFor(() => expect(screen.queryByRole("region", { name: "Swear in a juror" })).not.toBeInTheDocument());
     });
 
     it("stacks jurors as cards with full-width actions on phones, without a table", async () => {
@@ -202,8 +247,10 @@ describe("ClerksOffice", () => {
             const list = await screen.findByRole("list", { name: "Jurors" });
             expect(screen.queryByRole("table", { name: "Jurors" })).not.toBeInTheDocument();
             const card = within(list).getByText("Ana E.").closest("li")!;
-            expect(within(card).getByRole("button", { name: "Deactivate Ana E." })).toHaveClass("w-full");
-            expect(within(card).getByRole("button", { name: "Change the role of Ana E." })).toHaveClass("w-full");
+            expect(within(card).getByRole("button", { name: "Actions for Ana E." })).toHaveClass("w-full");
+            const menu = openActions(card, "Ana E.");
+            expect(within(menu).getByRole("menuitem", { name: "Deactivate Ana E." })).toBeInTheDocument();
+            expect(within(menu).getByRole("menuitem", { name: "Change the role of Ana E." })).toBeInTheDocument();
         } finally {
             window.matchMedia = original;
         }
@@ -222,7 +269,8 @@ describe("ClerksOffice", () => {
             setJurorActive: () => ({ code: 403, outcome: "rejected", reason: "not_admin", detail: "The requester is not an active admin." }),
         });
         render(<ClerksOffice client={client} jury={jury([ANA, DARIO])} me={DARIO} />);
-        fireEvent.click(await screen.findByRole("button", { name: "Deactivate Ana E." }));
+        const anaRow = (await within(await screen.findByRole("table", { name: "Jurors" })).findByText("Ana E.")).closest("tr")!;
+        fireEvent.click(within(openActions(anaRow, "Ana E.")).getByRole("menuitem", { name: "Deactivate Ana E." }));
         const alert = await screen.findByRole("alert");
         expect(alert).toHaveTextContent("Only active admins can do this.");
         expect(alert).toHaveTextContent("Nothing was changed.");
@@ -236,6 +284,7 @@ describe("ClerksOffice", () => {
             swearInJuror: () => ({ code: 409, outcome: "rejected", reason: "already_processed", detail: "The request was already processed." }),
         });
         render(<ClerksOffice client={client} jury={jury([ANA, DARIO])} me={DARIO} />);
+        fireEvent.click(await screen.findByRole("button", { name: "+ Swear in a juror" }));
         const email = await screen.findByLabelText("Work email");
         fireEvent.change(email, { target: { value: "new.juror@example.com" } });
         fireEvent.click(screen.getByLabelText(/^Approver/));

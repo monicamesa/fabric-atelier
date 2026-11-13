@@ -10,9 +10,10 @@ import type { ClerkRunner } from "./clerk-runner";
 interface SwearInFormProps {
     clerk: ClerkRunner;
     onNotice: (message: string) => void;
+    onCancel?: () => void;
 }
 
-export function SwearInForm({ clerk, onNotice }: SwearInFormProps) {
+export function SwearInForm({ clerk, onNotice, onCancel }: SwearInFormProps) {
     const { t } = useTranslation();
     const [email, setEmail] = useState("");
     const [displayName, setDisplayName] = useState("");
@@ -44,7 +45,7 @@ export function SwearInForm({ clerk, onNotice }: SwearInFormProps) {
             <h2 id="clerk-swear-in-title" className="m-0 font-serif text-[24px] font-bold text-ink">
                 {t("clerk.swearIn.title")}
             </h2>
-            <form noValidate onSubmit={(event) => void submit(event)} className="flex flex-col gap-3.5">
+            <form noValidate onSubmit={(event) => void submit(event)} className="grid gap-3.5 min-[900px]:grid-cols-2">
                 <TextField
                     label={t("clerk.swearIn.email")}
                     hint={t("clerk.swearIn.emailHint")}
@@ -81,10 +82,19 @@ export function SwearInForm({ clerk, onNotice }: SwearInFormProps) {
                         description: t(`roles.${value}.description`),
                     }))}
                 />
-                <ClerkError view={clerk.error} />
-                <Button type="submit" variant="primary" disabled={clerk.pending}>
-                    {clerk.pending ? t("clerk.swearIn.submitting") : t("clerk.swearIn.submit")}
-                </Button>
+                <div className="flex flex-col gap-3 min-[900px]:col-span-2">
+                    <ClerkError view={clerk.error} />
+                    <div className="flex flex-wrap items-center gap-3">
+                        <Button type="submit" variant="primary" disabled={clerk.pending}>
+                            {clerk.pending ? t("clerk.swearIn.submitting") : t("clerk.swearIn.submit")}
+                        </Button>
+                        {onCancel && (
+                            <Button variant="quiet" onClick={onCancel} disabled={clerk.pending}>
+                                {t("common.cancel")}
+                            </Button>
+                        )}
+                    </div>
+                </div>
             </form>
         </section>
     );

@@ -77,6 +77,16 @@ export interface FeedbackEntry {
   page: string;
   canContact: boolean;
   createdAt: string;
+  /** Only when the juror ticked "You can contact me" (and the Function could tell who they are); never an email. */
+  authorName?: string;
+}
+
+/** The name admins see for a juror who agreed to be contacted: the display name, else the part of the email before the @. */
+export function contactName(displayName: string | null | undefined, email: string | null | undefined): string | undefined {
+  const name = displayName?.trim();
+  if (name) return name;
+  const local = email?.trim().split('@')[0]?.trim();
+  return local ? local : undefined;
 }
 
 export interface ClerkResult {

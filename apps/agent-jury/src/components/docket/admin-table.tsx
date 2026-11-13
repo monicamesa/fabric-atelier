@@ -20,8 +20,9 @@ interface AdminTableProps {
 /** Raised table with an ink border and uppercase headers (design guide, "Admin table"). */
 export function AdminTable({ caption, columns, children }: AdminTableProps) {
     return (
-        // relative: keeps sr-only (absolute) labels inside the scroll area on narrow screens.
-        <div className="relative overflow-x-auto">
+        // relative: keeps sr-only (absolute) labels inside the scroll area on narrow screens. From 900 px up the table fits
+        // its container (the secondary columns give way), so nothing scrolls and the "Actions" menu can overlay the rows below.
+        <div className="relative overflow-x-auto min-[900px]:overflow-visible">
             <table className="w-full border-collapse border border-ink bg-paper-raised text-[15px] text-text">
                 <caption className="sr-only">{caption}</caption>
                 <thead>
