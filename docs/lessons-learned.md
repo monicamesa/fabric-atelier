@@ -57,6 +57,11 @@ Paths below are relative to this file. `I1a`, `I1b`, `I1c` and `I3` are the iter
 - **What we did:** commit first, deploy with the full `rayfin up` (never `--exclude-services staticHosting`, which skips the URL registration), then `git restore rayfin/rayfin.yml`. Our deploy script does it for the test deployment.
 - **More:** [conventions.md](conventions.md) ("`rayfin.yml` after a deploy").
 
+### `rayfin up` can end with "Functions deploy failed (500)" and an empty message
+- **Symptom:** the data step and the static content deploy, then `Functions deploy failed (500): {"Message":""}` (twice in a row on 2026-11-13, with a working capacity).
+- **Cause:** not found; nothing in the Function code was wrong, and the third run of the same commit deployed everything.
+- **What we did:** run the deploy again (the steps are idempotent) before changing any code, and use `node scripts/deploy-test.mjs --verbose` when the message matters.
+
 ### A deployed Fabric App cannot be signed in from a headless browser
 - **Symptom:** screenshots of the deployed test app show "Sign in to continue", even with a session injected into `localStorage`.
 - **Cause:** the hosted app signs in through Fabric SSO from the portal, so a session minted by a script is not picked up there.
@@ -232,6 +237,11 @@ Paths below are relative to this file. `I1a`, `I1b`, `I1c` and `I3` are the iter
 - **Facts:** `notebookutils.credentials.getToken("https://database.windows.net/")` plus ODBC Driver 18 (already present) connects to the app's SQL database in about a second, as the running identity.
 - **What we did:** pass the server and database as run parameters from the Function; the notebook stores neither.
 - **More:** I3 section 15 (S5).
+
+### The SDK keeps how the agent answered, and it also keeps the data
+- **Facts:** `evaluate_data_agent` writes a `<table>_steps` Delta table in the default lakehouse (tools, requests, generated DAX/SQL/KQL and, in `function_outputs`, the query results). The notebook reads it with `deltalake` (`/lakehouse/default/Tables/<table>_steps`, pinned) and keeps only the sources and the generated queries; it never reads `function_outputs`.
+- **What we did:** one `VerdictTrace` row per verdict, at most 4000 characters, URLs and GUIDs removed, written best-effort so a missing trace never changes a verdict. The `_steps` tables themselves stay in the agent's lakehouse with their results.
+- **More:** [I4.md](../apps/agent-jury/docs/iteraciones/I4.md), [I4-trace-spike.md](../apps/agent-jury/docs/iteraciones/I4-trace-spike.md).
 
 ### A third-party "quality lab" is not a standard
 - **What we did:** we export the approved bank as a CSV with `question, expected_answer, category, tags`, which a community project (not Microsoft) also reads. Our own test defines the format; loading it there is an optional manual check.

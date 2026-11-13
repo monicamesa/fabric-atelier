@@ -52,7 +52,8 @@ if (!readOnly) {
         });
         record("F.2", "a note of my own is accepted", ok);
     }
-    const row = own?.[0];
+    const ownNow = await client.data.Feedback.select(["id", "message"]).first(200).execute().catch(() => []);
+    const row = ownNow.find((item) => item.message.startsWith("[check]")) ?? ownNow[0];
     record("F.3", "a note cannot be updated or deleted", row ? (await rejected(() => client.data.Feedback.update(row.id, { message: "changed" }))) && (await rejected(() => client.data.Feedback.delete(row.id))) : false);
 
     // Admins read the notes through the Function; the entries carry no user id and no email.

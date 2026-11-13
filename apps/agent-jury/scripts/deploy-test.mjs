@@ -22,7 +22,8 @@ const secrets = [testWorkspace, productionWorkspace, values.APP_SQL_SERVER_AGENT
 const mask = (text) => secrets.reduce((out, secret) => out.split(secret).join("<id>"), text).replace(/https:\/\/\S+/g, "<url>");
 
 function run(args, { input, quiet = false } = {}) {
-    const result = spawnSync("npx", ["rayfin", ...args], {
+    const verbose = process.argv.includes("--verbose");
+    const result = spawnSync("npx", ["rayfin", ...args, ...(verbose && args[0] === "up" && !args.includes("switch") ? ["-v"] : [])], {
         cwd: appRoot,
         encoding: "utf8",
         shell: true,
@@ -30,7 +31,8 @@ function run(args, { input, quiet = false } = {}) {
         // The test build shows example agents by default; production leaves this unset (Clerk's office has a toggle).
         env: { ...process.env, VITE_SHOW_EXAMPLE_AGENTS: "1" },
     });
-    const lines = `${result.stdout}\n${result.stderr}`.split(/\r?\n/).filter((line) => /\[rayfin\]|deployed|✅|❌|rror|switch|ctive/i.test(line));
+    const all = `${result.stdout}\n${result.stderr}`.split(/\r?\n/);
+    const lines = verbose ? all.filter(Boolean) : all.filter((line) => /\[rayfin\]|deployed|✅|❌|rror|switch|ctive/i.test(line));
     if (!quiet) for (const line of lines) console.log(mask(line));
     if (result.status !== 0) throw new Error(`rayfin ${args[0]} ${args[1] ?? ""} failed (exit ${result.status}).`);
 }
