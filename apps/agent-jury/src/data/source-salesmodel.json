@@ -1,0 +1,112 @@
+{
+  "version": 1,
+  "snapshotDate": "2026-11-13",
+  "models": [
+    {
+      "key": "salesmodel",
+      "name": "SalesModel",
+      "agents": ["Sales Agent", "Finance Agent"],
+      "dataRange": { "en": "Orders from 1 Jul 2023 to 30 Jun 2026. The fiscal year runs July–June and is named by the year it ends (FY2026 = Jul 2025–Jun 2026).", "es": "Pedidos del 1 jul 2023 al 30 jun 2026. El año fiscal va de julio a junio y se llama por el año en que termina (FY2026 = jul 2025–jun 2026)." },
+      "referenceFigures": [
+        { "figure": { "en": "Customers in Spain", "es": "Clientes en España" },
+          "variants": [
+            { "label": { "en": "Billing country", "es": "País de facturación" }, "value": "141" },
+            { "label": { "en": "Shipping country", "es": "País de envío" }, "value": "265" }
+          ],
+          "difference": { "en": "Either country: 292", "es": "Cualquiera de los dos: 292" } },
+        { "figure": { "en": "Sales FY2026", "es": "Ventas FY2026" },
+          "variants": [
+            { "label": { "en": "Net (no tax, no freight)", "es": "Neto (sin impuestos ni portes)" }, "value": "2,183,973.48" },
+            { "label": { "en": "Net, calendar year 2026 (Jan–Jun)", "es": "Neto, año natural 2026 (ene–jun)" }, "value": "1,062,287.32" }
+          ],
+          "difference": { "en": "Fiscal vs calendar year", "es": "Año fiscal frente a natural" } },
+        { "figure": { "en": "Sales, all history", "es": "Ventas, todo el histórico" },
+          "variants": [
+            { "label": { "en": "Net", "es": "Neto" }, "value": "6,680,905.20" },
+            { "label": { "en": "Gross (tax 8% + freight 2.5%)", "es": "Bruto (impuestos 8 % + portes 2,5 %)" }, "value": "7,382,402.46" }
+          ],
+          "difference": { "en": "Tax + freight = 9.50% of gross (10.50% of net)", "es": "Impuestos + portes = 9,50 % del bruto (10,50 % del neto)" } },
+        { "figure": { "en": "Average order value", "es": "Valor medio de pedido" },
+          "variants": [
+            { "label": { "en": "Net", "es": "Neto" }, "value": "2,226.97" },
+            { "label": { "en": "Gross (the model's measure)", "es": "Bruto (la medida del modelo)" }, "value": "2,460.80" }
+          ],
+          "difference": { "en": "The measure 'Average Order Value' uses gross Sales", "es": "La medida 'Average Order Value' usa ventas brutas" } },
+        { "figure": { "en": "Net sales growth", "es": "Crecimiento de ventas netas" },
+          "variants": [
+            { "label": { "en": "FY2025", "es": "FY2025" }, "value": "2,147,910.60" },
+            { "label": { "en": "FY2026", "es": "FY2026" }, "value": "2,183,973.48" }
+          ],
+          "difference": { "en": "+1.68%", "es": "+1,68 %" } },
+        { "figure": { "en": "Customers at 30 Jun 2026", "es": "Clientes a 30 jun 2026" },
+          "variants": [
+            { "label": { "en": "Active (an order in the last 90 days)", "es": "Activos (un pedido en los últimos 90 días)" }, "value": "245" },
+            { "label": { "en": "With an open contract", "es": "Con contrato abierto" }, "value": "489" }
+          ],
+          "difference": { "en": "Two meanings of 'active customer'", "es": "Dos significados de «cliente activo»" } },
+        { "figure": { "en": "Volume", "es": "Volumen" },
+          "variants": [
+            { "label": { "en": "Orders, all history", "es": "Pedidos, todo el histórico" }, "value": "3,000" },
+            { "label": { "en": "Orders FY2026", "es": "Pedidos FY2026" }, "value": "997" }
+          ],
+          "difference": { "en": "Customers: 847 · Products: 295", "es": "Clientes: 847 · Productos: 295" } }
+      ],
+      "measures": [
+        { "name": "Sales", "tags": ["gross"], "dax": "SUM(SalesOrder[TotalAmount])",
+          "description": { "en": "Gross sales: net + tax + freight.", "es": "Ventas brutas: neto + impuestos + portes." } },
+        { "name": "Net Sales", "tags": ["net"], "dax": "SUM(SalesOrder[NetAmount])",
+          "description": { "en": "Net sales, without tax or freight.", "es": "Ventas netas, sin impuestos ni portes." } },
+        { "name": "Orders", "tags": [], "dax": "DISTINCTCOUNT(SalesOrder[OrderID])",
+          "description": { "en": "Number of orders.", "es": "Número de pedidos." } },
+        { "name": "Customers", "tags": [], "dax": "DISTINCTCOUNT(SalesOrder[CustomerID])",
+          "description": { "en": "Customers with at least one order.", "es": "Clientes con al menos un pedido." } },
+        { "name": "Average Order Value", "tags": ["gross"], "dax": "DIVIDE([Sales], [Orders])",
+          "description": { "en": "Average order value, using GROSS sales.", "es": "Valor medio de pedido, con ventas BRUTAS." } },
+        { "name": "Active Customers", "tags": [], "dax": "VAR maxDate = MAX('Calendar'[Date])\nRETURN CALCULATE(DISTINCTCOUNT(SalesOrder[CustomerID]), DATESINPERIOD('Calendar'[Date], maxDate, -90, DAY))",
+          "description": { "en": "Customers with an order in the 90 days up to the last date in context.", "es": "Clientes con un pedido en los 90 días hasta la última fecha del contexto." } },
+        { "name": "Customers With Open Contract", "tags": [], "dax": "VAR d = MAX('Calendar'[Date])\nRETURN COUNTROWS(FILTER(Contract, Contract[StartDate] <= d && (ISBLANK(Contract[EndDate]) || Contract[EndDate] >= d)))",
+          "description": { "en": "Contracts open on the last date in context (no end date, or ending later).", "es": "Contratos abiertos en la última fecha del contexto (sin fecha de fin o que acaban después)." } }
+      ],
+      "tables": [
+        { "name": "Customer", "columns": ["CustomerID", "CompanyName", "Country", "ShipToCountry"],
+          "description": { "en": "Customers. Country = billing country; ShipToCountry = shipping country.", "es": "Clientes. Country = país de facturación; ShipToCountry = país de envío." } },
+        { "name": "Product", "columns": ["ProductID", "ProductName", "Category", "ListPrice"],
+          "description": { "en": "Products with category and list price.", "es": "Productos con categoría y precio de lista." } },
+        { "name": "SalesOrder", "columns": ["OrderID", "OrderDate", "CustomerID", "ProductID", "Quantity", "NetAmount", "TaxAmount", "FreightAmount", "TotalAmount"],
+          "description": { "en": "One row per order. Tax = 8% of net, freight = 2.5% of net, total = gross.", "es": "Una fila por pedido. Impuestos = 8 % del neto, portes = 2,5 % del neto, total = bruto." } },
+        { "name": "Contract", "columns": ["ContractID", "CustomerID", "StartDate", "EndDate"],
+          "description": { "en": "Customer contracts. Empty EndDate = still open.", "es": "Contratos de clientes. EndDate vacío = sigue abierto." } },
+        { "name": "Calendar", "columns": ["Date", "Year", "CalendarYear", "MonthNumber", "MonthName", "CalendarQuarter"],
+          "description": { "en": "Dates. Year = FISCAL year (July–June); CalendarYear = calendar year.", "es": "Fechas. Year = año FISCAL (julio–junio); CalendarYear = año natural." } }
+      ],
+      "relationships": [
+        "SalesOrder → Calendar (OrderDate → Date)",
+        "SalesOrder → Customer (CustomerID)",
+        "SalesOrder → Product (ProductID)",
+        "Contract → Customer (CustomerID)"
+      ],
+      "questionIdeas": {
+        "en": [
+          "How many customers do we have in France?",
+          "What were our net sales in FY2025?",
+          "Which product category sold the most last fiscal year?",
+          "How many orders did we have in calendar year 2025?",
+          "How many contracts ended in FY2026?",
+          "What share of our customers are active?",
+          "What is our average order value in FY2026?",
+          "How much freight did we charge in total?"
+        ],
+        "es": [
+          "¿Cuántos clientes tenemos en Francia?",
+          "¿Cuánto vendimos (neto) en el año fiscal 2025?",
+          "¿Qué categoría de producto vendió más el último año fiscal?",
+          "¿Cuántos pedidos tuvimos en el año natural 2025?",
+          "¿Cuántos contratos terminaron en el año fiscal 2026?",
+          "¿Qué porcentaje de nuestros clientes está activo?",
+          "¿Cuál es el valor medio de pedido en el año fiscal 2026?",
+          "¿Cuánto cobramos en portes en total?"
+        ]
+      }
+    }
+  ]
+}

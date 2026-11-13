@@ -26,6 +26,13 @@ beforeAll(async () => {
 });
 
 describe("ProposeCaseForm", () => {
+    it("links to the source without discarding the draft", async () => {
+        await i18n.changeLanguage("en");
+        const { client } = fakeClient();
+        render(<ProposeCaseForm client={client} agentId="a1" agentName="Sales Agent" categories={[]} onSaved={vi.fn()} onCancel={vi.fn()} />);
+        expect(screen.getByRole("link", { name: /Need the numbers or definitions/ })).toHaveAttribute("href", "#source");
+        expect(screen.getByRole("link", { name: /Need the numbers or definitions/ })).toHaveAttribute("target", "_blank");
+    });
     it("names the agent in bold in the header and offers 'change' only when there is something to change to", async () => {
         await i18n.changeLanguage("en");
         const onChangeAgent = vi.fn();

@@ -16,6 +16,7 @@ import { CaseDetail } from "@/screens/case-detail/case-detail.screen";
 import { CasesScreen } from "@/screens/cases/cases.screen";
 import { ClerksOffice } from "@/screens/clerks-office/clerks-office.screen";
 import { GuideScreen } from "@/screens/guide/guide.screen";
+import { SourceScreen } from "@/screens/source/source.screen";
 import { FeedbackScreen } from "@/screens/feedback/feedback.screen";
 import { AgentSelector } from "@/screens/docket/agent-selector";
 import { useDocket, type DocketState } from "@/screens/docket/use-docket";
@@ -25,7 +26,7 @@ import { HearingScreen } from "@/screens/hearings/hearing.screen";
 import { HearingsScreen } from "@/screens/hearings/hearings.screen";
 import { IntroScreen } from "@/screens/intro/intro.screen";
 
-type Page = "home" | "cases" | "hearings" | "clerk";
+type Page = "home" | "cases" | "hearings" | "clerk" | "source";
 
 function connect(): { client?: AppRayfinClient; error?: unknown } {
     try {
@@ -99,11 +100,13 @@ function App() {
         { id: "home", label: t("nav.home") },
         { id: "cases", label: t("nav.cases") },
         { id: "hearings", label: t("nav.hearings") },
+        { id: "source", label: t("source.title") },
     ];
     if (isAdmin) items.push({ id: "clerk", label: t("nav.clerk") });
 
     function go(next: Page) {
         if (next === "clerk") navigate({ page: "clerk" });
+        else if (next === "source") navigate({ page: "source" });
         else if (next === "cases") navigate({ page: "cases", agentId: agent?.id, filter: "all", query: "" });
         else if (next === "hearings") navigate({ page: "hearings", agentId: agent?.id });
         else navigate({ page: "home", agentId: agent?.id });
@@ -183,6 +186,9 @@ function App() {
     const goBack = () => (window.history.length > 1 ? window.history.back() : navigate({ page: "home", agentId: agent?.id }));
     if (route.page === "guide") {
         return layout(<GuideScreen onBack={goBack} />);
+    }
+    if (route.page === "source") {
+        return layout(<SourceScreen />);
     }
     if (route.page === "feedback") {
         return layout(jury.data ? <FeedbackScreen client={client} viewer={viewer} from={route.from} onBack={goBack} /> : <Deliberating />);

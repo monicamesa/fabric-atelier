@@ -4,6 +4,7 @@ import { PageHeader } from "@/components/docket/page-header";
 import { guideHtml } from "@/guide/guide";
 import { STAGES } from "@/guide/stages";
 import { isAppLanguage, type AppLanguage } from "@/i18n/language-preference";
+import { formatRoute } from "@/lib/route";
 import { Journey } from "./journey";
 import { StageIllustration } from "./stage-illustration";
 
@@ -22,6 +23,7 @@ export function GuideScreen({ onBack }: { onBack: () => void }) {
         <div className="flex flex-col gap-10">
             <PageHeader kicker={t("guide.kicker")} title={t("guide.title")} help={t("guide.help")} aside={<BackButton onBack={onBack} label={t("guide.back")} />} />
 
+            <a href={formatRoute({ page: "source" })} className="text-[16px] font-bold text-action-text underline">{t("source.guideLink")}</a>
             <Journey />
 
             <div className="flex flex-col">

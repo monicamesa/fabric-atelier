@@ -36,6 +36,8 @@ Una partida va de una pregunta de negocio a una respuesta acordada, y de ahí a 
 
 **Elige primero el agente.** Arriba de Home, Casos y Vistas, "1 · Elige el agente" es el único sitio donde se cambia de agente: todo lo que ves y propones es para ese agente.
 
+**La fuente** muestra una instantánea fechada de SalesModel, cifras de referencia, definiciones e ideas de preguntas; no consulta el modelo.
+
 ¿Algo confuso o una idea? **Danos tu opinión** (arriba a la derecha, en todas las páginas) envía una nota corta a los admins.
 
 1. **Preparar la sala (admin).** En **Secretaría** añade a los jurados (email con el que entran en Fabric y rol) y registra el agente que se va a evaluar: nombre, **ID del workspace** e **ID del agente**, que se copian de la dirección del agente en Fabric. Los admins también pueden editar su propio nombre visible (Secretaría → pestaña **Jurados** → **Editar datos**), leer las notas que enviaron los jurados en la pestaña **Opiniones** (lo más reciente primero, sin nombres ni correos) y, en la pestaña **Agentes**, activar o desactivar **Mostrar datos de ejemplo** (desactivado por defecto; no se borra nada).

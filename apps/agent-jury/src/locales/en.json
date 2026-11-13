@@ -3,6 +3,26 @@
         "title": "Agent Jury",
         "tagline": "Who judges the judge?"
     },
+    "source": {
+        "kicker": "The source · {{model}}",
+        "title": "The source",
+        "help": "What the agent can see and how each number is calculated",
+        "snapshot": "Snapshot: {{date}}",
+        "referenceFigures": "Reference figures",
+        "figure": "Figure",
+        "variantA": "Variant A",
+        "variantB": "Variant B",
+        "difference": "Difference",
+        "measures": "Measures",
+        "tables": "Tables",
+        "relationships": "Relationships",
+        "questionIdeas": "Question ideas",
+        "gross": "Gross",
+        "net": "Net",
+        "copyFailed": "Could not copy the query.",
+        "proposeLink": "Need the numbers or definitions? See the source (opens in a new tab)",
+        "guideLink": "See the source: numbers and definitions"
+    },
     "language": {
         "label": "Language",
         "en": "EN",

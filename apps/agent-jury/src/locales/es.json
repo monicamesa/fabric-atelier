@@ -3,6 +3,26 @@
         "title": "Agent Jury",
         "tagline": "¿Quién juzga al juez?"
     },
+    "source": {
+        "kicker": "La fuente · {{model}}",
+        "title": "La fuente",
+        "help": "Qué ve el agente y cómo se calcula cada cifra",
+        "snapshot": "Instantánea: {{date}}",
+        "referenceFigures": "Cifras de referencia",
+        "figure": "Cifra",
+        "variantA": "Variante A",
+        "variantB": "Variante B",
+        "difference": "Diferencia",
+        "measures": "Medidas",
+        "tables": "Tablas",
+        "relationships": "Relaciones",
+        "questionIdeas": "Ideas de preguntas",
+        "gross": "Bruto",
+        "net": "Neto",
+        "copyFailed": "No se pudo copiar la consulta.",
+        "proposeLink": "¿Necesitas las cifras o las definiciones? Consulta la fuente (se abre en otra pestaña)",
+        "guideLink": "Consulta la fuente: cifras y definiciones"
+    },
     "language": {
         "label": "Idioma",
         "en": "EN",

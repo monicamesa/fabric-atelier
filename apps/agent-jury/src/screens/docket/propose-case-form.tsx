@@ -8,6 +8,7 @@ import { createCase, createTestimony } from "@/data/cases.service";
 import { canonicalCategory } from "@/data/docket";
 import { isAppLanguage, type AppLanguage } from "@/i18n/language-preference";
 import type { AppRayfinClient } from "@/lib/rayfin-client";
+import { formatRoute } from "@/lib/route";
 import { AnswerFields } from "./answer-form";
 import { EMPTY_ANSWER, trimDraft, validateAnswer, type AnswerDraft, type AnswerErrors } from "./answer-draft";
 
@@ -90,6 +91,7 @@ export function ProposeCaseForm({ client, agentId, agentName, categories, onSave
                     )}
                 </h2>
                 <p className="m-0 text-[15px] text-text">{t("proposeCase.help")}</p>
+                <a href={formatRoute({ page: "source" })} target="_blank" rel="noreferrer" className="text-[15px] font-semibold text-action-text underline">{t("source.proposeLink")}</a>
             </div>
             <TextAreaField
                 label={t("proposeCase.question")}

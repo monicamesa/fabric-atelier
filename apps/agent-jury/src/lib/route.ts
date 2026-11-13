@@ -10,6 +10,7 @@ export type Route =
     | { page: "hearing"; hearingId: string }
     | { page: "clerk" }
     | { page: "guide" }
+    | { page: "source" }
     | { page: "feedback"; from?: string }
     | { page: "intro" };
 
@@ -24,6 +25,7 @@ export function parseRoute(hash: string): Route {
     if (path === "clerk") return { page: "clerk" };
     if (path === "intro") return { page: "intro" };
     if (path === "guide") return { page: "guide" };
+    if (path === "source") return { page: "source" };
     if (path === "feedback") {
         const from = params.get("from");
         return { page: "feedback", from: from && /^[a-z]{1,20}$/.test(from) ? from : undefined };
@@ -52,6 +54,8 @@ export function formatRoute(route: Route): string {
             return "#intro";
         case "guide":
             return "#guide";
+        case "source":
+            return "#source";
         case "feedback":
             return route.from ? `#feedback?from=${route.from}` : "#feedback";
         case "case":

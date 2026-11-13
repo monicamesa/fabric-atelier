@@ -36,6 +36,8 @@ A game goes from a business question to an agreed answer, and from there to meas
 
 **Choose the agent first.** At the top of Home, Cases and Hearings, "1 · Choose the agent" is the one place to switch agents: everything you see and propose is for that agent.
 
+**The source** shows a dated SalesModel snapshot, reference figures, definitions and question ideas; it does not query the model.
+
 Something confusing, or an idea? **Give feedback** (top right, on every page) sends a short note to the admins.
 
 1. **Set up the courtroom (admin).** In the **Clerk's office**, add the jurors (the email they use to sign in to Fabric, and a role) and register the agent to evaluate: its name, the **Workspace ID** and the **Agent ID**, copied from the agent's address in Fabric. Admins can also edit their own display name (Clerk's office → **Jurors** tab → **Edit details**), read the notes jurors sent in the **Feedback** tab (newest first, without names or emails) and, on the **Agents** tab, switch **Show example data** on or off (off by default; nothing is deleted).

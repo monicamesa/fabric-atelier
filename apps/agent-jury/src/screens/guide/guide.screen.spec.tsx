@@ -13,6 +13,7 @@ describe("GuideScreen (How to play)", () => {
     it("opens with the title and the drawn journey of the five stages, in the order of The game line", () => {
         render(<GuideScreen onBack={vi.fn()} />);
         expect(screen.getByRole("heading", { level: 1, name: "How to play" })).toBeInTheDocument();
+        expect(screen.getByRole("link", { name: /See the source/ })).toHaveAttribute("href", "#source");
         expect(screen.getByRole("img", { name: "The game in five stages: Propose, Vote, Ruled, Hearing, Review." })).toBeInTheDocument();
         const headings = screen.getAllByRole("heading", { level: 2 }).map((heading) => heading.textContent);
         expect(headings.slice(0, 5)).toEqual(["Propose a case", "Vote", "Ruled", "Hearing", "Review the judge"]);

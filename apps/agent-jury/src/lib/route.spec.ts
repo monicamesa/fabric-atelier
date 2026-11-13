@@ -5,7 +5,7 @@ const AGENT = "00000000-0000-4000-8000-000000000021";
 
 describe("route", () => {
     it("reads and writes every page", () => {
-        for (const hash of [`#home?agent=${AGENT}`, "#home", `#cases?agent=${AGENT}&filter=vote&q=active+customers`, `#case/${AGENT}`, `#hearings?agent=${AGENT}`, "#hearings", `#hearing/${AGENT}`, "#clerk", "#intro", "#guide", "#feedback", "#feedback?from=cases"]) {
+        for (const hash of [`#home?agent=${AGENT}`, "#home", `#cases?agent=${AGENT}&filter=vote&q=active+customers`, `#case/${AGENT}`, `#hearings?agent=${AGENT}`, "#hearings", `#hearing/${AGENT}`, "#clerk", "#intro", "#guide", "#source", "#feedback", "#feedback?from=cases"]) {
             expect(formatRoute(parseRoute(hash))).toBe(hash);
         }
     });
