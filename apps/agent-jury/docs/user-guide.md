@@ -52,7 +52,7 @@ The first time, the app shows a three-step Intro; you can replay it from Home wi
 
 ### Language of the questions
 
-Questions, answers and definitions are **never translated**: the question is sent to the agent exactly as written, so translating it would change the test. Write each question in the language you want the agent tested in; the language of the screens (EN | ES) only changes the app's own texts. Each case shows a small **EN** or **ES** badge next to its question, taken from the screen language when it was written; older cases have no badge.
+Questions, answers and definitions are **never translated**: the question is sent to the agent exactly as written, so translating it would change the test. Write each question in the language you want the agent tested in; the language of the screens (EN | ES) only changes the app's own texts. Each case shows a small **EN** or **ES** badge next to its question: the language you pick in the propose form (it defaults to the screen language); older cases have no badge.
 
 ## The rules, precisely
 

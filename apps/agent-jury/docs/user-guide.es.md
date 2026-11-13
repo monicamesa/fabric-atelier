@@ -52,7 +52,7 @@ La primera vez, la app enseña una Intro de tres pasos; se puede repetir desde H
 
 ### Idioma de las preguntas
 
-Las preguntas, respuestas y definiciones **no se traducen nunca**: la pregunta se envía al agente tal cual está escrita, y traducirla cambiaría la prueba. Escribe cada pregunta en el idioma en el que quieras probar al agente; el idioma de las pantallas (EN | ES) solo cambia los textos de la propia app. Cada caso muestra una pequeña insignia **EN** o **ES** junto a su pregunta, tomada del idioma de la pantalla cuando se escribió; los casos antiguos no tienen insignia.
+Las preguntas, respuestas y definiciones **no se traducen nunca**: la pregunta se envía al agente tal cual está escrita, y traducirla cambiaría la prueba. Escribe cada pregunta en el idioma en el que quieras probar al agente; el idioma de las pantallas (EN | ES) solo cambia los textos de la propia app. Cada caso muestra una pequeña insignia **EN** o **ES** junto a su pregunta: el idioma que eliges en el formulario de proponer (por defecto, el de la pantalla); los casos antiguos no tienen insignia.
 
 ## Las reglas, con precisión
 
