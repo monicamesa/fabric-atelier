@@ -13,6 +13,7 @@ Los documentos para desarrolladores (convenciones, planes de iteración, guía d
 | App | Descripción | Estado | Carpeta |
 |---|---|---|---|
 | Agent Jury | ¿Quién juzga al juez? Expertos de negocio acuerdan las respuestas esperadas de los Fabric Data Agents y revisan los veredictos del juez de IA. | En desarrollo | [apps/agent-jury](apps/agent-jury) |
+| Moss Triage | ¿Has probado a apagarlo y volverlo a encender? Un servicio de soporte que clasifica tickets de un Lakehouse y pide contexto a un Fabric Data Agent. Interfaz en español. | Demo | [apps/moss-triage](apps/moss-triage) |
 
 ## Requisitos comunes
 

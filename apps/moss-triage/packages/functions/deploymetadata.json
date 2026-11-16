@@ -1,0 +1,50 @@
+{
+  "runtime": "TypeScript",
+  "functionsMetadata": [
+    {
+      "name": "askRic",
+      "scriptFile": "src\\function_app.ts",
+      "bindings": [
+        {
+          "name": "req",
+          "type": "httpTrigger",
+          "direction": "in",
+          "authLevel": "anonymous",
+          "methods": [
+            "post"
+          ],
+          "route": "askRic"
+        },
+        {
+          "name": "$return",
+          "type": "http",
+          "direction": "out"
+        },
+        {
+          "name": "__generic_Fabric",
+          "direction": "in",
+          "type": "FabricItem",
+          "alias": "",
+          "audienceType": "Fabric"
+        }
+      ],
+      "fabricProperties": {
+        "fabricMetadataSchemaVersion": "1.0",
+        "fabricFunctionReturnType": "Promise<RicResult>",
+        "fabricFunctionParameters": [
+          {
+            "name": "ctx",
+            "dataType": "RayfinContext<UniversalAppSchema, AudienceType.Fabric, 'RIC_DATA_AGENT_MCP_URL'>",
+            "hasDefaultValue": false
+          },
+          {
+            "name": "question",
+            "dataType": "string",
+            "hasDefaultValue": false
+          }
+        ]
+      },
+      "functionCode": "udf.func(\n  'askRic',\n  async (\n    ctx: RayfinContext<UniversalAppSchema, AudienceType.Fabric, 'RIC_DATA_AGENT_MCP_URL'>,\n    question: string,\n  ): Promise<RicResult> => {\n    let endpoint: string;\n    let token: string;\n    try { endpoint = ctx.Secrets.RIC_DATA_AGENT_MCP_URL; } catch { return { ok: false, reason: 'config' }; }\n    try { token = ctx.Tokens.Fabric; } catch { return { ok: false, reason: 'auth' }; }\n    return askAgent(endpoint, token, question);\n  },\n  []\n)"
+    }
+  ]
+}
