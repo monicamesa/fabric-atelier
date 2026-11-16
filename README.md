@@ -13,6 +13,7 @@ Developer docs (conventions, iteration plans, design guide, lessons learned) are
 | App | Description | Status | Folder |
 |---|---|---|---|
 | Agent Jury | Who judges the judge? Business experts agree on the expected answers for Fabric Data Agents and review the verdicts of the LLM judge. | In development | [apps/agent-jury](apps/agent-jury) |
+| Moss Triage | Have you tried turning it off and on again? A support desk that triages tickets from a Lakehouse and asks a Fabric Data Agent for context. Spanish UI. | Demo | [apps/moss-triage](apps/moss-triage) |
 
 ## Common requirements
 

@@ -1,0 +1,161 @@
+{
+  "source": "ricsupport",
+  "connector": "fabric-sqlanalytics",
+  "connectionString": "<RIC_SUPPORT_SQL_ENDPOINT>",
+  "discoveredAt": "2026-11-15T18:09:39.957Z",
+  "schemas": [
+    {
+      "schemaName": "dbo",
+      "tables": [
+        {
+          "tableName": "customers",
+          "columns": [
+            {
+              "columnName": "customer_id",
+              "dataType": "varchar",
+              "isNullable": true,
+              "maxLength": 8000
+            },
+            {
+              "columnName": "customer_name",
+              "dataType": "varchar",
+              "isNullable": true,
+              "maxLength": 8000
+            },
+            {
+              "columnName": "contact_name",
+              "dataType": "varchar",
+              "isNullable": true,
+              "maxLength": 8000
+            },
+            {
+              "columnName": "segment",
+              "dataType": "varchar",
+              "isNullable": true,
+              "maxLength": 8000
+            },
+            {
+              "columnName": "country",
+              "dataType": "varchar",
+              "isNullable": true,
+              "maxLength": 8000
+            }
+          ]
+        },
+        {
+          "tableName": "support_team",
+          "columns": [
+            {
+              "columnName": "member_id",
+              "dataType": "varchar",
+              "isNullable": true,
+              "maxLength": 8000
+            },
+            {
+              "columnName": "member_name",
+              "dataType": "varchar",
+              "isNullable": true,
+              "maxLength": 8000
+            },
+            {
+              "columnName": "role",
+              "dataType": "varchar",
+              "isNullable": true,
+              "maxLength": 8000
+            }
+          ]
+        },
+        {
+          "tableName": "tickets",
+          "columns": [
+            {
+              "columnName": "ticket_id",
+              "dataType": "varchar",
+              "isNullable": true,
+              "maxLength": 8000
+            },
+            {
+              "columnName": "customer_id",
+              "dataType": "varchar",
+              "isNullable": true,
+              "maxLength": 8000
+            },
+            {
+              "columnName": "created_at",
+              "dataType": "datetime2",
+              "isNullable": true,
+              "datePrecision": 6
+            },
+            {
+              "columnName": "category",
+              "dataType": "varchar",
+              "isNullable": true,
+              "maxLength": 8000
+            },
+            {
+              "columnName": "subject",
+              "dataType": "varchar",
+              "isNullable": true,
+              "maxLength": 8000
+            },
+            {
+              "columnName": "description",
+              "dataType": "varchar",
+              "isNullable": true,
+              "maxLength": 8000
+            },
+            {
+              "columnName": "priority",
+              "dataType": "varchar",
+              "isNullable": true,
+              "maxLength": 8000
+            },
+            {
+              "columnName": "channel",
+              "dataType": "varchar",
+              "isNullable": true,
+              "maxLength": 8000
+            },
+            {
+              "columnName": "sla_hours",
+              "dataType": "bigint",
+              "isNullable": true,
+              "precision": 19,
+              "scale": 0
+            },
+            {
+              "columnName": "first_response_minutes",
+              "dataType": "bigint",
+              "isNullable": true,
+              "precision": 19,
+              "scale": 0
+            },
+            {
+              "columnName": "status",
+              "dataType": "varchar",
+              "isNullable": true,
+              "maxLength": 8000
+            },
+            {
+              "columnName": "assigned_to",
+              "dataType": "varchar",
+              "isNullable": true,
+              "maxLength": 8000
+            },
+            {
+              "columnName": "resolved_at",
+              "dataType": "datetime2",
+              "isNullable": true,
+              "datePrecision": 6
+            },
+            {
+              "columnName": "sla_breached",
+              "dataType": "bit",
+              "isNullable": true
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

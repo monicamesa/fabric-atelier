@@ -18,6 +18,7 @@ Paths below are relative to this file. `I1a`, `I1b`, `I1c` and `I3` are the iter
 6. [Design and UX](#6-design-and-ux)
 7. [Working with a coding agent](#7-working-with-a-coding-agent)
 8. [Limits of Fabric Apps](#8-limits-of-fabric-apps)
+9. [Moss Triage: Fabricator and a Data Agent in an app](#9-moss-triage-fabricator-and-a-data-agent-in-an-app)
 
 ---
 
@@ -365,3 +366,41 @@ Things that shaped the design as of this writing:
 - **Bundle size.** The template's main bundle is over the default 500 kB warning; split screens with dynamic `import()` once there are several.
 - **Template dependency audit.** The template ships deprecated packages and `npm audit` findings; review before making a repository public (`npm audit --omit=dev` shows the ones that reach the deployed app).
 - **More:** [conventions.md](conventions.md) ("Pending"), [spec section 10](../apps/agent-jury/docs/especificacion-general.md).
+
+---
+
+## 9. Moss Triage: Fabricator and a Data Agent in an app
+
+Gotchas from [Moss Triage](../apps/moss-triage), built with Fabricator and VS Code on the same Rayfin CLI version.
+
+### Connector metadata stores the SQL endpoint host
+- **Symptom:** nothing visible; `rayfin/connectors/<name>/metadata.json` is committed with a `connectionString` like `<id>-<id>.datawarehouse.fabric.microsoft.com`.
+- **Cause:** schema discovery for a `fabric-sqlanalytics` connector saves the SQL analytics endpoint host. That host encodes the tenant and the workspace, and it is not a GUID, so the GUID check does not catch it.
+- **What we did:** replaced it with `<RIC_SUPPORT_SQL_ENDPOINT>` and added a "Fabric SQL endpoint host" rule to `.githooks/pre-commit`. Run the discovery again after a schema change and check the file before committing.
+- **More:** [`metadata.json`](../apps/moss-triage/rayfin/connectors/ricsupport/metadata.json), [`.githooks/pre-commit`](../.githooks/pre-commit).
+
+### Fabricator commits on its own and can overwrite outside edits
+- **Symptom:** a file edited in VS Code goes back to an older version after the next Fabricator turn; the branch fills with automatic commits.
+- **Cause:** Fabricator commits after each turn in the repository and branch that are open, and works from its own view of the files.
+- **What we did:** commit right after editing outside Fabricator, and before asking it anything else. Publish to GitHub from a clean branch with a single commit (`git checkout <branch> -- apps/<app>`), so the automatic commits stay local.
+
+### A new Fabricator app lands inside the current repository
+- **Symptom:** a throwaway test app appears under `apps/` and in the commits of the branch you were on.
+- **Cause:** Fabricator creates the project inside the open repository.
+- **What we did:** create throwaway apps in a separate folder outside the repository. If one gets in, remove it with `git add -A apps/<app>` and a commit before building the clean branch.
+
+### Blank preview: decorators not transformed
+- **Symptom:** the Vite preview is a blank page; the build in the terminal works.
+- **Cause:** the connector schema uses TypeScript decorators, and the Vite config of that project did not transform them for the browser.
+- **What we did:** asked Fabricator to configure Vite to transform the connector schema decorators. When generating an app with a connector, say so in the first prompt.
+
+### Calling a published Data Agent from a Function
+- **Symptom:** none; this is the pattern that worked.
+- **Cause:** the agent publishes an MCP endpoint (agent → Settings → Model Context Protocol) that accepts a Fabric token.
+- **What we did:** a Rayfin Function (`askRic`) reads the endpoint from a secret, uses `ctx.Tokens.Fabric` and calls `initialize` → `tools/list` → `tools/call`. The secret needs a value for local and another for the published app. Answers take 15–20 s, so the Function call uses a long client timeout and the UI shows progress. The identity is the item owner (see section 8).
+- **More:** [`ric-mcp.ts`](../apps/moss-triage/packages/functions/src/ric-mcp.ts), [`use-ask-ric.ts`](../apps/moss-triage/packages/frontend/src/hooks/use-ask-ric.ts).
+
+### New Lakehouse data does not show up in the app or in the agent
+- **Symptom:** after a notebook rewrites the tables, the app shows old rows and the agent gives old answers.
+- **Cause:** the SQL analytics endpoint syncs with a delay, and the ontology graph model has its own refresh.
+- **What we did:** refresh the SQL analytics endpoint metadata and the graph model after loading data, before a demo.
