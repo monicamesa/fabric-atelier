@@ -1,39 +1,62 @@
 [English](README.md) · Español
 
-# Moss Triage
+# 🔥 Moss Triage
 
 > **¿Has probado a apagarlo y volverlo a encender?**
 
-Moss Triage es una Fabric App para un servicio de soporte (ficticio) que trabaja en el sótano. Los agentes ven los tickets abiertos, se asignan uno, lo escalan a nivel 2, responden al cliente y lo cierran. Cuando necesitan contexto, le preguntan a **Ric**, un Fabric Data Agent que responde en lenguaje natural sobre los mismos datos, sin salir de la app.
+<p align="center"><img src="docs/images/moss-triage-ping.gif" width="324" alt="Ping, el becario, teclea hasta que el monitor echa humo y acaba ardiendo"></p>
 
-Se creó para la sesión *De «qué interesante» a «esto sí podría usarlo»* (Microsoft Reactor Data Days, noviembre de 2026) como segunda demo. La primera enseña la ontología de Fabric IQ y el Data Agent; esta enseña ese agente dentro de una app que la gente puede usar a diario. Está hecha con Fabricator y VS Code.
+Te damos la bienvenida al sótano. Moss Triage es una Fabric App para un servicio de soporte (ficticio) donde los tickets no paran de llegar, el café se acaba y la mitad de los problemas son de capa 8. Los agentes ven los tickets abiertos, se los asignan, los escalan a N2, responden al cliente y los cierran. Y cuando necesitan contexto, le preguntan a **Ric**: un Fabric Data Agent que responde en lenguaje natural sobre los mismos datos, sin salir de la app.
 
-La interfaz está **solo en español**: es una demo para público hispanohablante y una excepción a la regla bilingüe de [conventions.md](../../docs/conventions.md). El humor es un guiño a la cultura del soporte informático; la mascota, Ping, y todos los datos son originales y ficticios.
+![Moss Triage: tablero de tickets y panel del equipo](docs/images/moss-triage-home.png)
 
-## Qué hace
+Se creó para la sesión *De «qué interesante» a «esto sí podría usarlo»* (Microsoft Reactor Data Days, noviembre de 2026). La primera demo enseña la ontología de Fabric IQ y el Data Agent; esta demuestra que ese agente puede vivir dentro de una app que la gente usa cada día. Está hecha con **Fabricator** y **VS Code**, y montarla fue divertidísimo.
 
-- **Tablero de tickets:** los tickets abiertos de un Lakehouse, con prioridad, canal, categoría y cuenta atrás del SLA. Filtros (prioridad, canal, categoría, «solo SLA incumplido»), vistas y paginación.
-- **Panel del equipo:** quién está de guardia, la carga del equipo y algunos indicadores (abiertos, SLA incumplido, resueltos hoy, racha sin SLA roto).
-- **Detalle del ticket**, con cuatro pestañas:
-  - **Ticket:** el mensaje del cliente y su contexto.
-  - **Responder:** asignárselo, escalarlo a nivel 2 (N2), escribir la respuesta y resolverlo.
-  - **✦ Preguntar a Ric:** preguntar al Data Agent por el ticket o el cliente; la respuesta se puede copiar a la contestación.
-  - **Historial:** cada asignación, escalado, respuesta y resolución.
-- **Manual del sótano:** una guía dentro de la app con el vocabulario (N1/N2, SLA…), el flujo de trabajo y los atajos de teclado.
+## El sótano en 30 segundos
 
-## Cómo funciona
+1. **Llega un ticket.** Lo ves en el tablero con su prioridad, su canal y la cuenta atrás del SLA. Si algo está ardiendo, lo verás arder.
+2. **Ping lo diagnostica.** Ping es el becario que nunca duerme: te sugiere a quién asignarlo y calcula la probabilidad de que sea capa 8.
+3. **Te lo pides o lo escalas.** Un clic y es tuyo, o va a N2 («gente con más café»).
+4. **Le preguntas a Ric.** «¿Este cliente ya ha tenido este problema?». Ric consulta la ontología y te contesta en unos segundos.
+5. **Respondes y cierras.** Con respuestas rápidas incluidas, como «¿Está enchufado?» o «Por favor, no toques nada más».
+
+![Un ticket crítico abierto: Ping sugiere escalarlo a N2 y diagnostica PEBKAC, mientras el monitor del banner arde](docs/images/moss-triage-responder.png)
+
+| ✦ Preguntar a Ric | Manual del sótano |
+|---|---|
+| <img src="docs/images/moss-triage-ric.png" width="320" alt="Ric respondiendo dentro de la app"> | <img src="docs/images/moss-triage-manual.png" width="460" alt="Manual del sótano"> |
+
+## Glosario friki
+
+Todo está explicado en el **Manual del sótano**, dentro de la app (tecla `?`).
+
+| Término | Qué significa |
+|---|---|
+| **PING>** | La consola de Ping, el becario. Sugiere a quién asignar y diagnostica el problema. |
+| **Capa 8** | El modelo OSI tiene 7 capas. La octava es la persona que está delante. |
+| **PEBKAC** | *Problem Exists Between Keyboard And Chair.* |
+| **PICNIC** | *Problem In Chair, Not In Computer.* Para no repetirse. |
+| **Error ID-10T** | Parece un código técnico. Escríbelo todo junto. |
+| **Nivel de café** | Tu energía: baja un 12 % con cada ticket que te pides. Por debajo del 25 %, recarga. |
+| **Racha sin SLA roto** | Días seguidos sin incumplir ningún SLA. Que no se rompa en tu guardia. |
+| **N1 / N2** | Primera línea / gente con más café y más contexto. |
+
+**Atajos de teclado:** `J`/`K` siguiente/anterior · `Enter` abrir · `A` asignármelo · `E` escalar a N2 · `R` resuelto · `/` buscar · `?` ayuda.
+
+## Cómo funciona por dentro
 
 | Camino | Por dónde va | Con qué identidad |
 |---|---|---|
 | Leer tickets, clientes y equipo | Conector `ricsupport` (`fabric-sqlanalytics`) → SQL analytics endpoint del Lakehouse, solo lectura | La app |
 | Asignar, escalar, responder, resolver | Servicio de datos de Rayfin → base de datos de la app (`TicketAssignment`, `TicketEvent`) | El usuario que ha iniciado sesión |
-| Preguntar a Ric | Rayfin Function `askRic` → endpoint MCP del Data Agent publicado → ontología → Lakehouse | La app (la dueña del elemento) |
+| ✦ Preguntar a Ric | Rayfin Function `askRic` → endpoint MCP del Data Agent publicado → ontología de Fabric IQ → Lakehouse | La app (la dueña del elemento) |
 
-La app nunca escribe en el Lakehouse: el estado del flujo vive en su propia base de datos.
-
-`askRic` se ejecuta en el servidor: lee el endpoint MCP del secreto `RIC_DATA_AGENT_MCP_URL`, obtiene un token de Fabric con `ctx.Tokens.Fabric` y llama al agente por MCP (`initialize` → `tools/list` → `tools/call`). Las respuestas suelen tardar entre 15 y 20 segundos.
+- **La app nunca escribe en el Lakehouse:** el estado del flujo vive en su propia base de datos.
+- **Ric no se llama desde el navegador.** `askRic` se ejecuta en el servidor: lee el endpoint del secreto `RIC_DATA_AGENT_MCP_URL`, obtiene un token con `ctx.Tokens.Fabric` y habla MCP con el agente (`initialize` → `tools/list` → `tools/call`). Tarda entre 15 y 20 segundos, y mientras tanto la consola de la app va contando.
 
 > **Nota de seguridad.** La identidad de la app es la persona dueña del elemento Fabric App, así que Ric responde con sus permisos. En una demo está bien. Para un uso real, dale a la app una identidad dedicada con el mínimo privilegio y decide en la Function a qué agente puede llamar cada usuario.
+
+La interfaz está **solo en español** (es una demo para público hispanohablante, una excepción a la regla bilingüe de [conventions.md](../../docs/conventions.md)). Ping, los avatares pixelados y todos los datos son originales y ficticios.
 
 ## Requisitos
 
@@ -42,7 +65,7 @@ La app nunca escribe en el Lakehouse: el estado del flujo vive en su propia base
 - Un Fabric Data Agent **publicado** sobre esos datos (en la demo, encima de una ontología de Fabric IQ), con su endpoint MCP (agente → *Settings* → *Model Context Protocol*).
 - Una capacidad de Fabric de pago (los Data Agents no funcionan en capacidades de prueba).
 
-## Configuración
+## Ponla en marcha
 
 Ejecuta todos los comandos desde `apps/moss-triage`.
 
@@ -77,4 +100,8 @@ npx.cmd rayfin up
 
 ## Lecciones aprendidas
 
-Los problemas que encontramos con esta app están en [docs/lessons-learned.md](../../docs/lessons-learned.md#9-moss-triage-fabricator-and-a-data-agent-in-an-app) (en inglés).
+Lo que aprendimos por el camino (Fabricator haciendo commits por su cuenta, la pantalla en blanco, el SQL endpoint que se colaba en el repo…) está en [docs/lessons-learned.md](../../docs/lessons-learned.md#9-moss-triage-fabricator-and-a-data-agent-in-an-app) (en inglés).
+
+---
+
+*Si no es capa 8, escala a N2. Si arde: extintor, y avisa a N2.* 🧯

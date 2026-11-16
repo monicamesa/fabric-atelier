@@ -330,7 +330,7 @@ Paths below are relative to this file. `I1a`, `I1b`, `I1c` and `I3` are the iter
 ### A deploy chained after a commit can ship uncommitted code
 - **Symptom:** the pre-commit hook blocked a commit, but the production deploy chained after it still ran, so production had code that was not in Git.
 - **Cause:** commands separated by ; run whatever the previous result was.
-- **What we did:** the order is tests, commit, push, deploy, as separate steps, and scripts/deploy-production.mjs refuses unless the tree is clean and HEAD is origin/main. Test fixtures must follow the privacy rules too: emails on example.com or plain strings without @, and GUIDs in the allowed  0000000-0000-4000-8000-0000000000NN form (the hook caught invented @acme.test emails and a GUID with too many digits).
+- **What we did:** the order is tests, commit, push, deploy, as separate steps, and scripts/deploy-production.mjs refuses unless the tree is clean and HEAD is origin/main. Test fixtures must follow the privacy rules too: emails on example.com or plain strings without @, and GUIDs in the allowed 00000000-0000-4000-8000-0000000000NN form (the hook caught invented @acme.test emails and a GUID with too many digits).
 - **More:** [AGENTS.md](../apps/agent-jury/AGENTS.md) (Token and capacity discipline).
 
 ### Tool defaults you must override

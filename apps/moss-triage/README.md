@@ -1,25 +1,47 @@
 English · [Español](README.es.md)
 
-# Moss Triage
+# 🔥 Moss Triage
 
 > **Have you tried turning it off and on again?**
 
-Moss Triage is a Microsoft Fabric App for a (fictional) support desk in the basement. Agents see the open tickets, pick one up, escalate it to level 2, answer the customer and close it. When they need context, they ask **Ric**, a Fabric Data Agent that answers in plain language over the same data, without leaving the app.
+<p align="center"><img src="docs/images/moss-triage-ping.gif" width="324" alt="Ping, the intern, types until the monitor smokes and catches fire"></p>
 
-It was built for the session *De «qué interesante» a «esto sí podría usarlo»* (Microsoft Reactor Data Days, November 2026), as the second demo: the first one shows the Fabric IQ ontology and the Data Agent; this one shows that agent inside an app people can use every day. It was built with Fabricator and VS Code.
+Welcome to the basement. Moss Triage is a Microsoft Fabric App for a (fictional) support desk where tickets never stop coming, the coffee always runs out and half of the problems are layer 8. Agents see the open tickets, pick them up, escalate them to level 2, answer the customer and close them. And when they need context, they ask **Ric**: a Fabric Data Agent that answers in plain language over the same data, without leaving the app.
 
-The interface is **in Spanish only**: it is a demo for a Spanish-speaking audience, an exception to the bilingual rule in [conventions.md](../../docs/conventions.md). The humour is a nod to IT support culture; the mascot, Ping, and all the data are original and fictional.
+![Moss Triage: ticket board and team panel](docs/images/moss-triage-home.png)
 
-## What it does
+It was built for the session *De «qué interesante» a «esto sí podría usarlo»* (Microsoft Reactor Data Days, November 2026). The first demo shows the Fabric IQ ontology and the Data Agent; this one shows that the agent can live inside an app people use every day. It was built with **Fabricator** and **VS Code**, and it was great fun.
 
-- **Ticket board:** open tickets from a Lakehouse, with priority, channel, category and SLA countdown. Filters (priority, channel, category, "only SLA breached"), views and pagination.
-- **Team panel:** who is on call, the team's load and a few indicators (open, breached SLA, resolved today, streak without a breached SLA).
-- **Ticket detail**, with four tabs:
-  - **Ticket:** the customer's message and context.
-  - **Responder:** self-assign, escalate to level 2 (N2), write the answer and resolve.
-  - **✦ Preguntar a Ric:** ask the Data Agent about the ticket or the customer; the answer can be copied into the reply.
-  - **Historial:** every assignment, escalation, reply and resolution.
-- **Manual del sótano:** an in-app guide with the vocabulary (N1/N2, SLA…), the workflow and the keyboard shortcuts.
+## The basement in 30 seconds
+
+1. **A ticket arrives.** It shows up on the board with its priority, channel and SLA countdown. If something is on fire, you will see it burn.
+2. **Ping diagnoses it.** Ping is the intern who never sleeps: it suggests who should take the ticket and estimates how likely it is to be layer 8.
+3. **Take it or escalate it.** One click and it is yours, or it goes to N2 ("people with more coffee").
+4. **Ask Ric.** "Has this customer had this problem before?" Ric queries the ontology and answers in a few seconds.
+5. **Reply and close.** Quick replies included, such as "Is it plugged in?" or "Please don't touch anything else".
+
+![A critical ticket: Ping suggests escalating it to N2 and diagnoses PEBKAC, while the banner monitor burns](docs/images/moss-triage-responder.png)
+
+| ✦ Asking Ric | Manual del sótano (the in-app guide) |
+|---|---|
+| <img src="docs/images/moss-triage-ric.png" width="320" alt="Ric answering inside the app"> | <img src="docs/images/moss-triage-manual.png" width="460" alt="Manual del sótano"> |
+
+## Geek glossary
+
+The interface is **in Spanish only** (it is a demo for a Spanish-speaking audience, an exception to the bilingual rule in [conventions.md](../../docs/conventions.md)), so here is what the basement slang means. It is all explained in the in-app **Manual del sótano** (press `?`).
+
+| Term | Meaning |
+|---|---|
+| **PING>** | Ping's console. Ping is the intern: it suggests who to assign and diagnoses the problem. |
+| **Capa 8** (layer 8) | The OSI model has 7 layers. The eighth is the person in front of the screen. |
+| **PEBKAC** | *Problem Exists Between Keyboard And Chair.* |
+| **PICNIC** | *Problem In Chair, Not In Computer.* So you don't repeat yourself. |
+| **Error ID-10T** | Looks like an error code. Write it without the dash. |
+| **Nivel de café** (coffee level) | Your energy: it drops 12% with every ticket you take. Below 25%, refill. |
+| **Racha sin SLA roto** (streak) | Days in a row without a breached SLA. Don't break it on your shift. |
+| **N1 / N2** | First line / people with more coffee and more context. |
+
+**Keyboard shortcuts:** `J`/`K` next/previous · `Enter` open · `A` assign to me · `E` escalate to N2 · `R` resolved · `/` search · `?` help.
 
 ## How it works
 
@@ -27,22 +49,23 @@ The interface is **in Spanish only**: it is a demo for a Spanish-speaking audien
 |---|---|---|
 | Read tickets, customers and team | `ricsupport` connector (`fabric-sqlanalytics`) → SQL analytics endpoint of the Lakehouse, read only | The app |
 | Assign, escalate, reply, resolve | Rayfin data service → app database (`TicketAssignment`, `TicketEvent`) | The signed-in user |
-| Ask Ric | Rayfin Function `askRic` → MCP endpoint of the published Data Agent → ontology → Lakehouse | The app (the item owner) |
+| ✦ Ask Ric | Rayfin Function `askRic` → MCP endpoint of the published Data Agent → Fabric IQ ontology → Lakehouse | The app (the item owner) |
 
-The Lakehouse is never written to: the workflow state lives in the app's own database.
-
-`askRic` runs on the server: it reads the MCP endpoint from the `RIC_DATA_AGENT_MCP_URL` secret, gets a Fabric token with `ctx.Tokens.Fabric` and calls the agent over MCP (`initialize` → `tools/list` → `tools/call`). Answers usually take 15–20 seconds.
+- **The app never writes to the Lakehouse:** the workflow state lives in its own database.
+- **Ric is not called from the browser.** `askRic` runs on the server: it reads the endpoint from the `RIC_DATA_AGENT_MCP_URL` secret, gets a token with `ctx.Tokens.Fabric` and talks MCP to the agent (`initialize` → `tools/list` → `tools/call`). It takes 15–20 seconds, and the app's console counts them meanwhile.
 
 > **Security note.** The app identity is the owner of the Fabric App item, so Ric answers with the owner's permissions. That is fine for a demo. For real use, give the app a dedicated identity with least privilege, and decide in the Function which agent each user may call.
+
+Ping, the pixel avatars and all the data are original and fictional.
 
 ## Requirements
 
 - Everything in the [root README](../../README.md#common-requirements).
-- A Lakehouse with three tables: `tickets`, `customers` and `support_team`. The columns the app expects are in [`rayfin/connectors/ricsupport/schema.ts`](rayfin/connectors/ricsupport/schema.ts). The data in the demo is generated by a notebook that is not part of this repository.
+- A Lakehouse with three tables: `tickets`, `customers` and `support_team`. The columns the app expects are in [`rayfin/connectors/ricsupport/schema.ts`](rayfin/connectors/ricsupport/schema.ts). The demo data is generated by a notebook that is not part of this repository.
 - A **published** Fabric Data Agent over that data (in the demo, on top of a Fabric IQ ontology), with its MCP endpoint (agent → *Settings* → *Model Context Protocol*).
 - A paid Fabric capacity (Data Agents do not run on trial capacities).
 
-## Setup
+## Run it
 
 Run every command from `apps/moss-triage`.
 
@@ -61,7 +84,7 @@ Run every command from `apps/moss-triage`.
 
 3. Set the secret with the agent's MCP endpoint, for local and for the published app (Fabricator → *Code* → *Secrets*, or `npx.cmd rayfin secret set RIC_DATA_AGENT_MCP_URL`). Locally, Rayfin Functions read it from `packages/functions/local.settings.json`, which is also ignored by Git.
 
-4. Run it:
+4. Start it:
 
    ```powershell
    npm.cmd run dev
@@ -77,4 +100,8 @@ npx.cmd rayfin up
 
 ## Lessons learned
 
-The gotchas from this app are in [docs/lessons-learned.md](../../docs/lessons-learned.md#9-moss-triage-fabricator-and-a-data-agent-in-an-app).
+What we learned on the way (Fabricator committing on its own, the blank preview, the SQL endpoint sneaking into the repo…) is in [docs/lessons-learned.md](../../docs/lessons-learned.md#9-moss-triage-fabricator-and-a-data-agent-in-an-app).
+
+---
+
+*If it's not layer 8, escalate to N2. If it's on fire: extinguisher, then tell N2.* 🧯
